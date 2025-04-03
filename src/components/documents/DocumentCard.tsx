@@ -19,7 +19,7 @@ const DocumentCard = ({
   return (
     <div
       onClick={() => router.push("/reader/" + documentId)}
-      className="flex w-full min-w-[500px] max-w-[500px] cursor-pointer items-center justify-between border-b border-gray-border bg-border p-3"
+      className="flex w-full min-w-[450px] max-w-[550px] cursor-pointer items-center justify-between border-gray-border bg-border p-3"
     >
       <div className="flex items-start gap-3">
         <iframe

@@ -37,16 +37,20 @@ const trimContent = (content: string) => {
 
   htmlContent.querySelector("#sidebar")!.remove();
 
+  //Remove all js codes
   htmlContent.querySelectorAll("script").forEach((script) => {
     script.remove();
   });
 
+  //Replace span element with thier text
+  // htmlContent.querySelectorAll("span").forEach((span) => {
+  //   span.replaceWith(span.textContent as string);
+  // });
+
   const pageContainer =
     htmlContent.querySelector<HTMLDivElement>("#page-container")!;
   pageContainer.style.backgroundImage = "none";
-  pageContainer.style.backgroundColor = "black";
-
-  // Fix weird behavior when selecting text
+  pageContainer.style.backgroundColor = "transparent";
 
   return htmlContent.innerHTML;
 };

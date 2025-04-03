@@ -7,15 +7,27 @@ import "./src/env.js";
 /** @type {import("next").NextConfig} */
 const config = {
   experimental: {
-    turbo: {
-      resolveAlias: {
-        canvas: "./empty-module.ts",
-      },
-    },
+    // turbo: {
+    //   resolveAlias: {
+    //     canvas: "./empty-module.ts",
+    //   },
+    // },
+    //esmExternals: "loose",
     serverActions: {
       bodySizeLimit: "3mb",
     },
   },
+  // webpack: (config) => {
+  //   config.resolve.alias = {
+  //     ...config.resolve.alias,
+  //     "pdfjs-dist": "pdfjs-dist/legacy/build/pdf",
+  //   };
+  //   return config;
+  // },
+  // webpack: (config) => {
+  //   config.externals = [...config.externals, { canvas: "canvas" }]; // required for the canvas to work
+  //   return config;
+  // },
 };
 
 export default config;
