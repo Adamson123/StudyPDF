@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --total-scale-factor: 1;
+}
+
 @font-face {
   font-family: poppins;
   src: url("../font/poppins.woff2");
@@ -11,26 +15,17 @@ body {
   font-family: poppins;
 }
 
-.pc {
-  line-height: normal !important; /* Ensure proper spacing */
-  display: block; /* Prevent inline block collapsing */
-}
+/* .textLayer br {
+  pointer-events: none;
+} */
+/* .textLayer span {
+  display: inline;
+  white-space: pre;
+  user-select: text;
+} */
 
-.pc span {
-  display: inline !important;
-  position: relative !important; /* Avoid absolute messing up flow */
-  vertical-align: baseline !important; /* Keep text on the same line */
-  user-select: text !important;
-}
-
-.pc div {
-  overflow: hidden; /* Prevent selection from jumping to other lines */
-}
-
-/* .t {
-  padding-bottom: 40px;
-  margin-bottom: -10px;
-  padding-right: 0px;
+/* .textLayer br {
+  user-select: text;
 } */
 
 /* --gray-border: 82 88 102 / var(--tw-text-opacity, 0.3); */
