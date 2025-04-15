@@ -3,16 +3,17 @@ import * as pdfJS from "pdfjs-dist";
 export const renderPDFToCanvas = (
   pageDocument: pdfJS.PDFPageProxy,
   canvas: HTMLCanvasElement,
+  viewport: pdfJS.PageViewport,
 ): Promise<HTMLCanvasElement> => {
   return new Promise((resolve, reject) => {
+    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+
     pageDocument
       .render({
-        canvasContext: canvas.getContext("2d") as CanvasRenderingContext2D,
-        viewport: pageDocument.getViewport({ scale: 1 }),
+        canvasContext: context,
+        viewport: viewport,
       })
-      .promise.then(function () {
-        resolve(canvas);
-      })
+      .promise.then(() => resolve(canvas))
       .catch((error) => reject(error));
   });
 };

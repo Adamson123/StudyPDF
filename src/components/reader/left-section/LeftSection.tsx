@@ -1,9 +1,11 @@
-import { Circle } from "lucide-react";
+import { Square } from "lucide-react";
 import PageCard from "./PageCard";
 
-const LeftSection = () => {
+const LeftSection = ({ showLeftSection }: { showLeftSection: boolean }) => {
   return (
-    <section className="fixed bottom-0 left-0 top-0 z-40 w-[350px] bg-background px-4 pt-24 shadow-[4px_0px_3px_rgba(0,0,0,0.3)]">
+    <section
+      className={`fixed bottom-0 left-0 top-0 z-40 w-[350px] bg-background px-4 pt-24 shadow-[4px_0px_3px_rgba(0,0,0,0.3)] transition-all ${showLeftSection ? "translate-x-0" : "-translate-x-full"}`}
+    >
       {/* First section */}
       <div className="flex flex-col gap-5">
         {/*  */}
@@ -12,7 +14,7 @@ const LeftSection = () => {
           {/* Bookmarked only */}
           <div className="flex items-center gap-1 text-[10px]">
             <label htmlFor="bkOnly"> bookmarked</label>
-            <Circle className="h-5 w-5 stroke-primary" id="bkOnly" />
+            <Square className="h-5 w-5 stroke-primary" id="bkOnly" />
           </div>
         </div>
 

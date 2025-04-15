@@ -1,4 +1,9 @@
-import { Bookmark, FileText, MessageCircleQuestion } from "lucide-react";
+import {
+  Bookmark,
+  Expand,
+  FileText,
+  MessageCircleQuestion,
+} from "lucide-react";
 
 const PageCard = () => {
   return (
@@ -11,18 +16,9 @@ const PageCard = () => {
       <p className="w-full text-sm">No summary...</p>
       {/*  */}
       <div className="flex items-center gap-3">
-        <FileText
-          strokeWidth={"1"}
-          className="h-6 w-6 fill-green-400/10 stroke-green-400"
-        />
-        <Bookmark
-          strokeWidth={"1"}
-          className="h-6 w-6 fill-sky-400/10 stroke-sky-400"
-        />
-        <MessageCircleQuestion
-          strokeWidth={"2"}
-          className="stroke-red-60000 h-6 w-6 cursor-pointer fill-red-400 stroke-red-600"
-        />
+        <Expand className="h-5 w-5 fill-green-400/10 stroke-green-400" />
+        <Bookmark className="h-5 w-6 fill-sky-400/10 stroke-sky-400" />
+        <MessageCircleQuestion className="stroke-red-60000 h-5 w-6 cursor-pointer fill-red-400/10 stroke-red-600" />
       </div>
     </div>
   );
