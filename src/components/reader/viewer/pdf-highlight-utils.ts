@@ -4,7 +4,6 @@ export const getHighlight = (html: string, comment: string) => {
   highlight.style.position = "absolute";
   highlight.innerHTML = html;
   highlight.classList.add("alertComment");
-  highlight.dataset.comment = comment;
   highlight.style.cursor = "pointer";
   highlight.style.paddingLeft = "1px";
   highlight.style.paddingRight = "1px";
@@ -14,22 +13,23 @@ export const getHighlight = (html: string, comment: string) => {
     span.remove();
   });
 
-  highlight.onclick = (event: Event) => {
-    event.stopImmediatePropagation();
-    alert(highlight.dataset.comment);
-  };
   return highlight;
 };
 
 export const highlightMultilineSelection = (
   selectedSpans: NodeListOf<HTMLSpanElement>,
+  selectionClass: string,
   comment = "",
-  parent: HTMLDivElement,
+  pdfsContainer: HTMLDivElement,
 ) => {
   selectedSpans.forEach((span, index) => {
-    const spanInDom = document.querySelector("#" + span.id)!;
+    if (!span.id) return;
+    const spanInDom = pdfsContainer.querySelector("#" + span.id)!;
     if (spanInDom && spanInDom.textContent) {
       const highlight = getHighlight(span.innerHTML, comment);
+      highlight.classList.add(selectionClass);
+      highlight.style.paddingLeft = "3px";
+      highlight.style.paddingRight = "3px";
 
       if (index === 0) {
         highlight.style.right = "0";

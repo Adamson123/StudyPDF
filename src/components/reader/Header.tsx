@@ -1,20 +1,20 @@
 import {
-  Hash,
-  PanelLeftClose,
   MessageSquareText,
-  MoreVertical,
   Search,
-  Square,
-  PanelLeft,
   Minus,
   Plus,
   PanelLeftDashed,
-  ChevronRight,
   ChevronsRight,
   Star,
   SquareDashed,
 } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import {
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import Input from "../ui/input";
 
 const Header = ({
@@ -23,15 +23,99 @@ const Header = ({
   incrementScale,
   decrementScale,
   numOfPages,
+  pdfsContainer,
 }: {
   setShowLeftSection: Dispatch<SetStateAction<boolean>>;
   showLeftSection: boolean;
   incrementScale: () => void;
   decrementScale: () => void;
   numOfPages: number;
+  pdfsContainer: RefObject<HTMLDivElement>;
 }) => {
+  const [pageNum, setPageNum] = useState("1");
+  const [onPageNumInput, setOnPageNumInput] = useState(false);
+
+  const handlePageNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOnPageNumInput(true);
+    const value = e.target.value;
+
+    if (Number(value) <= numOfPages) {
+      setPageNum(value);
+      const page = pdfsContainer.current?.querySelector(
+        `#pdfContainer-${value}`,
+      ) as HTMLDivElement;
+      if (!page) return;
+      // Scroll to the page
+      page.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
+    }
+
+    //setPageNum(value);
+  };
+  useEffect(() => {
+    const updatePagNumOnScroll = () => {
+      if (onPageNumInput) return;
+      const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
+      const pages = pdfsContainerElement.querySelectorAll(".pdfContainer");
+      if (!pages.length) return;
+
+      let currentPageNum = 1;
+
+      interface PagePos {
+        index: number;
+        top: number;
+        bottom: number;
+      }
+
+      const pagePos: PagePos[] = [];
+
+      pages.forEach((page, index) => {
+        const rect = page.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          currentPageNum = index + 1;
+
+          pagePos.push({
+            index: currentPageNum,
+            bottom: rect.bottom,
+            top: rect.top,
+          });
+          return;
+        }
+      });
+
+      if (pagePos.length > 1) {
+        const firstPage = pagePos[0] as PagePos;
+        const secondPage = pagePos[1] as PagePos;
+
+        const remainOfFirstInView = firstPage.bottom;
+        const remainOfSecondInView = window.innerHeight - secondPage.top;
+
+        if (remainOfFirstInView > remainOfSecondInView) {
+          currentPageNum = firstPage.index;
+        } else {
+          currentPageNum = secondPage.index;
+        }
+      }
+
+      setPageNum(currentPageNum.toString());
+    };
+
+    const updatePagNumOnScrollEnd = () => {
+      setOnPageNumInput(false);
+    };
+
+    window.addEventListener("scroll", updatePagNumOnScroll);
+    window.addEventListener("scrollend", updatePagNumOnScrollEnd);
+    return () => {
+      window.removeEventListener("scroll", updatePagNumOnScroll);
+      window.removeEventListener("scrollend", updatePagNumOnScrollEnd);
+    };
+  }, [onPageNumInput]);
+
   return (
-    <div className="fixed left-0 right-0 top-0 z-50 flex w-full items-center justify-between gap-3 bg-background px-3 py-[7px] shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
+    <div className="fixed left-0 right-0 top-0 z-[100000] flex w-full items-center justify-between gap-3 bg-background px-3 py-[7px] shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
       <div className="flex items-center gap-3">
         {/* Left section toggle */}
         <PanelLeftDashed
@@ -42,8 +126,13 @@ const Header = ({
 
         <div className="flex h-7 items-center gap-2 border-l border-gray-border pl-3">
           <Search className="h-[18px] w-[18px]" />{" "}
-          <Input type="number" className="h-8 w-10 bg-gray-100/5" />/
-          {numOfPages}
+          <Input
+            value={pageNum}
+            onChange={handlePageNumChange}
+            type="number"
+            className="text-md h-8 w-10 bg-gray-100/5"
+          />
+          /{numOfPages}
         </div>
       </div>
       {/* Middle section */}

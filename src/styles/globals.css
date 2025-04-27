@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --total-scale-factor: 0.8;
+  --total-scale-factor: 1;
 }
 
 @font-face {
