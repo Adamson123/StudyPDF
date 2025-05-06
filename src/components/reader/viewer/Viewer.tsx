@@ -12,7 +12,7 @@ import AddComment from "./comment/AddComment";
 import Comment from "./comment/Comment";
 import { Message } from "./Message";
 import HighlightMenu from "./HighlightMenu";
-import useDrawRectangle from "./useDrawRectangle";
+import useDrawSelectionBox from "./hooks/useDrawSelectionBox";
 
 export type CommentType = { text: string; class: string };
 
@@ -28,12 +28,13 @@ const Viewer = () => {
   const [comment, setComment] = useState<CommentType>({ text: "", class: "" });
   const [message, setMessage] = useState("");
   const [highlightClass, setHighlightClass] = useState("");
-  const handleMouse = useDrawRectangle(pdfsContainer, scale);
+  const [selectionBoxMode, setSelectionBoxMode] = useState(false);
+  const [pdfURL, setPdfURL] = useState(window.location.origin + "/Split.pdf");
+  const handleMouse = useDrawSelectionBox(pdfsContainer, selectionBoxMode);
 
   useEffect(() => {
     (async () => {
-      const url = window.location.origin + "/Split.pdf";
-      const pdfDocument = await getPDFDocument(url);
+      const pdfDocument = await getPDFDocument(pdfURL);
 
       const pdfPages: PDFPage[] = [];
       for (let index = 1; index <= pdfDocument.numPages; index++) {
@@ -47,6 +48,9 @@ const Viewer = () => {
       }
       setLoading(false);
 
+      const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
+
+      if (pdfsContainerElement) pdfsContainerElement.innerHTML = ""; // Clear the container before appending new pages
       pdfPages.forEach((pdfPage) => {
         if (
           pdfsContainer.current?.querySelectorAll(".pdfContainer").length !==
@@ -57,7 +61,7 @@ const Viewer = () => {
       });
       setPdfPages(pdfPages);
     })();
-  }, []);
+  }, [pdfURL]);
 
   const updateScale = async (scale: number) => {
     setScale(scale);
@@ -113,6 +117,9 @@ const Viewer = () => {
         decrementScale={decrementScale}
         numOfPages={pdfPages.length}
         pdfsContainer={pdfsContainer}
+        setSelectionBoxMode={setSelectionBoxMode}
+        setPdfURL={setPdfURL}
+        setMessage={setMessage}
       />
       {/* Add Optimization */}
       <LeftSection showLeftSection={showLeftSection} />

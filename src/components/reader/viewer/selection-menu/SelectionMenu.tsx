@@ -5,12 +5,15 @@ import {
   Paintbrush,
   Underline,
 } from "lucide-react";
-import { Dispatch, RefObject, SetStateAction, useEffect, useRef } from "react";
 import {
-  copyToClipboard,
-  generateClass,
-  highlightSelection,
-} from "./selecton-menu-utils";
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
+import { copyToClipboard, generateClass } from "./selecton-menu-utils";
 
 const SelectionMenu = ({
   pdfsContainer,
@@ -26,98 +29,18 @@ const SelectionMenu = ({
   const selectionMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let start: { y: number; scrollY: number } = { y: 0, scrollY: 0 };
-    const handleSelectStart = () => {
-      const selection = window.getSelection();
-      if (selection?.rangeCount === 0 || !selection) return;
-
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      start = { y: rect.top, scrollY: window.scrollY };
-    };
-
-    const updateSelectionMenuPos = (rect: DOMRect, range: Range, width = 0) => {
-      const pdfsContainerRect = (
-        pdfsContainer.current as HTMLDivElement
-      ).getBoundingClientRect();
-
+    const updateSelectionMenuPos = (range: Range) => {
       const selectionMenu = selectionMenuRef.current as HTMLDivElement;
-      //const selectionMenuRect = selectionMenu.getBoundingClientRect();
-      const selectionMenuRectHeight = 221;
-      const selectionMenuRectWidth = 176;
-
-      let shiftRight = 0;
-      if (rect.right + selectionMenuRectWidth > window.innerWidth) {
-        shiftRight = window.innerWidth - selectionMenuRectWidth - 50;
-      }
-
-      const switchVertical =
-        rect.top + selectionMenuRectHeight + 20 > window.innerHeight;
-
-      const parentRight = pdfsContainerRect.right;
-      const left = window.innerWidth - parentRight;
-
       if (pdfsContainer.current?.contains(range?.commonAncestorContainer))
         selectionMenu.style.display = "flex";
     };
-    //
-    //   selectionMenu.style.left = shiftRight
-    //     ? shiftRight + "px"
-    //     : rect.left - left + width + window.scrollX + "px";
-    //   //
-    //   selectionMenu.style.top = switchVertical
-    //     ? start.y + window.scrollY - selectionMenuRectHeight - 70 + "px"
-    //     : rect.top + window.scrollY - 20 + "px";
-    // };
 
     const getSelectionInfo = () => {
       const selection = window.getSelection() as Selection;
-
       if (selection?.toString().length) {
         const range = selection.getRangeAt(0).cloneRange();
         range.collapse(false);
         return { rect: range.getBoundingClientRect(), range };
-      }
-    };
-
-    const updatePosAfterCollapse = () => {
-      const selection = window.getSelection();
-      if (selection?.rangeCount === 0 || selection?.isCollapsed) return;
-
-      const range = selection?.getRangeAt(0);
-      if (range) {
-        const container = document.createElement("div");
-        container.appendChild(range.cloneContents());
-
-        const spansWithIds = Array.from(
-          container.querySelectorAll("span")!,
-        ).filter((span) => span.id);
-        const lastSpan = spansWithIds[
-          spansWithIds.length - 1
-        ] as HTMLSpanElement;
-
-        if (!lastSpan) {
-          return;
-        }
-        const rect = (pdfsContainer.current as HTMLDivElement)
-          .querySelector("#" + lastSpan.id)!
-          .getBoundingClientRect();
-
-        updateSelectionMenuPos(rect, range, rect.width);
-      }
-    };
-
-    const handleScroll = () => {
-      const rect = getSelectionInfo()?.rect;
-      if (rect) {
-        const selectionMenu = selectionMenuRef.current as HTMLDivElement;
-        const selectionMenuRect = selectionMenu.getBoundingClientRect();
-        const switchVertical =
-          rect.top + selectionMenuRect.height + 20 > window.innerHeight;
-
-        selectionMenu.style.top = switchVertical
-          ? rect.bottom + window.scrollY - selectionMenuRect.height - 90 + "px"
-          : rect.top + window.scrollY - 20 + "px";
       }
     };
 
@@ -126,39 +49,23 @@ const SelectionMenu = ({
       const selection = getSelectionInfo();
       if (selection) {
         const { rect, range } = selection;
-        updateSelectionMenuPos(rect, range);
-        if (!rect.x && !rect.y) updatePosAfterCollapse();
+        updateSelectionMenuPos(range);
       } else {
-        //TODO:
         selectionMenu.style.display = "none";
       }
     };
 
-    // document.addEventListener("mousedown", handleSelectStart);
-    document.addEventListener("selectstart", handleSelectStart);
     document.addEventListener("selectionchange", handleSelectionChange);
-    // document.addEventListener("scroll", handleScroll);
 
     return () => {
-      // document.removeEventListener("mousedown", handleSelectStart);
       document.removeEventListener("selectionchange", handleSelectionChange);
-      // document.removeEventListener("scroll", handleScroll);
-      document.removeEventListener("selectstart", handleSelectStart);
     };
   }, []);
 
   const handleAddComment = () => {
-    // const selectonClass = textLayerOnMouseUp(
-    //   pdfsContainer.current as HTMLDivElement,
-    // );
-    // if (selectonClass) openAddComment(selectonClass);
     (selectionMenuRef.current as HTMLDivElement).style.display = "none";
     const selectionClass = generateClass("comment");
-    highlightSelection(
-      selectionClass,
-      pdfsContainer.current as HTMLDivElement,
-      "comment",
-    );
+    highlightSelection(selectionClass, "comment");
     openAddComment(selectionClass);
   };
 
@@ -167,12 +74,7 @@ const SelectionMenu = ({
     const onClickFunc = (highlightClass: string) => {
       setHighlightClass(highlightClass);
     };
-    highlightSelection(
-      selectionClass,
-      pdfsContainer.current as HTMLDivElement,
-      "bgColor",
-      onClickFunc,
-    );
+    highlightSelection(selectionClass, "bgColor", onClickFunc);
   };
 
   const handleUnderlineText = () => {
@@ -180,18 +82,108 @@ const SelectionMenu = ({
     const onClickFunc = (highlightClass: string) => {
       setHighlightClass(highlightClass);
     };
-    highlightSelection(
-      selectionClass,
-      pdfsContainer.current as HTMLDivElement,
-      "underline",
-      onClickFunc,
-    );
+    highlightSelection(selectionClass, "underline", onClickFunc);
   };
 
   const handleCopy = () => {
     copyToClipboard();
     setMessage("Text copied");
   };
+
+  const highlightSelection = useCallback(
+    (
+      selectionClass: string,
+      type: "comment" | "bgColor" | "underline",
+      onClickFunc?: (highlightClass: string) => any,
+    ) => {
+      const selection = window.getSelection() as Selection;
+      if (selection?.rangeCount === 0) return;
+
+      const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
+      const range = selection.getRangeAt(0);
+      const rects = range.getClientRects();
+      const startY = pdfsContainerElement.getBoundingClientRect().top;
+      const startX = pdfsContainerElement.getBoundingClientRect().left;
+
+      let highestTop;
+      let count = 0;
+      for (const rect of rects) {
+        const left = rect.left - startX;
+        const top = rect.top - startY;
+
+        if (!rect.width) {
+          continue;
+        }
+        highestTop = rect.top;
+        const highlight = document.createElement("span");
+
+        highlight.style.position = "absolute";
+        highlight.style.left = `${left}px`;
+        highlight.style.top = `${top}px`;
+        highlight.style.width = `${rect.width}px`;
+        highlight.style.height = `${rect.height}px`;
+        //highlight.style.border = "1px solid red";
+        highlight.style.opacity = "0.5";
+        highlight.classList.add(type, selectionClass);
+        highlight.style.cursor = "pointer";
+        highlight.style.padding = "6px 6px";
+        highlight.style.transform = "translateY(-10%)";
+        if (type === "comment" || type === "bgColor") {
+          highlight.style.backgroundColor = "rgba(255,0,0,0.7)";
+        } else {
+          highlight.style.borderBottom = "2px solid red";
+        }
+        if (type === "bgColor" || type === "underline") {
+          //  highlight.style.pointerEvents = "none";
+        }
+
+        count++;
+
+        //TODO: Change border in HighlightMenu instead of here
+        if (onClickFunc) {
+          const hClass = highlight.classList.value.split(" ") as string[];
+          highlight.onclick = (event) => {
+            event.stopImmediatePropagation();
+            pdfsContainerElement
+              .querySelectorAll<HTMLSpanElement>("." + hClass[0])!
+              .forEach((highlight) => {
+                const borderValue = "0px solid green";
+                if (type === "bgColor") {
+                  highlight.style.border = borderValue;
+                } else {
+                  highlight.style.borderTop = borderValue;
+                  highlight.style.borderRight = borderValue;
+                  highlight.style.borderLeft = borderValue;
+                }
+              });
+
+            const highlights =
+              pdfsContainerElement.querySelectorAll<HTMLSpanElement>(
+                "." + hClass[1],
+              )!;
+
+            highlights.forEach((highlight, i) => {
+              const borderValue = "2px solid green";
+              if (type === "bgColor") {
+                highlight.style.border = borderValue;
+              } else {
+                highlight.style.borderTop = borderValue;
+                highlight.style.borderRight = borderValue;
+                highlight.style.borderLeft = borderValue;
+                highlight.style.borderBottom = "2px solid red";
+              }
+            });
+            onClickFunc(hClass[1] as string);
+          };
+        }
+
+        pdfsContainerElement.appendChild(highlight);
+      }
+      selection.removeAllRanges();
+      console.log("rects", rects);
+    },
+    [],
+  );
 
   return (
     <div

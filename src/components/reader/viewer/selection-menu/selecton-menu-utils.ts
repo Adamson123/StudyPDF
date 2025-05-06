@@ -102,6 +102,7 @@ export const copyToClipboard = () => {
 // };
 
 //Try to use use getClientRects to get the selection range then create a svg element from it instead of append a span element to the range we want to append a svg element to the range
+//TODO : Remove this !!!!!!!
 export const highlightSelection = (
   selectionClass: string,
   pdfsContainer: HTMLDivElement,

@@ -36,7 +36,11 @@ const HighlightMenu = ({
     if (type === "bgColor") {
       setHighlightColor(firstHighlight.style.backgroundColor);
     } else {
+      //TODO: Fix bug of red always, we will use dataset next time
       setHighlightColor(firstHighlight.style.borderBottomColor);
+      firstHighlight.style.borderBottomColor =
+        firstHighlight.style.borderBottomColor;
+      console.log(firstHighlight.style.borderBottomColor);
     }
 
     const lastHighlight = highlights[highlights.length - 1] as HTMLSpanElement;
@@ -103,6 +107,7 @@ const HighlightMenu = ({
         highlight.style.borderBottomColor = color;
       }
     });
+
     setHighlightColor(color);
   };
 
