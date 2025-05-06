@@ -29,11 +29,12 @@ const Viewer = () => {
   const [message, setMessage] = useState("");
   const [highlightClass, setHighlightClass] = useState("");
   const [selectionBoxMode, setSelectionBoxMode] = useState(false);
-  const [pdfURL, setPdfURL] = useState(window.location.origin + "/Split.pdf");
+
   const handleMouse = useDrawSelectionBox(pdfsContainer, selectionBoxMode);
 
   useEffect(() => {
     (async () => {
+      const pdfURL = window.location.origin + "/Split.pdf";
       const pdfDocument = await getPDFDocument(pdfURL);
 
       const pdfPages: PDFPage[] = [];
@@ -61,7 +62,7 @@ const Viewer = () => {
       });
       setPdfPages(pdfPages);
     })();
-  }, [pdfURL]);
+  }, []);
 
   const updateScale = async (scale: number) => {
     setScale(scale);
@@ -118,8 +119,6 @@ const Viewer = () => {
         numOfPages={pdfPages.length}
         pdfsContainer={pdfsContainer}
         setSelectionBoxMode={setSelectionBoxMode}
-        setPdfURL={setPdfURL}
-        setMessage={setMessage}
       />
       {/* Add Optimization */}
       <LeftSection showLeftSection={showLeftSection} />
