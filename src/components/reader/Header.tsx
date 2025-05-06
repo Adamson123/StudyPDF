@@ -24,6 +24,9 @@ const Header = ({
   decrementScale,
   numOfPages,
   pdfsContainer,
+  setSelectionBoxMode,
+  setPdfURL,
+  setMessage,
 }: {
   setShowLeftSection: Dispatch<SetStateAction<boolean>>;
   showLeftSection: boolean;
@@ -31,6 +34,9 @@ const Header = ({
   decrementScale: () => void;
   numOfPages: number;
   pdfsContainer: RefObject<HTMLDivElement>;
+  setSelectionBoxMode: Dispatch<SetStateAction<boolean>>;
+  setPdfURL: Dispatch<SetStateAction<string>>;
+  setMessage: Dispatch<SetStateAction<string>>;
 }) => {
   const [pageNum, setPageNum] = useState("1");
   const [onPageNumInput, setOnPageNumInput] = useState(false);
@@ -114,6 +120,15 @@ const Header = ({
     };
   }, [onPageNumInput]);
 
+  const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const fileURL = URL.createObjectURL(file);
+    setPdfURL(fileURL);
+    setMessage("Loading PDF...");
+    setPageNum("1");
+  };
+
   return (
     <div className="fixed left-0 right-0 top-0 z-[100000] flex w-full items-center justify-between gap-3 bg-background px-3 py-[7px] shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
       <div className="flex items-center gap-3">
@@ -157,10 +172,22 @@ const Header = ({
           <Square className="h-5 w-5" />
           <Hash className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2" />
         </div> */}
-        <SquareDashed className="h-[18px] w-[18px]" />
+        <SquareDashed
+          onClick={() => setSelectionBoxMode((prev) => !prev)}
+          className="h-[18px] w-[18px]"
+        />
         <Star className="h-[18px] w-[18px]" />
-        {/* Info Icon */}
         <MessageSquareText className="h-[18px] w-[18px]" />
+        <div className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-gray-border bg-gray-border">
+          <Plus className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
+          <Input
+            onChange={handlePdfSelection}
+            type="file"
+            accept="application/pdf"
+            className="h-full w-full cursor-pointer opacity-0"
+          />
+        </div>
+
         <ChevronsRight className="h-6 w-6" />
       </div>
     </div>

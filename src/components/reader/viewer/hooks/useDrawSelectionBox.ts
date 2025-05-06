@@ -1,8 +1,11 @@
 "use client";
 import { MouseEvent, RefObject, useEffect, useState } from "react";
-import { generateClass } from "./selection-menu/selecton-menu-utils";
+import { generateClass } from "../selection-menu/selecton-menu-utils";
 
-const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
+const useDrawRectangle = (
+  divRef: RefObject<HTMLDivElement>,
+  selectionBoxMode: boolean,
+) => {
   useEffect(() => {
     const pdfsContainer = divRef.current as HTMLDivElement;
     if (!pdfsContainer) return;
@@ -11,23 +14,51 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
     let pdfPageContainer: HTMLDivElement;
     let pdfPageContainerRect: DOMRect;
 
-    pdfsContainer.querySelectorAll("span").forEach((span) => {
-      span.style.pointerEvents = "none";
-    });
+    if (selectionBoxMode) {
+      pdfsContainer.querySelectorAll("span").forEach((span) => {
+        span.style.pointerEvents = "none";
+      });
+      pdfsContainer.style.userSelect = "none";
+    } else {
+      pdfsContainer.querySelectorAll("span").forEach((span) => {
+        span.style.pointerEvents = "auto";
+      });
+      pdfsContainer.style.userSelect = "initial";
+    }
 
-    const getMousePos = (event: MouseEvent | any) => {
-      const { clientX, clientY } = event;
-
+    const getMousePos = (event: MouseEvent | TouchEvent | any) => {
       //start the y axis of the mouse from pdf container top
-      const mousePosX = Math.round(clientX - pdfPageContainerRect.left);
-      //start the x axis of the mouse from pdf container left
-      const mousePosY = Math.round(clientY - pdfPageContainerRect.top);
+      // const mousePosX = Math.round(clientX - pdfPageContainerRect.left);
+      // //start the x axis of the mouse from pdf container left
+      // const mousePosY = Math.round(clientY - pdfPageContainerRect.top);
+      let mousePosX: number = 0,
+        mousePosY: number = 0;
+      if ("touches" in event && event.touches.length > 0) {
+        const { clientX, clientY } = event.touches[0];
+        mousePosX = Math.round(clientX - pdfPageContainerRect.left) + scrollX;
+        mousePosY = Math.round(clientY - pdfPageContainerRect.top);
+      } else if ("clientX" in event) {
+        const { clientX, clientY } = event;
+        mousePosX = Math.round(clientX - pdfPageContainerRect.left) + scrollX;
+        mousePosY = Math.round(clientY - pdfPageContainerRect.top);
+      }
 
       return { mousePosX, mousePosY };
     };
 
     const handlePdfPageSelection = (event: MouseEvent | any) => {
-      const { clientX, clientY } = event;
+      // const mousePosY = Math.round(clientY - pdfPageContainerRect.top);
+      let clientX = 0,
+        clientY = 0;
+      if ("touches" in event && event.touches.length > 0) {
+        const { clientX: x, clientY: y } = event.touches[0];
+        clientX = x;
+        clientY = y;
+      } else if ("clientX" in event) {
+        const { clientX: x, clientY: y } = event;
+        clientX = x;
+        clientY = y;
+      }
       pdfsContainer
         .querySelectorAll<HTMLDivElement>(".pdfContainer")!
         .forEach((pdfContainer, index) => {
@@ -60,6 +91,8 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
     const selectionBoxStartingSize = 0;
     const extraSize = 0;
 
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
     const resetExpansionState = () => {
       isMouseExpandingRight = false;
       isMouseExpandingLeft = false;
@@ -79,8 +112,13 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
 
       let dragStartX: number;
       let dragStartY: number;
-      newSelectionBox.onmousedown = (event) => {
+
+      const newSelectionBoxTouchDown = (
+        event: MouseEvent | TouchEvent | any,
+      ) => {
+        if (!selectionBoxMode) return;
         event.stopImmediatePropagation();
+        document.body.style.overflowY = "hidden";
         handlePdfPageSelection(event);
         //Set this selection box as the active
         pdfsContainer
@@ -112,8 +150,10 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
         newSelectionBox.style.top = mousePosY - dragStartY + "px";
       };
 
-      newSelectionBox.onmousemove = (event) => {
-        if (!isMouseDownOnSelectionBox) return;
+      const newSelectionBoxTouchMove = (
+        event: MouseEvent | TouchEvent | any,
+      ) => {
+        if (!isMouseDownOnSelectionBox || !selectionBoxMode) return;
         const { mousePosX, mousePosY } = getMousePos(event);
 
         const left = mousePosX - dragStartX;
@@ -145,9 +185,19 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
         isMouseDownOnSelectionBox = false;
         resetExpansionState();
       };
-
-      newSelectionBox.onmouseup = handleMouseLeave;
-      newSelectionBox.onmouseout = handleMouseLeave;
+      if (!isMobile) {
+        // Mouse events for PC
+        newSelectionBox.onmousedown = newSelectionBoxTouchDown;
+        newSelectionBox.onmousemove = newSelectionBoxTouchMove;
+        newSelectionBox.onmouseup = handleMouseLeave;
+        newSelectionBox.onmouseout = handleMouseLeave;
+      } else {
+        // Touch events for Mobile
+        newSelectionBox.ontouchmove = newSelectionBoxTouchMove;
+        newSelectionBox.ontouchstart = newSelectionBoxTouchDown;
+        newSelectionBox.ontouchend = handleMouseLeave;
+        newSelectionBox.ontouchcancel = handleMouseLeave;
+      }
 
       const innerNewSelectionBox = document.createElement("div");
       innerNewSelectionBox.style.position = "relative";
@@ -173,19 +223,21 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
       };
 
       //Right Circle
+
       const selectionBoxToRightCircle = getSelectionBoxCircle("rightCircle");
+
       selectionBoxToRightCircle.style.right = -(size / 2) + "px";
       selectionBoxToRightCircle.style.top = "50%";
       selectionBoxToRightCircle.style.transform = "translateY(-50%)";
 
-      selectionBoxToRightCircle.onmousedown = (event) => {
+      const selectionBoxToRightCircleTouchDown = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingRight = true;
         selectionBoxToExpand = newSelectionBox;
         handlePdfPageSelection(event);
       };
 
-      selectionBoxToRightCircle.onmouseup = (event) => {
+      const selectionBoxToRightCircleTouchUp = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingRight = false;
       };
@@ -196,14 +248,14 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
       selectionBoxToLeftCircle.style.top = "50%";
       selectionBoxToLeftCircle.style.transform = "translateY(-50%)";
 
-      selectionBoxToLeftCircle.onmousedown = (event) => {
+      const selectionBoxToLeftCircleTouchDown = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingLeft = true;
         selectionBoxToExpand = newSelectionBox;
         handlePdfPageSelection(event);
       };
 
-      selectionBoxToLeftCircle.onmouseup = (event) => {
+      const selectionBoxToLeftCircleTouchUp = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingLeft = false;
       };
@@ -214,17 +266,18 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
       selectionBoxToTopCircle.style.left = "50%";
       selectionBoxToTopCircle.style.transform = "translateX(-50%)";
 
-      selectionBoxToTopCircle.onmousedown = (event) => {
+      const selectionBoxToTopCircleTouchDown = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingTop = true;
         selectionBoxToExpand = newSelectionBox;
         handlePdfPageSelection(event);
       };
 
-      selectionBoxToTopCircle.onmouseup = (event) => {
+      const selectionBoxToTopCircleTouchUp = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingTop = false;
       };
+      //
 
       //Bottom Circle
       const selectionBoxToBottomCircle = getSelectionBoxCircle("bottomCircle");
@@ -232,17 +285,59 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
       selectionBoxToBottomCircle.style.left = "50%";
       selectionBoxToBottomCircle.style.transform = "translateX(-50%)";
 
-      selectionBoxToBottomCircle.onmousedown = (event) => {
+      const selectionBoxToBottomCircleTouchDown = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingBottom = true;
         selectionBoxToExpand = newSelectionBox;
         handlePdfPageSelection(event);
       };
 
-      selectionBoxToBottomCircle.onmouseup = (event) => {
+      const selectionBoxToBottomCircleTouchUp = (event: any) => {
         event.stopImmediatePropagation();
         isMouseExpandingBottom = false;
       };
+
+      if (!isMobile) {
+        // For PC
+        // Mouse events
+        // Bottom Circle
+        selectionBoxToBottomCircle.onmousedown =
+          selectionBoxToBottomCircleTouchDown;
+        selectionBoxToBottomCircle.onmouseup =
+          selectionBoxToBottomCircleTouchUp;
+        // Top Circle
+        selectionBoxToTopCircle.onmousedown = selectionBoxToTopCircleTouchDown;
+        selectionBoxToTopCircle.onmouseup = selectionBoxToTopCircleTouchUp;
+        // Left Circle
+        selectionBoxToLeftCircle.onmousedown =
+          selectionBoxToLeftCircleTouchDown;
+        selectionBoxToLeftCircle.onmouseup = selectionBoxToLeftCircleTouchUp;
+        // Right Circle
+        selectionBoxToRightCircle.onmousedown =
+          selectionBoxToRightCircleTouchDown;
+        selectionBoxToRightCircle.onmouseup = selectionBoxToRightCircleTouchUp;
+      } else {
+        // For Mobile
+        // Touch events
+        // Bottom Circle
+        selectionBoxToBottomCircle.ontouchstart =
+          selectionBoxToBottomCircleTouchDown;
+        selectionBoxToBottomCircle.ontouchcancel =
+          selectionBoxToBottomCircleTouchUp;
+        // Top Circle
+        selectionBoxToTopCircle.ontouchstart = selectionBoxToTopCircleTouchDown;
+        selectionBoxToTopCircle.ontouchcancel = selectionBoxToTopCircleTouchUp;
+        // Left Circle
+        selectionBoxToLeftCircle.ontouchstart =
+          selectionBoxToLeftCircleTouchDown;
+        selectionBoxToLeftCircle.ontouchcancel =
+          selectionBoxToLeftCircleTouchUp;
+        // Right Circle
+        selectionBoxToRightCircle.ontouchstart =
+          selectionBoxToRightCircleTouchDown;
+        selectionBoxToRightCircle.ontouchcancel =
+          selectionBoxToRightCircleTouchUp;
+      }
 
       innerNewSelectionBox.appendChild(selectionBoxToRightCircle);
       innerNewSelectionBox.appendChild(selectionBoxToLeftCircle);
@@ -346,7 +441,6 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
 
       //Getting the top of selection box in pdf container
       const top = selectionBoxToExpandRect.top - pdfPageContainerRect.top;
-      console.log(pdfPageContainerRect);
 
       //Getting how far mouse is moving away from the top of selection box
       const deltaY = top - mousePosY;
@@ -421,7 +515,9 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
     };
 
     const handleMouseDown = (event: MouseEvent | any) => {
+      if (!selectionBoxMode) return;
       isMouseDown = true;
+      document.body.style.overflowY = "hidden";
 
       handlePdfPageSelection(event);
 
@@ -440,11 +536,12 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
       selectionBox.style.left = startMouseX + "px";
       selectionBox.style.top = startMouseY + "px";
 
-      pdfsContainer.style.userSelect = "none";
       pdfPageContainer.appendChild(selectionBox);
     };
 
     const handleMouseMove = (event: MouseEvent | any) => {
+      if (!selectionBoxMode) return;
+
       if (isMouseDown) {
         resizeNewSelectionBox(event);
       } else {
@@ -466,9 +563,31 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
       }
     };
 
-    const handleMouseLeave = () => {
-      isMouseDown = false;
+    const getSelectionBoxPartFromCanvas = () => {
+      if (!selectionBox || !pdfPageContainer) return;
 
+      const canvas = pdfPageContainer.querySelector("canvas")!;
+      const tempCanvas = document.createElement("canvas");
+
+      const selectionBoxRect = selectionBox.getBoundingClientRect();
+
+      const { height, width } = selectionBoxRect;
+      tempCanvas.width = width;
+      tempCanvas.height = height;
+
+      const tempCtx = tempCanvas.getContext("2d") as CanvasRenderingContext2D;
+
+      const x = selectionBoxRect.x - pdfPageContainerRect.x;
+      const y = selectionBoxRect.y - pdfPageContainerRect.y;
+      tempCtx.drawImage(canvas, x, y, width, height, 0, 0, width, height);
+
+      //document.body.appendChild(tempCanvas);
+    };
+
+    const handleMouseLeave = () => {
+      if (!selectionBoxMode) return;
+      isMouseDown = false;
+      document.body.style.overflowY = "auto";
       if (!selectionBox) return;
 
       //Make other selection box no active
@@ -491,26 +610,47 @@ const useDrawRectangle = (divRef: RefObject<HTMLDivElement>, scale: number) => {
     };
 
     const handleMouseUp = () => {
+      if (!selectionBoxMode) return;
       resetExpansionState();
+      getSelectionBoxPartFromCanvas();
       handleMouseLeave();
     };
 
     const handleMouseOut = () => {
+      if (!selectionBoxMode) return;
       handleMouseLeave();
     };
 
-    pdfsContainer.addEventListener("mousedown", handleMouseDown);
-    pdfsContainer.addEventListener("mousemove", handleMouseMove);
-    pdfsContainer.addEventListener("mouseup", handleMouseUp);
-    pdfsContainer.addEventListener("mouseout", handleMouseOut);
+    if (!isMobile) {
+      // Mouse events for PC
+      pdfsContainer.addEventListener("mousedown", handleMouseDown);
+      pdfsContainer.addEventListener("mousemove", handleMouseMove);
+      pdfsContainer.addEventListener("mouseup", handleMouseUp);
+      pdfsContainer.addEventListener("mouseout", handleMouseOut);
+    } else {
+      // Touch events for Mobile
+      pdfsContainer.addEventListener("touchstart", handleMouseDown);
+      pdfsContainer.addEventListener("touchmove", handleMouseMove);
+      pdfsContainer.addEventListener("touchcancel", handleMouseUp);
+      pdfsContainer.addEventListener("touchend", handleMouseOut);
+    }
 
     return () => {
-      pdfsContainer.removeEventListener("mousedown", handleMouseDown);
-      pdfsContainer.removeEventListener("mousemove", handleMouseMove);
-      pdfsContainer.removeEventListener("mouseup", handleMouseUp);
-      pdfsContainer.removeEventListener("mouseout", handleMouseOut);
+      if (!isMobile) {
+        // Remove Mouse events for PC
+        pdfsContainer.removeEventListener("mousedown", handleMouseDown);
+        pdfsContainer.removeEventListener("mousemove", handleMouseMove);
+        pdfsContainer.removeEventListener("mouseup", handleMouseUp);
+        pdfsContainer.removeEventListener("mouseout", handleMouseOut);
+      } else {
+        // Remove Touch events for Mobile
+        pdfsContainer.removeEventListener("touchstart", handleMouseDown);
+        pdfsContainer.removeEventListener("touchmove", handleMouseMove);
+        pdfsContainer.removeEventListener("touchcancel", handleMouseUp);
+        pdfsContainer.removeEventListener("touchend", handleMouseOut);
+      }
     };
-  }, [divRef.current, scale]);
+  }, [divRef.current, selectionBoxMode]);
 };
 
 export default useDrawRectangle;
