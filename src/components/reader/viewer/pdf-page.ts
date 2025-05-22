@@ -1,5 +1,5 @@
 import * as pdfJS from "pdfjs-dist";
-import { createPDFPage } from "./pdf-utils";
+import { createPDFPage } from "./utils";
 
 class PDFPage {
   pdfsContainer: HTMLDivElement;
@@ -38,7 +38,8 @@ class PDFPage {
     const pdfPage = await createPDFPage(pdfDocument, this.index);
     const viewport = pdfPage.getViewport({ scale: this.scale });
 
-    // Resize canvas
+    // const resolution = 2; // Set the resolution to 2x
+    // // Resize canvas
     this.pdfCanvas.width = viewport.width;
     this.pdfCanvas.height = viewport.height;
 

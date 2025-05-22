@@ -1,25 +1,31 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
+export type MessageType = {
+  text: string;
+  autoTaminate: boolean;
+};
+
 export const Message = ({
   message,
   setMessage,
 }: {
-  message: string;
-  setMessage: Dispatch<SetStateAction<string>>;
+  message: MessageType;
+  setMessage: Dispatch<SetStateAction<MessageType>>;
 }) => {
   useEffect(() => {
-    if (!message) return;
+    if (!message.text || !message.autoTaminate) return;
+
     const timeoutID = setTimeout(() => {
-      setMessage("");
-    }, 500);
+      setMessage({ text: "", autoTaminate: false });
+    }, 1000);
 
     return () => clearTimeout(timeoutID);
   }, [message]);
   return (
     <div
-      className={`pointer-events-none fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-background p-3 px-5 transition-all duration-75 ${message ? "opacity-100" : "opacity-0"}`}
+      className={`pointer-events-none fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-background p-3 px-5 text-sm transition-all duration-75 ${message.text ? "opacity-100" : "opacity-0"}`}
     >
-      {message}
+      {message.text}
     </div>
   );
 };

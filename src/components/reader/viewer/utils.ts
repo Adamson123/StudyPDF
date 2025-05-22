@@ -48,3 +48,9 @@ export const getPDFDocument = async (
       .catch(reject);
   });
 };
+
+export const generateClass = (
+  type: "comment" | "bgColor" | "underline" | "selectionBox",
+) => {
+  return `${type}-${Math.round(Math.random() * 50000000)}`;
+};

@@ -13,7 +13,25 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { copyToClipboard, generateClass } from "./selecton-menu-utils";
+import { MessageType } from "./Message";
+import { generateClass } from "./utils";
+
+export const copyToClipboard = () => {
+  const selection = window.getSelection() as Selection;
+  if (selection?.rangeCount === 0) return;
+  const range = selection.getRangeAt(0);
+  const text = range.toString();
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      //TODO: will pop up a message after copying
+      console.log("Text copied to clipboard: ", text);
+    })
+    .catch((err) => {
+      console.error("Error copying text: ", err);
+      document.execCommand("copy");
+    });
+};
 
 const SelectionMenu = ({
   pdfsContainer,
@@ -23,7 +41,7 @@ const SelectionMenu = ({
 }: {
   pdfsContainer: RefObject<HTMLDivElement>;
   openAddComment: (id: string) => void;
-  setMessage: Dispatch<SetStateAction<string>>;
+  setMessage: Dispatch<SetStateAction<MessageType>>;
   setHighlightClass: Dispatch<SetStateAction<string>>;
 }) => {
   const selectionMenuRef = useRef<HTMLDivElement>(null);
@@ -31,8 +49,9 @@ const SelectionMenu = ({
   useEffect(() => {
     const updateSelectionMenuPos = (range: Range) => {
       const selectionMenu = selectionMenuRef.current as HTMLDivElement;
-      if (pdfsContainer.current?.contains(range?.commonAncestorContainer))
+      if (pdfsContainer.current?.contains(range?.commonAncestorContainer)) {
         selectionMenu.style.display = "flex";
+      }
     };
 
     const getSelectionInfo = () => {
@@ -51,6 +70,7 @@ const SelectionMenu = ({
         const { rect, range } = selection;
         updateSelectionMenuPos(range);
       } else {
+        //TODO
         selectionMenu.style.display = "none";
       }
     };
@@ -77,17 +97,17 @@ const SelectionMenu = ({
     highlightSelection(selectionClass, "bgColor", onClickFunc);
   };
 
-  const handleUnderlineText = () => {
-    const selectionClass = generateClass("underline");
-    const onClickFunc = (highlightClass: string) => {
-      setHighlightClass(highlightClass);
-    };
-    highlightSelection(selectionClass, "underline", onClickFunc);
-  };
+  // const handleUnderlineText = () => {
+  //   const selectionClass = generateClass("underline");
+  //   const onClickFunc = (highlightClass: string) => {
+  //     setHighlightClass(highlightClass);
+  //   };
+  //   highlightSelection(selectionClass, "underline", onClickFunc);
+  // };
 
   const handleCopy = () => {
     copyToClipboard();
-    setMessage("Text copied");
+    setMessage({ text: "Text copied", autoTaminate: true });
   };
 
   const highlightSelection = useCallback(
@@ -180,7 +200,6 @@ const SelectionMenu = ({
         pdfsContainerElement.appendChild(highlight);
       }
       selection.removeAllRanges();
-      console.log("rects", rects);
     },
     [],
   );
@@ -192,34 +211,34 @@ const SelectionMenu = ({
     >
       <button
         onClick={() => {}}
-        className="flex w-full items-center gap-2 rounded-none border-b bg-transparent p-2.5 hover:bg-gray-100/10"
+        className="flex w-full items-center gap-2 rounded-none border-b bg-transparent p-3 hover:bg-gray-100/10"
       >
         <MessageSquare />
       </button>
       <button
         onClick={handleAddComment}
-        className="flex w-full items-center gap-2 rounded-none bg-transparent p-2.5 hover:bg-gray-100/10"
+        className="flex w-full items-center gap-2 rounded-none bg-transparent p-3 hover:bg-gray-100/10"
       >
         <MessageSquarePlus />
       </button>
       <button
         onClick={handleCopy}
-        className="flex w-full items-center gap-2 rounded-none bg-transparent p-2.5 hover:bg-gray-100/10"
+        className="flex w-full items-center gap-2 rounded-none bg-transparent p-3 hover:bg-gray-100/10"
       >
         <CopyIcon />
       </button>
       <button
         onClick={handleChangeTextBgColor}
-        className="flex w-full items-center gap-2 rounded-none bg-transparent p-2.5 hover:bg-gray-100/10"
+        className="flex w-full items-center gap-2 rounded-none bg-transparent p-3 hover:bg-gray-100/10"
       >
         <Paintbrush />
       </button>
-      <button
+      {/* <button
         onClick={handleUnderlineText}
-        className="flex w-full items-center gap-2 rounded-none bg-transparent p-2.5 hover:bg-gray-100/10"
+        className="flex w-full items-center gap-2 rounded-none bg-transparent p-3 hover:bg-gray-100/10"
       >
         <Underline />
-      </button>
+      </button> */}
     </div>
   );
 };

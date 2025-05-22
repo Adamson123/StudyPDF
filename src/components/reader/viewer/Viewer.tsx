@@ -3,8 +3,8 @@
 import "pdfjs-dist/web/pdf_viewer.css";
 import { useEffect, useRef, useState } from "react";
 import PDFPage from "@/components/reader/viewer/pdf-page";
-import { getPDFDocument } from "./pdf-utils";
-import SelectionMenu from "./selection-menu/SelectionMenu";
+import { getPDFDocument } from "./utils";
+import SelectionMenu from "./SelectionMenu";
 import Header from "../Header";
 import LeftSection from "../left-section/LeftSection";
 import { Loader2 } from "lucide-react";
@@ -12,7 +12,9 @@ import AddComment from "./comment/AddComment";
 import Comment from "./comment/Comment";
 import { Message } from "./Message";
 import HighlightMenu from "./HighlightMenu";
-import useDrawSelectionBox from "./hooks/useDrawSelectionBox";
+import Quiz from "../quiz/Quiz";
+import { MultiChoiceQuestionTypes } from "../quiz/MultiChoiceCard";
+import { FillAnswerCardTypes } from "../quiz/FillAnswerCard";
 
 export type CommentType = { text: string; class: string };
 
@@ -26,11 +28,14 @@ const Viewer = () => {
   const [loading, setLoading] = useState(true);
   const [selectionClass, setSelectionClass] = useState("");
   const [comment, setComment] = useState<CommentType>({ text: "", class: "" });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ text: "", autoTaminate: false });
   const [highlightClass, setHighlightClass] = useState("");
+  //TODO:  Add selection box mode
   const [selectionBoxMode, setSelectionBoxMode] = useState(false);
   const [pdfURL, setPdfURL] = useState(window.location.origin + "/Split.pdf");
-  const handleMouse = useDrawSelectionBox(pdfsContainer, selectionBoxMode);
+  const [questions, setQuestions] = useState<
+    (MultiChoiceQuestionTypes | FillAnswerCardTypes)[]
+  >([]);
 
   useEffect(() => {
     (async () => {
@@ -60,6 +65,10 @@ const Viewer = () => {
         }
       });
       setPdfPages(pdfPages);
+      setMessage({
+        text: "PDF Loaded Successfully",
+        autoTaminate: true,
+      });
     })();
   }, [pdfURL]);
 
@@ -88,25 +97,25 @@ const Viewer = () => {
     //setShowAddComment(true);
     commentInputRef.current?.focus();
   };
-  const closeHighlightMenu = () => {
-    if (!highlightClass) return;
-    const highlights = document.querySelectorAll<HTMLSpanElement>(
-      "." + highlightClass,
-    )!;
+  // const closeHighlightMenu = () => {
+  //   if (!highlightClass) return;
+  //   const highlights = document.querySelectorAll<HTMLSpanElement>(
+  //     "." + highlightClass,
+  //   )!;
 
-    const type = highlights[0]?.classList.value.split(" ")[0];
-    highlights.forEach((highlight) => {
-      const borderValue = "0px solid green";
-      if (type === "bgColor") {
-        highlight.style.border = borderValue;
-      } else {
-        highlight.style.borderTop = borderValue;
-        highlight.style.borderRight = borderValue;
-        highlight.style.borderLeft = borderValue;
-      }
-    });
-    setHighlightClass("");
-  };
+  //   const type = highlights[0]?.classList.value.split(" ")[0];
+  //   highlights.forEach((highlight) => {
+  //     const borderValue = "0px solid green";
+  //     if (type === "bgColor") {
+  //       highlight.style.border = borderValue;
+  //     } else {
+  //       highlight.style.borderTop = borderValue;
+  //       highlight.style.borderRight = borderValue;
+  //       highlight.style.borderLeft = borderValue;
+  //     }
+  //   });
+  //   setHighlightClass("");
+  // };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-12">
@@ -117,9 +126,11 @@ const Viewer = () => {
         decrementScale={decrementScale}
         numOfPages={pdfPages.length}
         pdfsContainer={pdfsContainer}
+        // it will set the selection box mode to true or false
         setSelectionBoxMode={setSelectionBoxMode}
         setPdfURL={setPdfURL}
         setMessage={setMessage}
+        setQuestions={setQuestions}
       />
       {/* Add Optimization */}
       <LeftSection showLeftSection={showLeftSection} />
@@ -129,18 +140,12 @@ const Viewer = () => {
           <Loader2 className="h-7 w-7 animate-spin" />
         </div>
       ) : (
-        <div
-          onClick={closeHighlightMenu}
-          className="relative mt-10 flex flex-col gap-1"
-          ref={pdfsContainer}
-        >
-          <SelectionMenu
-            pdfsContainer={pdfsContainer}
-            openAddComment={openAddComment}
-            setMessage={setMessage}
-            setHighlightClass={setHighlightClass}
-          />
-        </div>
+        // <div
+        //   onClick={closeHighlightMenu}
+        //   className="relative mt-10 flex flex-col gap-3"
+        //   ref={pdfsContainer}
+        // ></div>
+        <div></div>
       )}
       {selectionClass && (
         <AddComment
@@ -164,7 +169,13 @@ const Viewer = () => {
           highlightClass={highlightClass}
         />
       )}
-
+      <SelectionMenu
+        pdfsContainer={pdfsContainer}
+        openAddComment={openAddComment}
+        setMessage={setMessage}
+        setHighlightClass={setHighlightClass}
+      />
+      <Quiz questions={questions} />
       <Message message={message} setMessage={setMessage} />
     </main>
   );
