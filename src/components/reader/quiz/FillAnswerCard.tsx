@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { Stars } from "lucide-react";
-import React, { useRef } from "react";
+import React, { use, useEffect, useRef } from "react";
 import { MultiChoiceQuestionTypes } from "./MultiChoiceCard";
 
 export type FillAnswerCardTypes = {
@@ -9,32 +9,57 @@ export type FillAnswerCardTypes = {
   answer: string[];
   choosenAnswer: string[];
   explanation: string;
+  type: string;
+  isCorrect: false;
 };
 
 const FillAnswerCard = ({
   index,
   numberOfQuestions,
   question: { question, answer, explanation, choosenAnswer },
-  setQuestion,
+  setQuestions,
+  setCurrentQuestion,
 }: {
   question: FillAnswerCardTypes;
   index: number;
   numberOfQuestions: number;
-  setQuestion: React.Dispatch<
+  setQuestions: React.Dispatch<
     React.SetStateAction<(FillAnswerCardTypes | MultiChoiceQuestionTypes)[]>
+  >;
+  setCurrentQuestion: React.Dispatch<
+    React.SetStateAction<FillAnswerCardTypes | MultiChoiceQuestionTypes>
   >;
 }) => {
   const answerInputs = useRef<(HTMLInputElement | null)[]>([]);
 
+  useEffect(() => {
+    const inputs = answerInputs.current;
+    if (inputs.length) {
+      inputs.forEach((input, i) => {
+        console.log("Setting input value", choosenAnswer[i], i);
+        if (input) input!.value = (choosenAnswer[i] as string) || "";
+      });
+    }
+  }, [answer]);
+
   const handleSubmitAnswer = () => {
+    if (choosenAnswer.length) return;
     const pickedAnswers = answerInputs.current.map(
       (answer) => answer?.value.trim() || "",
     );
-
-    setQuestion(
+    const isCorrect = pickedAnswers.every((ans, i) => ans === answer[i]);
+    setCurrentQuestion(
+      (prev) =>
+        ({
+          ...prev,
+          choosenAnswer: pickedAnswers,
+          isCorrect,
+        }) as FillAnswerCardTypes,
+    );
+    setQuestions(
       (prev) =>
         prev.map((q, i) =>
-          i === index ? { ...q, choosenAnswer: pickedAnswers } : q,
+          i === index ? { ...q, choosenAnswer: pickedAnswers, isCorrect } : q,
         ) as (FillAnswerCardTypes | MultiChoiceQuestionTypes)[],
     );
   };
@@ -42,7 +67,7 @@ const FillAnswerCard = ({
   const getAnswerInputIndex = (i: number) => (i + 1) / 2 - 1;
 
   return (
-    <div className="flex min-w-[500px] snap-center flex-col items-start gap-5 rounded-md border border-gray-border p-5">
+    <div className="flex max-w-[600px] snap-center flex-col items-start gap-5 rounded-md border border-gray-border p-5">
       <div className="flex items-center gap-1 rounded-md bg-primary/30 p-2 text-sm">
         <Stars className="h-4 w-4 fill-primary stroke-primary" />
         Question {index + 1} of {numberOfQuestions}
@@ -62,7 +87,7 @@ const FillAnswerCard = ({
                 ref={(el) => {
                   answerInputs.current[getAnswerInputIndex(i)] = el;
                 }}
-                className={`"bg-gray-400/15" inline h-7 w-auto ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)] === answer[getAnswerInputIndex(i)] ? "bg-green-500" : "bg-red-500")}`}
+                className={`"bg-gray-400/15" inline h-7 w-auto ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)] === answer[getAnswerInputIndex(i)] ? "bg-green-500/40" : "bg-red-500/40")}`}
               />{" "}
               &nbsp;
             </span>
@@ -92,11 +117,16 @@ const FillAnswerCard = ({
         ""
       )}
 
-      <div className="w-full border-b pb-5">
-        <Button onClick={handleSubmitAnswer}>Submit Answer</Button>
+      <div className="w-full border-b pb-3">
+        {!choosenAnswer.length && (
+          <Button onClick={handleSubmitAnswer}>Submit Answer</Button>
+        )}
       </div>
+
       {/* Explanation */}
-      <div className="flex w-full flex-col gap-2">
+      <div
+        className={`flex w-full flex-col gap-2 ${choosenAnswer.length ? "" : "blur"}`}
+      >
         <div className="text-md underline">Explanation</div>
         <div className="text-sm font-semibold text-gray-500">{explanation}</div>
       </div>

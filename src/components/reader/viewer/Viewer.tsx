@@ -1,8 +1,8 @@
 "use client";
 
 import "pdfjs-dist/web/pdf_viewer.css";
-import { useEffect, useRef, useState } from "react";
-import PDFPage from "@/components/reader/viewer/pdf-page";
+import { createContext, useEffect, useRef, useState } from "react";
+import PDFPage from "@/components/reader/viewer/pdfPage";
 import { getPDFDocument } from "./utils";
 import SelectionMenu from "./SelectionMenu";
 import Header from "../Header";
@@ -12,9 +12,15 @@ import AddComment from "./comment/AddComment";
 import Comment from "./comment/Comment";
 import { Message } from "./Message";
 import HighlightMenu from "./HighlightMenu";
-import Quiz from "../quiz/Quiz";
 import { MultiChoiceQuestionTypes } from "../quiz/MultiChoiceCard";
 import { FillAnswerCardTypes } from "../quiz/FillAnswerCard";
+import dynamic from "next/dynamic";
+
+const Quiz = dynamic(() => import("../quiz/Quiz"), {
+  ssr: false,
+});
+
+export const ViewerContext = createContext<{ pdfURL: string }>({ pdfURL: "" });
 
 export type CommentType = { text: string; class: string };
 
@@ -36,25 +42,29 @@ const Viewer = () => {
   const [questions, setQuestions] = useState<
     (MultiChoiceQuestionTypes | FillAnswerCardTypes)[]
   >([]);
+  const [openQuiz, setOpenQuiz] = useState(false);
 
   useEffect(() => {
     (async () => {
       const pdfDocument = await getPDFDocument(pdfURL);
 
       const pdfPages: PDFPage[] = [];
+      const renderArray: any[] = [];
       for (let index = 1; index <= pdfDocument.numPages; index++) {
         const pdfPage = new PDFPage(
           index,
           pdfsContainer.current as HTMLDivElement,
         );
-        await pdfPage.render(pdfDocument, scale);
-
+        // await pdfPage.render(pdfDocument, scale);
+        renderArray.push(pdfPage.render(pdfDocument, scale));
         pdfPages.push(pdfPage);
       }
+
+      await Promise.all(renderArray);
+
       setLoading(false);
 
       const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
-
       if (pdfsContainerElement) pdfsContainerElement.innerHTML = ""; // Clear the container before appending new pages
       pdfPages.forEach((pdfPage) => {
         if (
@@ -64,6 +74,7 @@ const Viewer = () => {
           pdfsContainer.current?.appendChild(pdfPage.pdfContainer);
         }
       });
+
       setPdfPages(pdfPages);
       setMessage({
         text: "PDF Loaded Successfully",
@@ -97,87 +108,93 @@ const Viewer = () => {
     //setShowAddComment(true);
     commentInputRef.current?.focus();
   };
-  // const closeHighlightMenu = () => {
-  //   if (!highlightClass) return;
-  //   const highlights = document.querySelectorAll<HTMLSpanElement>(
-  //     "." + highlightClass,
-  //   )!;
+  const closeHighlightMenu = () => {
+    if (!highlightClass) return;
+    const highlights = document.querySelectorAll<HTMLSpanElement>(
+      "." + highlightClass,
+    )!;
 
-  //   const type = highlights[0]?.classList.value.split(" ")[0];
-  //   highlights.forEach((highlight) => {
-  //     const borderValue = "0px solid green";
-  //     if (type === "bgColor") {
-  //       highlight.style.border = borderValue;
-  //     } else {
-  //       highlight.style.borderTop = borderValue;
-  //       highlight.style.borderRight = borderValue;
-  //       highlight.style.borderLeft = borderValue;
-  //     }
-  //   });
-  //   setHighlightClass("");
-  // };
+    const type = highlights[0]?.classList.value.split(" ")[0];
+    highlights.forEach((highlight) => {
+      const borderValue = "0px solid green";
+      if (type === "bgColor") {
+        highlight.style.border = borderValue;
+      } else {
+        highlight.style.borderTop = borderValue;
+        highlight.style.borderRight = borderValue;
+        highlight.style.borderLeft = borderValue;
+      }
+    });
+    setHighlightClass("");
+  };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-12">
-      <Header
-        setShowLeftSection={setShowLeftSection}
-        showLeftSection={showLeftSection}
-        incrementScale={incrementScale}
-        decrementScale={decrementScale}
-        numOfPages={pdfPages.length}
-        pdfsContainer={pdfsContainer}
-        // it will set the selection box mode to true or false
-        setSelectionBoxMode={setSelectionBoxMode}
-        setPdfURL={setPdfURL}
-        setMessage={setMessage}
-        setQuestions={setQuestions}
-      />
-      {/* Add Optimization */}
-      <LeftSection showLeftSection={showLeftSection} />
-      {loading ? (
-        <div className="text-md flex flex-col items-center gap-1">
-          Loading PDF...
-          <Loader2 className="h-7 w-7 animate-spin" />
-        </div>
-      ) : (
-        // <div
-        //   onClick={closeHighlightMenu}
-        //   className="relative mt-10 flex flex-col gap-3"
-        //   ref={pdfsContainer}
-        // ></div>
-        <div></div>
-      )}
-      {selectionClass && (
-        <AddComment
-          selectionClass={selectionClass}
-          setSelectionClass={setSelectionClass}
-          setComment={setComment}
+    <ViewerContext.Provider value={{ pdfURL }}>
+      <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-12">
+        <Header
+          setShowLeftSection={setShowLeftSection}
+          showLeftSection={showLeftSection}
+          incrementScale={incrementScale}
+          decrementScale={decrementScale}
+          numOfPages={pdfPages.length}
           pdfsContainer={pdfsContainer}
+          // it will set the selection box mode to true or false
+          setSelectionBoxMode={setSelectionBoxMode}
+          setPdfURL={setPdfURL}
+          setMessage={setMessage}
+          setQuestions={setQuestions}
+          setOpenQuiz={setOpenQuiz}
         />
-      )}
-      {comment.text && (
-        <Comment
-          comment={comment}
-          setComment={setComment}
+        {/* Add Optimization */}
+        <LeftSection showLeftSection={showLeftSection} />
+        {loading ? (
+          <div className="text-md flex flex-col items-center gap-1">
+            Loading PDF...
+            <Loader2 className="h-7 w-7 animate-spin" />
+          </div>
+        ) : (
+          <div
+            onClick={closeHighlightMenu}
+            className={`relative mt-10 flex flex-col gap-3 ${openQuiz && "hidden"}`}
+            ref={pdfsContainer}
+          ></div>
+        )}
+        {selectionClass && (
+          <AddComment
+            selectionClass={selectionClass}
+            setSelectionClass={setSelectionClass}
+            setComment={setComment}
+            pdfsContainer={pdfsContainer}
+          />
+        )}
+        {comment.text && (
+          <Comment
+            comment={comment}
+            setComment={setComment}
+            pdfsContainer={pdfsContainer}
+          />
+        )}
+        {highlightClass && (
+          <HighlightMenu
+            setHighlightClass={setHighlightClass}
+            pdfsContainer={pdfsContainer}
+            highlightClass={highlightClass}
+          />
+        )}
+        <SelectionMenu
           pdfsContainer={pdfsContainer}
-        />
-      )}
-      {highlightClass && (
-        <HighlightMenu
+          openAddComment={openAddComment}
+          setMessage={setMessage}
           setHighlightClass={setHighlightClass}
-          pdfsContainer={pdfsContainer}
-          highlightClass={highlightClass}
         />
-      )}
-      <SelectionMenu
-        pdfsContainer={pdfsContainer}
-        openAddComment={openAddComment}
-        setMessage={setMessage}
-        setHighlightClass={setHighlightClass}
-      />
-      <Quiz questions={questions} />
-      <Message message={message} setMessage={setMessage} />
-    </main>
+        {openQuiz ? (
+          <Quiz setOpenQuiz={setOpenQuiz} questions={questions} />
+        ) : (
+          ""
+        )}
+        <Message message={message} setMessage={setMessage} />
+      </main>
+    </ViewerContext.Provider>
   );
 };
 

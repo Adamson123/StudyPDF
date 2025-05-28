@@ -8,6 +8,7 @@ export type MultiChoiceQuestionTypes = {
   choosenAnswer: string;
   explanation: string;
   type: string;
+  isCorrect: boolean;
 };
 
 const optionAlp = ["A", "B", "C", "D"];
@@ -16,20 +17,36 @@ const MultiChoiceCard = ({
   question: { question, answer, explanation, options, choosenAnswer },
   index,
   numberOfQuestions,
-  setQuestion,
+  setQuestions,
+  setCurrentQuestion,
 }: {
   question: MultiChoiceQuestionTypes;
   index: number;
   numberOfQuestions: number;
-  setQuestion: React.Dispatch<
+  setQuestions: React.Dispatch<
     React.SetStateAction<(FillAnswerCardTypes | MultiChoiceQuestionTypes)[]>
+  >;
+  setCurrentQuestion: React.Dispatch<
+    React.SetStateAction<FillAnswerCardTypes | MultiChoiceQuestionTypes>
   >;
 }) => {
   const handleOptionClick = (option: string) => {
-    setQuestion(
+    if (choosenAnswer) return;
+    setCurrentQuestion(
+      (prev) =>
+        ({ ...prev, choosenAnswer: option }) as MultiChoiceQuestionTypes,
+    );
+
+    setQuestions(
       (prev) =>
         prev.map((q, i) =>
-          i === index ? { ...q, choosenAnswer: option } : q,
+          i === index
+            ? {
+                ...q,
+                choosenAnswer: option,
+                isCorrect: isCorrect(option),
+              }
+            : q,
         ) as (FillAnswerCardTypes | MultiChoiceQuestionTypes)[],
     );
   };
@@ -46,7 +63,7 @@ const MultiChoiceCard = ({
   };
 
   return (
-    <div className="flex min-w-[500px] snap-center flex-col items-start gap-5 rounded-md border border-gray-border p-5">
+    <div className="flex max-w-[600px] snap-center flex-col items-start gap-5 rounded-md border border-gray-border p-5">
       <div className="flex items-center gap-1 rounded-md bg-primary/30 p-2 text-sm">
         <Stars className="h-4 w-4 fill-primary stroke-primary" />
         Question {index + 1} of {numberOfQuestions}
@@ -59,9 +76,9 @@ const MultiChoiceCard = ({
           <div
             onClick={() => handleOptionClick(optionAlp[i] as string)}
             key={i}
-            className={`flex cursor-pointer items-center gap-2 rounded-md border border-gray-border p-2 text-sm hover:opacity-[0.7] ${choseAnswer(i) && (isCorrect(choosenAnswer === optionAlp[i] ? optionAlp[i] : answer) ? "bg-green-500" : "bg-red-500")}`}
+            className={`flex cursor-pointer items-center gap-2 rounded-md border border-gray-border p-2 text-sm hover:opacity-[0.9] ${choseAnswer(i) && (isCorrect(choosenAnswer === optionAlp[i] ? optionAlp[i] : answer) ? "bg-green-500" : "bg-red-500")}`}
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-border">
+            <span className="flex min-h-6 min-w-6 items-center justify-center rounded-full border border-gray-border">
               {optionAlp[i]}
             </span>
             <span className="text-sm font-semibold">{option}</span>
@@ -69,7 +86,9 @@ const MultiChoiceCard = ({
         ))}
       </div>
       {/* Explanation */}
-      <div className="flex w-full flex-col gap-2">
+      <div
+        className={`flex w-full flex-col gap-2 ${choosenAnswer.length ? "" : "blur"}`}
+      >
         <div className="text-md underline">Explanation</div>
         <div className="text-sm font-semibold text-gray-500">{explanation}</div>
       </div>

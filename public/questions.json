@@ -1,0 +1,132 @@
+[
+  {
+    "question": "What is the main purpose of PHY 191 General Physics Practical I?",
+    "options": [
+      "To develop manipulative skills in handling physics apparatus",
+      "To memorize physics constants without experiments",
+      "To learn about physics apparatus only theoretically",
+      "To study the history of physics discoveries"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The course is designed to help students develop manipulative skills in handling physics apparatus and reinforce principles learned in core physics topics.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Which of the following is an example of a fundamental physical quantity?",
+    "options": ["Force", "Mass", "Velocity", "Pressure"],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "Fundamental physical quantities include length, mass, time, and temperature, while derived quantities like force and velocity are calculated from them.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the gradient of a linear graph that passes through the origin?",
+    "options": [
+      "The constant of proportionality",
+      "The intercept on the x-axis",
+      "The intercept on the y-axis",
+      "The area under the graph"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "In a linear graph through the origin, the gradient represents the constant of proportionality between the dependent and independent variables.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What should be included in the table of observations during an experiment?",
+    "options": [
+      "Independent and dependent variable values",
+      "Only theoretical predictions",
+      "Hypotheses and assumptions",
+      "Unrelated physical constants"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The table should include observed and recorded values of dependent variables for corresponding values of independent variables to ensure accurate results.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What type of graph is obtained when \( y = mx \)?",
+    "options": [
+      "A non-linear graph",
+      "A linear graph through the origin",
+      "A linear graph not passing through the origin",
+      "A graph with a negative slope"
+    ],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The equation \( y = mx \) represents a linear graph that passes through the origin, showing direct proportionality between \( y \) and \( x \).",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the significance of the intercept on the y-axis in a graph of \( y = mx + b \)?",
+    "options": [
+      "It represents the gradient of the graph",
+      "It shows the independent variable",
+      "It indicates the value of \( b \) when \( x = 0 \)",
+      "It measures the slope of the graph"
+    ],
+    "answer": "C",
+    "choosenAnswer": "",
+    "explanation": "In the equation \( y = mx + b \), the intercept on the y-axis represents \( b \), which is the value of \( y \) when \( x = 0 \).",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What precaution should be taken to ensure accurate measurements during an experiment?",
+    "options": [
+      "Record repetitive values to obtain mean values",
+      "Avoid repetitive measurements",
+      "Use only theoretical data for calculations",
+      "Measure variables randomly without structure"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "Recording repetitive values and using the mean ensures greater accuracy in measurement by minimizing random errors.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "How should a non-linear equation be transformed to obtain a linear graph?",
+    "options": [
+      "By plotting the original variables directly",
+      "By introducing logarithmic corrections",
+      "By squaring or modifying one of the variables",
+      "By changing the dependent variable to an independent variable"
+    ],
+    "answer": "C",
+    "choosenAnswer": "",
+    "explanation": "Transforming variables, such as squaring one side, can help reduce non-linear equations to linear equations for easier graphical representation.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Which of the following is a step in reporting an experiment?",
+    "options": [
+      "Including theoretical considerations already in the course-text",
+      "Specifying the aim and purpose of the experiment",
+      "Repeating all apparatus details",
+      "Avoiding any calculations"
+    ],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The report of an experiment should start with specifying its aim and purpose, alongside observations, graphs, calculations, and conclusions.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the duration recommended for performing and reporting an experiment in PHY 191?",
+    "options": ["1 hour 30 minutes", "2 hours", "3 hours", "30 minutes"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The course recommends spending not more than 1 hour 30 minutes for performing and reporting an experiment in the laboratory.",
+    "type": "multiChoice",
+    "isCorrect": false
+  }
+]

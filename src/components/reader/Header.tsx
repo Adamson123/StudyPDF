@@ -8,6 +8,9 @@ import {
   Star,
   SquareDashed,
   Stars,
+  File,
+  FileQuestion,
+  LucideFileStack,
 } from "lucide-react";
 import {
   Dispatch,
@@ -21,7 +24,29 @@ import { MessageType } from "./viewer/Message";
 import generateQuestion from "@/server/actions/generateQuestion";
 import { MultiChoiceQuestionTypes } from "./quiz/MultiChoiceCard";
 import { FillAnswerCardTypes } from "./quiz/FillAnswerCard";
-import { set } from "zod";
+import GenerateQuestionMenu from "./GenerateMenu/GenerateQuestionMenu";
+
+const GenerateMenu = ({
+  setOpenQuestionMenu,
+}: {
+  setOpenQuestionMenu: Dispatch<SetStateAction<boolean>>;
+}) => {
+  return (
+    <div className="absolute right-0 top-10 z-[100] flex flex-col text-nowrap rounded-md border border-gray-border bg-background text-sm shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
+      <div
+        onClick={() => setOpenQuestionMenu(true)}
+        className="flex cursor-pointer items-center gap-2 p-3 hover:bg-gray-100/10"
+      >
+        <FileQuestion />
+        Generate questions
+      </div>
+      <div className="flex cursor-pointer items-center gap-2 p-3 hover:bg-gray-100/10">
+        <LucideFileStack />
+        Generate flashcards
+      </div>
+    </div>
+  );
+};
 
 const Header = ({
   setShowLeftSection,
@@ -34,6 +59,7 @@ const Header = ({
   setPdfURL,
   setMessage,
   setQuestions,
+  setOpenQuiz,
 }: {
   setShowLeftSection: Dispatch<SetStateAction<boolean>>;
   showLeftSection: boolean;
@@ -47,10 +73,12 @@ const Header = ({
   setQuestions: Dispatch<
     SetStateAction<(MultiChoiceQuestionTypes | FillAnswerCardTypes)[]>
   >;
+  setOpenQuiz: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [pageNum, setPageNum] = useState("1");
   const [onPageNumInput, setOnPageNumInput] = useState(false);
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
+  const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
 
   const handlePageNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOnPageNumInput(true);
@@ -75,6 +103,7 @@ const Header = ({
     const updatePagNumOnScroll = () => {
       if (onPageNumInput) return;
       const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
+      if (!pdfsContainerElement) return;
       const pages = pdfsContainerElement.querySelectorAll(".pdfContainer");
       if (!pages.length) return;
 
@@ -134,24 +163,22 @@ const Header = ({
   const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setPdfFile(file);
     const fileURL = URL.createObjectURL(file);
     setPdfURL(fileURL);
     setMessage({ text: "Loading PDF...", autoTaminate: false });
     setPageNum("1");
   };
 
-  const handleGeminiQuestionGeneration = async () => {
-    console.log("Gemini question generation clicked");
-
-    if (!pdfFile) return alert("Pls select a pdf");
-    console.log("Getting pdf buffer...");
-    const arrayBuffer = await pdfFile.arrayBuffer();
-    console.log("Pdf buffer got");
-
-    const response = await generateQuestion(arrayBuffer);
-    console.log(response);
-    setQuestions(response);
+  const handleAiQuestionGeneration = async (
+    callback: () => Promise<
+      (MultiChoiceQuestionTypes | FillAnswerCardTypes)[] | undefined
+    >,
+  ) => {
+    const response = await callback();
+    if (!response) return;
+    setQuestions(response as any);
+    setOpenQuiz(true);
+    setOpenQuestionMenu(false);
   };
 
   return (
@@ -204,14 +231,9 @@ const Header = ({
 
         {/* <Star className="h-[18px] w-[18px]" /> */}
         <MessageSquareText className="h-[18px] w-[18px]" />
-        <button
-          onClick={handleGeminiQuestionGeneration}
-          className="flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
-        >
-          <Stars className="h-[18px] w-[18px] cursor-pointer" />
-        </button>
-        <div className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-gray-border bg-gray-border">
-          <Plus className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
+
+        <div className="relative flex h-[18px] w-[18px] cursor-pointer items-center justify-center">
+          <File className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
           <Input
             onChange={handlePdfSelection}
             type="file"
@@ -219,9 +241,23 @@ const Header = ({
             className="h-full w-full cursor-pointer opacity-0"
           />
         </div>
+        <div
+          tabIndex={0}
+          className="generateMenu relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
+        >
+          <Stars className="h-[18px] w-[18px] cursor-pointer" />
+          <GenerateMenu setOpenQuestionMenu={setOpenQuestionMenu} />
+        </div>
 
         <ChevronsRight className="h-6 w-6" />
       </div>
+      {openQuestionMenu && (
+        <GenerateQuestionMenu
+          setOpenQuestionMenu={setOpenQuestionMenu}
+          handleAiQuestionGeneration={handleAiQuestionGeneration}
+          numOfPages={numOfPages}
+        />
+      )}
     </div>
   );
 };

@@ -25,6 +25,21 @@ input[type="number"] {
   margin: 0;
 }
 
+progress::-webkit-progress-bar {
+  border-radius: 7px;
+  background-color: white;
+}
+progress::-webkit-progress-value {
+  border-radius: 7px;
+  background-color: #e11d48; /* Changed to blue color */
+}
+progress::-moz-progress-bar {
+  border-radius: 7px;
+  background-color: #e11d48; /* Changed to blue color */
+}
+.resultProgress::-webkit-progress-value {
+  background-color: #22c55e;
+}
 /* .textLayer br {
   pointer-events: none;
 } */
@@ -39,6 +54,14 @@ input[type="number"] {
 } */
 
 /* --gray-border: 82 88 102 / var(--tw-text-opacity, 0.3); */
+
+.generateMenu div {
+  display: none;
+}
+
+.generateMenu:focus div {
+  display: flex;
+}
 
 @layer base {
   :root {

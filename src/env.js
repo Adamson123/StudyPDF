@@ -28,6 +28,8 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT: z.string(),
+    NEXT_PUBLIC_AZURE_OPENAI_API_KEY: z.string(),
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
   },
 
@@ -44,6 +46,10 @@ export const env = createEnv({
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     AZURE_OPENAI_ENDPOINT: process.env.AZURE_OPENAI_ENDPOINT,
     AZURE_OPENAI_API_KEY: process.env.AZURE_OPENAI_API_KEY,
+    NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT:
+      process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT,
+    NEXT_PUBLIC_AZURE_OPENAI_API_KEY:
+      process.env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
