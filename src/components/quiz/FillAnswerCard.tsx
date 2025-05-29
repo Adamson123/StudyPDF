@@ -1,17 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { Stars } from "lucide-react";
-import React, { use, useEffect, useRef } from "react";
-import { MultiChoiceQuestionTypes } from "./MultiChoiceCard";
-
-export type FillAnswerCardTypes = {
-  question: string;
-  answer: string[];
-  choosenAnswer: string[];
-  explanation: string;
-  type: string;
-  isCorrect: false;
-};
+import React, { useEffect, useRef } from "react";
 
 const FillAnswerCard = ({
   index,
@@ -20,14 +10,14 @@ const FillAnswerCard = ({
   setQuestions,
   setCurrentQuestion,
 }: {
-  question: FillAnswerCardTypes;
+  question: FillAnswerTypes;
   index: number;
   numberOfQuestions: number;
   setQuestions: React.Dispatch<
-    React.SetStateAction<(FillAnswerCardTypes | MultiChoiceQuestionTypes)[]>
+    React.SetStateAction<(FillAnswerTypes | MultiChoiceQuestionTypes)[]>
   >;
   setCurrentQuestion: React.Dispatch<
-    React.SetStateAction<FillAnswerCardTypes | MultiChoiceQuestionTypes>
+    React.SetStateAction<FillAnswerTypes | MultiChoiceQuestionTypes>
   >;
 }) => {
   const answerInputs = useRef<(HTMLInputElement | null)[]>([]);
@@ -54,13 +44,13 @@ const FillAnswerCard = ({
           ...prev,
           choosenAnswer: pickedAnswers,
           isCorrect,
-        }) as FillAnswerCardTypes,
+        }) as FillAnswerTypes,
     );
     setQuestions(
       (prev) =>
         prev.map((q, i) =>
           i === index ? { ...q, choosenAnswer: pickedAnswers, isCorrect } : q,
-        ) as (FillAnswerCardTypes | MultiChoiceQuestionTypes)[],
+        ) as (FillAnswerTypes | MultiChoiceQuestionTypes)[],
     );
   };
 

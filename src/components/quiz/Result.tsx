@@ -1,7 +1,8 @@
-import { Check, RotateCcw, X } from "lucide-react";
+import { Check, Home, RotateCcw, X } from "lucide-react";
 import React, { SetStateAction, useEffect, useState } from "react";
-import MultiChoiceCard, { MultiChoiceQuestionTypes } from "./MultiChoiceCard";
-import FillAnswerCard, { FillAnswerCardTypes } from "./FillAnswerCard";
+import MultiChoiceCard from "./MultiChoiceCard";
+import FillAnswerCard from "./FillAnswerCard";
+import { useRouter } from "next/navigation";
 
 const getRemark = (score: number) => {
   if (score === 100) return "Excellent!";
@@ -17,10 +18,10 @@ const Result = ({
 
   setCurrentQuestionIndex,
 }: {
-  questions: (MultiChoiceQuestionTypes | FillAnswerCardTypes)[];
+  questions: (MultiChoiceQuestionTypes | FillAnswerTypes)[];
   setShowResult: React.Dispatch<SetStateAction<boolean>>;
   setQuestions: React.Dispatch<
-    React.SetStateAction<(MultiChoiceQuestionTypes | FillAnswerCardTypes)[]>
+    React.SetStateAction<(MultiChoiceQuestionTypes | FillAnswerTypes)[]>
   >;
 
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -31,6 +32,7 @@ const Result = ({
     incorrectAnswers: 0,
     score: 0,
   });
+  const router = useRouter();
 
   useEffect(() => {
     if (questions.length === 0) return;
@@ -53,7 +55,7 @@ const Result = ({
             ...q,
             choosenAnswer: q.type === "multiChoice" ? "" : [],
             isCorrect: false,
-          }) as MultiChoiceQuestionTypes | FillAnswerCardTypes,
+          }) as MultiChoiceQuestionTypes | FillAnswerTypes,
       ),
     );
     setCurrentQuestionIndex(0);
@@ -90,14 +92,24 @@ const Result = ({
           </span>
         </div>
 
-        <button
-          onClick={restartQuiz}
-          className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-white"
-          aria-label="Retry"
-        >
-          Restart Quiz
-          <RotateCcw className="h-4 w-4" />
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={restartQuiz}
+            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-white"
+            aria-label="Retry"
+          >
+            Restart Quiz
+            <RotateCcw className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => router.replace("/")}
+            className="flex items-center gap-2 rounded-md bg-green-500 px-4 py-2 text-sm text-white"
+            aria-label="Retry"
+          >
+            Go Home
+            <Home className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -115,7 +127,7 @@ const Result = ({
             <FillAnswerCard
               key={index}
               setQuestions={() => {}}
-              question={question as FillAnswerCardTypes}
+              question={question as FillAnswerTypes}
               index={index}
               setCurrentQuestion={() => {}}
               numberOfQuestions={questions.length}

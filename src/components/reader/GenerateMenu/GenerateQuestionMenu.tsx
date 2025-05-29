@@ -3,12 +3,13 @@ import { Stars, X } from "lucide-react";
 import { useContext, useState } from "react";
 import { createPDFPage, getPDFDocument } from "../viewer/utils";
 import { env } from "@/env";
-import { MultiChoiceQuestionTypes } from "../quiz/MultiChoiceCard";
-import { FillAnswerCardTypes } from "../quiz/FillAnswerCard";
 import { prompts } from "@/data/static-data/prompts";
 import Input from "@/components/ui/input";
 import { ViewerContext } from "../viewer/Viewer";
 import GeneratingCover from "./GeneratingCover";
+import { saveQuiz } from "@/lib/quizStorage";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
 
 const splitTexts = (pdfString: string[], chunkSize = 30000) => {
   //const paragraphs = (text.match(/[^]+?(?:\n\s*\n|$)/g) || []) as string[]; // split by paragraphs and handle null
@@ -28,17 +29,9 @@ const splitTexts = (pdfString: string[], chunkSize = 30000) => {
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
-  handleAiQuestionGeneration,
-
   numOfPages,
 }: {
   setOpenQuestionMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  handleAiQuestionGeneration: (
-    callback: () => Promise<
-      (MultiChoiceQuestionTypes | FillAnswerCardTypes)[] | undefined
-    >,
-  ) => void;
-
   numOfPages: number;
 }) => {
   const [questionType, setQuestionType] = useState<string>("multiChoice");
@@ -47,9 +40,10 @@ const GenerateQuestionMenu = ({
   const pdfURL = useContext(ViewerContext).pdfURL;
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [questions, setQuestions] = useState<
-    (MultiChoiceQuestionTypes | FillAnswerCardTypes)[]
+    (MultiChoiceQuestionTypes | FillAnswerTypes)[]
   >([]);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const getPDFTexts = async () => {
     //TODO: Remove another getPDFDocument
@@ -94,12 +88,23 @@ const GenerateQuestionMenu = ({
       Authorization: `Bearer ${apiKey}`,
     };
 
-    const generatePrompt = `
-    - fillInAnswer questions should only have one gap and answer
-    - I will using JSON.parse in javascript to parse the output so make sure it is a valid JSON array of objects
-    - When it come's to Maths or Physics or any calculation like subject or topic or texts, calculation question should take up 75% of the questions and the rest 30% should be normal questions.
-    - You will Also Generate  questions on sentences like Declarative Sentence, Complex Sentence, Simple Sentence, Active Voice, or Passive Voice 
-    - Strictly return only a JSON array of ${amountOfQuestionsEach} amount of questions don't return any other text like "Here are the questions" or "I have generated the following questions or \`\`\`json" or \`\`\` or \`\`\` `;
+    const generatePrompt = `  
+  - fillInAnswer questions must only contain one gap and one correct answer.  
+  - I will be using JSON.parse in JavaScript to parse the output, so the response must be a valid JSON array of objects.  
+  - At least 75% of the questions should be calculations when the topic involves Maths or Physics. The remaining 25% can be conceptual/theoretical.  
+  - Include questions about sentence types like Declarative, Complex, Simple, Active Voice, and Passive Voice.  
+  - Strictly return only a JSON array of ${amountOfQuestionsEach} questions. Do NOT include explanations, markdown, or any introductory or closing text.  
+  - Each question object must include: question, options (array of 4 strings), answer (letter A-D), choosenAnswer (empty string or array), explanation, type (multiChoice or fillAnswer), and isCorrect (false).  
+  - For multiple-choice questions, use difficulty-based answer randomization:  
+    • If the question is **Easy**, place the correct answer randomly in **Option A or B**.  
+    • If the question is **Medium**, place it randomly in **Option B or C**.  
+    • If the question is **Hard**, place it randomly in **Option C or D**.  
+  - Assign difficulty levels based on how complex or calculative the question is. You may optionally include a "difficulty" field to clarify.  
+  - Avoid repetition of correct answer positions throughout the question set. Spread answers across A, B, C, and D as much as possible.  
+  - All options should be relevant and logical distractors. No silly or unrelated choices.  
+  - Make sure you are asking questions that are relevant to the text provided only. the questions should be based strictly on the texts only
+`;
+
     const body = {
       messages: [
         { role: "user", content: prompt + generatePrompt },
@@ -121,7 +126,7 @@ const GenerateQuestionMenu = ({
       const data = await res.json();
       const output = data.choices?.[0]?.message?.content || "error";
 
-      if (output === "error") return;
+      if (output === "error") return { error: "Error generating questions" };
 
       let trimmedOutput = [];
       try {
@@ -141,16 +146,28 @@ const GenerateQuestionMenu = ({
     }
   };
 
+  const handleSaveAndRedirectToQuiz = async (
+    questions: (FillAnswerTypes | MultiChoiceQuestionTypes)[],
+  ) => {
+    console.log("Saving quiz with questions:", questions);
+    const id = uuidv4(); // Generate a unique ID for the quiz
+    if (!questions.length) return; // No questions to save
+    saveQuiz(id, questions);
+    setQuestions([]);
+    setRange({ from: 1, to: numOfPages }); // Reset range
+    router.push(`/quiz/${id}`); // Redirect to the quiz page
+    setOpenQuestionMenu(false);
+  };
+
   const generateQuestions = async () => {
     setIsGenerating(true);
-    let response: (MultiChoiceQuestionTypes | FillAnswerCardTypes)[] = [];
+    let response: (MultiChoiceQuestionTypes | FillAnswerTypes)[] = [];
     const pdfTexts = await getPDFTexts();
     const chunks = splitTexts(pdfTexts);
     let error = "";
 
     for (let index = 0; index < chunks.length; index++) {
       const text = chunks[index];
-
       console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
 
       const questions = await generateQuestionWithOpenAI(
@@ -184,33 +201,34 @@ const GenerateQuestionMenu = ({
     }
 
     setIsGenerating(false);
-    return response;
+    handleSaveAndRedirectToQuiz(response);
+    // return response;
   };
 
-  const handleTryAgain = () => {
+  const handleTryAgain = async () => {
     setError("");
-    handleAiQuestionGeneration(generateQuestions);
+    await generateQuestions();
   };
   const handleContinue = () => {
     setError("");
-    handleAiQuestionGeneration(async () => {
-      return questions;
-    });
+    setIsGenerating(false);
+    handleSaveAndRedirectToQuiz(questions);
   };
   const handleCancel = () => {
     setError("");
     setIsGenerating(false);
+    setQuestions([]);
   };
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center backdrop-blur-sm">
       {!isGenerating ? (
         <form
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
-            handleAiQuestionGeneration(generateQuestions);
+            await generateQuestions();
           }}
-          className="flex flex-col gap-6 rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]"
+          className="flex max-w-[390px] flex-col gap-6 rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)] md:max-w-[420px]"
         >
           <div className="flex items-center justify-between">
             <div>

@@ -1,15 +1,4 @@
 import { Stars } from "lucide-react";
-import { FillAnswerCardTypes } from "./FillAnswerCard";
-
-export type MultiChoiceQuestionTypes = {
-  question: string;
-  options: string[];
-  answer: string;
-  choosenAnswer: string;
-  explanation: string;
-  type: string;
-  isCorrect: boolean;
-};
 
 const optionAlp = ["A", "B", "C", "D"];
 
@@ -24,10 +13,10 @@ const MultiChoiceCard = ({
   index: number;
   numberOfQuestions: number;
   setQuestions: React.Dispatch<
-    React.SetStateAction<(FillAnswerCardTypes | MultiChoiceQuestionTypes)[]>
+    React.SetStateAction<(FillAnswerTypes | MultiChoiceQuestionTypes)[]>
   >;
   setCurrentQuestion: React.Dispatch<
-    React.SetStateAction<FillAnswerCardTypes | MultiChoiceQuestionTypes>
+    React.SetStateAction<FillAnswerTypes | MultiChoiceQuestionTypes>
   >;
 }) => {
   const handleOptionClick = (option: string) => {
@@ -47,7 +36,7 @@ const MultiChoiceCard = ({
                 isCorrect: isCorrect(option),
               }
             : q,
-        ) as (FillAnswerCardTypes | MultiChoiceQuestionTypes)[],
+        ) as (FillAnswerTypes | MultiChoiceQuestionTypes)[],
     );
   };
 

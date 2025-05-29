@@ -12,13 +12,6 @@ import AddComment from "./comment/AddComment";
 import Comment from "./comment/Comment";
 import { Message } from "./Message";
 import HighlightMenu from "./HighlightMenu";
-import { MultiChoiceQuestionTypes } from "../quiz/MultiChoiceCard";
-import { FillAnswerCardTypes } from "../quiz/FillAnswerCard";
-import dynamic from "next/dynamic";
-
-const Quiz = dynamic(() => import("../quiz/Quiz"), {
-  ssr: false,
-});
 
 export const ViewerContext = createContext<{ pdfURL: string }>({ pdfURL: "" });
 
@@ -30,7 +23,7 @@ const Viewer = () => {
 
   const [pdfPages, setPdfPages] = useState<PDFPage[]>([]);
   const [showLeftSection, setShowLeftSection] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0.7);
   const [loading, setLoading] = useState(true);
   const [selectionClass, setSelectionClass] = useState("");
   const [comment, setComment] = useState<CommentType>({ text: "", class: "" });
@@ -39,10 +32,6 @@ const Viewer = () => {
   //TODO:  Add selection box mode
   const [selectionBoxMode, setSelectionBoxMode] = useState(false);
   const [pdfURL, setPdfURL] = useState(window.location.origin + "/Split.pdf");
-  const [questions, setQuestions] = useState<
-    (MultiChoiceQuestionTypes | FillAnswerCardTypes)[]
-  >([]);
-  const [openQuiz, setOpenQuiz] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -130,7 +119,7 @@ const Viewer = () => {
 
   return (
     <ViewerContext.Provider value={{ pdfURL }}>
-      <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-12">
+      <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-6">
         <Header
           setShowLeftSection={setShowLeftSection}
           showLeftSection={showLeftSection}
@@ -142,8 +131,6 @@ const Viewer = () => {
           setSelectionBoxMode={setSelectionBoxMode}
           setPdfURL={setPdfURL}
           setMessage={setMessage}
-          setQuestions={setQuestions}
-          setOpenQuiz={setOpenQuiz}
         />
         {/* Add Optimization */}
         <LeftSection showLeftSection={showLeftSection} />
@@ -155,7 +142,7 @@ const Viewer = () => {
         ) : (
           <div
             onClick={closeHighlightMenu}
-            className={`relative mt-10 flex flex-col gap-3 ${openQuiz && "hidden"}`}
+            className={`relative mt-10 flex flex-col gap-3`}
             ref={pdfsContainer}
           ></div>
         )}
@@ -187,11 +174,7 @@ const Viewer = () => {
           setMessage={setMessage}
           setHighlightClass={setHighlightClass}
         />
-        {openQuiz ? (
-          <Quiz setOpenQuiz={setOpenQuiz} questions={questions} />
-        ) : (
-          ""
-        )}
+
         <Message message={message} setMessage={setMessage} />
       </main>
     </ViewerContext.Provider>

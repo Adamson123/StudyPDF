@@ -21,9 +21,6 @@ import {
 } from "react";
 import Input from "../ui/input";
 import { MessageType } from "./viewer/Message";
-import generateQuestion from "@/server/actions/generateQuestion";
-import { MultiChoiceQuestionTypes } from "./quiz/MultiChoiceCard";
-import { FillAnswerCardTypes } from "./quiz/FillAnswerCard";
 import GenerateQuestionMenu from "./GenerateMenu/GenerateQuestionMenu";
 
 const GenerateMenu = ({
@@ -58,8 +55,6 @@ const Header = ({
   setSelectionBoxMode,
   setPdfURL,
   setMessage,
-  setQuestions,
-  setOpenQuiz,
 }: {
   setShowLeftSection: Dispatch<SetStateAction<boolean>>;
   showLeftSection: boolean;
@@ -70,10 +65,6 @@ const Header = ({
   setSelectionBoxMode: Dispatch<SetStateAction<boolean>>;
   setPdfURL: Dispatch<SetStateAction<string>>;
   setMessage: Dispatch<SetStateAction<MessageType>>;
-  setQuestions: Dispatch<
-    SetStateAction<(MultiChoiceQuestionTypes | FillAnswerCardTypes)[]>
-  >;
-  setOpenQuiz: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [pageNum, setPageNum] = useState("1");
   const [onPageNumInput, setOnPageNumInput] = useState(false);
@@ -169,18 +160,6 @@ const Header = ({
     setPageNum("1");
   };
 
-  const handleAiQuestionGeneration = async (
-    callback: () => Promise<
-      (MultiChoiceQuestionTypes | FillAnswerCardTypes)[] | undefined
-    >,
-  ) => {
-    const response = await callback();
-    if (!response) return;
-    setQuestions(response as any);
-    setOpenQuiz(true);
-    setOpenQuestionMenu(false);
-  };
-
   return (
     <div className="fixed left-0 right-0 top-0 z-[100] flex w-full items-center justify-between gap-3 bg-background px-3 py-[7px] shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
       <div className="flex items-center gap-3">
@@ -254,7 +233,6 @@ const Header = ({
       {openQuestionMenu && (
         <GenerateQuestionMenu
           setOpenQuestionMenu={setOpenQuestionMenu}
-          handleAiQuestionGeneration={handleAiQuestionGeneration}
           numOfPages={numOfPages}
         />
       )}

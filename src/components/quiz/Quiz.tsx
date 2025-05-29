@@ -1,34 +1,27 @@
 "use client";
-import { ChevronLeft, X } from "lucide-react";
-import MultiChoiceCard, { MultiChoiceQuestionTypes } from "./MultiChoiceCard";
-import FillAnswerCard, { FillAnswerCardTypes } from "./FillAnswerCard";
-import { use, useEffect, useState } from "react";
+import { ChevronLeft } from "lucide-react";
+import MultiChoiceCard from "./MultiChoiceCard";
+import FillAnswerCard from "./FillAnswerCard";
+import { useEffect, useState } from "react";
 import Result from "./Result";
 import { questionsMock } from "@/data/static-data/questionMock";
+import { getQuizById } from "@/lib/quizStorage";
 
-const Quiz = ({
-  questions: questions_1,
-  setOpenQuiz,
-}: {
-  questions: (MultiChoiceQuestionTypes | FillAnswerCardTypes)[];
-  setOpenQuiz: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-  const [questions, setQuestions] = useState(
-    questions_1.length ? questions_1 : questionsMock,
-  );
+const Quiz = ({ id }: { id: string }) => {
+  const [questions, setQuestions] = useState(questionsMock);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<
-    MultiChoiceQuestionTypes | FillAnswerCardTypes
+    MultiChoiceQuestionTypes | FillAnswerTypes
   >();
   const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
-    if (!questions_1.length) return;
-    setQuestions(questions_1);
-  }, [questions_1]);
+    const localQuestions = getQuizById(id);
+    if (localQuestions) {
+      setQuestions(localQuestions);
+    }
 
-  useEffect(() => {
     const warnOnPageReload = (event: BeforeUnloadEvent) => {
       // if (questions.some((question) => question.choosenAnswer.length)) {
       event.preventDefault();
@@ -46,7 +39,7 @@ const Quiz = ({
   useEffect(() => {
     const question = questions[currentQuestionIndex];
     setCurrentQuestion(question);
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, questions]);
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
@@ -73,16 +66,14 @@ const Quiz = ({
       <div className="flex items-center justify-between border-gray-border bg-background">
         <div>
           <h2 className="text-3xl">Quiz: CIT108</h2>
-          <h3 className="text-gray-500">
-            Total QuestionCards: {questions.length}
-          </h3>
+          <h3 className="text-gray-500">Total Questions: {questions.length}</h3>
         </div>
-        <button
+        {/* <button
           onClick={() => setOpenQuiz(false)}
           className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-border"
         >
           <X />
-        </button>
+        </button> */}
       </div>
 
       <div className="m-auto flex w-full flex-col items-center gap-7">
@@ -109,14 +100,14 @@ const Quiz = ({
               />
             ) : (
               <FillAnswerCard
-                question={currentQuestion as FillAnswerCardTypes}
+                question={currentQuestion as FillAnswerTypes}
                 index={currentQuestionIndex}
                 setQuestions={setQuestions}
                 numberOfQuestions={questions.length}
                 setCurrentQuestion={
                   setCurrentQuestion as React.Dispatch<
                     React.SetStateAction<
-                      FillAnswerCardTypes | MultiChoiceQuestionTypes
+                      FillAnswerTypes | MultiChoiceQuestionTypes
                     >
                   >
                 }

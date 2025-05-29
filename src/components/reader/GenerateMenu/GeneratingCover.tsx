@@ -20,20 +20,20 @@ const GeneratingCover = ({
   return (
     <div className="flex flex-col items-center gap-6 rounded-md border border-gray-border bg-background p-7 py-10 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
       {error ? (
-        <span className="text-7xl">😥</span>
+        <span className="text-6xl">😥</span>
       ) : (
-        <Stars className="h-20 w-20 animate-pulse" />
+        <Stars className="h-16 w-16 animate-pulse" />
       )}
       {/*  */}
       <div className="space-y-1 text-center">
-        <h2 className="text-3xl font-bold">
+        <h2 className="text-xl font-bold">
           {error ? (
             <span className="text-red-500">{error}</span>
           ) : (
             "Generating questons..."
           )}
         </h2>
-        <p className="w-[400px] text-center text-sm text-gray-500">
+        <p className="w-[390px] text-center text-xs text-gray-500">
           {error
             ? `${error}. Please try again.`
             : `This may take a while, depending on the number of pages and the

@@ -1,6 +1,5 @@
 "use server";
-import { FillAnswerCardTypes } from "@/components/reader/quiz/FillAnswerCard";
-import { MultiChoiceQuestionTypes } from "@/components/reader/quiz/MultiChoiceCard";
+
 import { prompts } from "@/data/static-data/prompts";
 import { env } from "@/env";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -35,10 +34,10 @@ const generateQuestion = async (
 
     console.log(cleanJson);
 
-    let parsedJSON: (FillAnswerCardTypes | MultiChoiceQuestionTypes)[] = [];
+    let parsedJSON: (FillAnswerTypes | MultiChoiceQuestionTypes)[] = [];
     if (cleanJson) {
       parsedJSON = JSON.parse(cleanJson) as (
-        | FillAnswerCardTypes
+        | FillAnswerTypes
         | MultiChoiceQuestionTypes
       )[];
       //randomize the order of multiChoice answers
