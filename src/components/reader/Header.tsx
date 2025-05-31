@@ -22,11 +22,14 @@ import {
 import Input from "../ui/input";
 import { MessageType } from "./viewer/Message";
 import GenerateQuestionMenu from "./GenerateMenu/GenerateQuestionMenu";
+import GenerateFlashcardMenu from "./GenerateMenu/GenerateFlashcardMenu";
 
 const GenerateMenu = ({
   setOpenQuestionMenu,
+  setOpenFlashCardMenu,
 }: {
   setOpenQuestionMenu: Dispatch<SetStateAction<boolean>>;
+  setOpenFlashCardMenu: Dispatch<SetStateAction<boolean>>;
 }) => {
   return (
     <div className="absolute right-0 top-10 z-[100] flex flex-col text-nowrap rounded-md border border-gray-border bg-background text-sm shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
@@ -37,7 +40,10 @@ const GenerateMenu = ({
         <FileQuestion />
         Generate questions
       </div>
-      <div className="flex cursor-pointer items-center gap-2 p-3 hover:bg-gray-100/10">
+      <div
+        onClick={() => setOpenFlashCardMenu(true)}
+        className="flex cursor-pointer items-center gap-2 p-3 hover:bg-gray-100/10"
+      >
         <LucideFileStack />
         Generate flashcards
       </div>
@@ -225,7 +231,10 @@ const Header = ({
           className="generateMenu relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
         >
           <Stars className="h-[18px] w-[18px] cursor-pointer" />
-          <GenerateMenu setOpenQuestionMenu={setOpenQuestionMenu} />
+          <GenerateMenu
+            setOpenQuestionMenu={setOpenQuestionMenu}
+            setOpenFlashCardMenu={setOpenFlashCardMenu}
+          />
         </div>
 
         <ChevronsRight className="h-6 w-6" />
@@ -233,6 +242,12 @@ const Header = ({
       {openQuestionMenu && (
         <GenerateQuestionMenu
           setOpenQuestionMenu={setOpenQuestionMenu}
+          numOfPages={numOfPages}
+        />
+      )}
+      {openFlashCardMenu && (
+        <GenerateFlashcardMenu
+          setOpenFlashCardMenu={setOpenFlashCardMenu}
           numOfPages={numOfPages}
         />
       )}

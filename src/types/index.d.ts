@@ -16,3 +16,8 @@ interface FillAnswerTypes {
   type: string;
   isCorrect: false;
 }
+interface FlashcardTypes {
+  front: string;
+  back: string;
+  level: string;
+}

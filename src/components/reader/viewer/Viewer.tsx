@@ -69,6 +69,10 @@ const Viewer = () => {
         text: "PDF Loaded Successfully",
         autoTaminate: true,
       });
+      document.documentElement.style.setProperty(
+        "--total-scale-factor",
+        scale.toString(),
+      );
     })();
   }, [pdfURL]);
 

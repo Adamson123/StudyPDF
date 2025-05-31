@@ -40,6 +40,15 @@ progress::-moz-progress-bar {
 .resultProgress::-webkit-progress-value {
   background-color: #22c55e;
 }
+.hardPercentage::-webkit-progress-value {
+  background-color: #f33a3aec;
+}
+.mediumPercentage::-webkit-progress-value {
+  background-color: #f59e0b;
+}
+.easyPercentage::-webkit-progress-value {
+  background-color: #22c55e;
+}
 /* .textLayer br {
   pointer-events: none;
 } */

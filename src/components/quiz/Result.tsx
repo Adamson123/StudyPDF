@@ -1,5 +1,5 @@
 import { Check, Home, RotateCcw, X } from "lucide-react";
-import React, { SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import MultiChoiceCard from "./MultiChoiceCard";
 import FillAnswerCard from "./FillAnswerCard";
 import { useRouter } from "next/navigation";
@@ -15,16 +15,16 @@ const Result = ({
   questions,
   setShowResult,
   setQuestions,
-
   setCurrentQuestionIndex,
+  setStartQuiz,
 }: {
   questions: (MultiChoiceQuestionTypes | FillAnswerTypes)[];
-  setShowResult: React.Dispatch<SetStateAction<boolean>>;
-  setQuestions: React.Dispatch<
-    React.SetStateAction<(MultiChoiceQuestionTypes | FillAnswerTypes)[]>
+  setShowResult: Dispatch<SetStateAction<boolean>>;
+  setQuestions: Dispatch<
+    SetStateAction<(MultiChoiceQuestionTypes | FillAnswerTypes)[]>
   >;
-
-  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentQuestionIndex: Dispatch<React.SetStateAction<number>>;
+  setStartQuiz: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [result, setResult] = useState({
     totalQuestions: 0,
@@ -46,8 +46,6 @@ const Result = ({
   }, [questions]);
 
   const restartQuiz = () => {
-    setShowResult(false);
-
     setQuestions((prev) =>
       prev.map(
         (q) =>
@@ -59,24 +57,34 @@ const Result = ({
       ),
     );
     setCurrentQuestionIndex(0);
+    setShowResult(false);
+  };
+
+  const goHome = () => {
+    setQuestions((prev) =>
+      prev.map(
+        (q) =>
+          ({
+            ...q,
+            choosenAnswer: q.type === "multiChoice" ? "" : [],
+            isCorrect: false,
+          }) as MultiChoiceQuestionTypes | FillAnswerTypes,
+      ),
+    );
+    setShowResult(false);
+    setStartQuiz(false);
   };
 
   const { totalQuestions, correctAnswers, incorrectAnswers, score } = result;
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center gap-10 overflow-auto bg-background px-5 pb-10 pt-20">
+    <div className="flex flex-col items-center gap-10 overflow-auto bg-background px-5 py-5">
       <div className="flex w-full flex-col items-center gap-3">
         <div className="text-lg font-semibold">
           {score}% {getRemark(score)}
         </div>
 
         <div className="flex w-full max-w-[500px] items-center gap-2">
-          {/* <div className="h-2 flex-grow rounded-full bg-gray-200">
-              <div
-                className="h-full rounded-full bg-green-500"
-                style={{ width: `${score}%` }}
-              ></div>
-            </div> */}
           <progress value={score} max={100} className="resultProgress w-full" />
         </div>
 
@@ -102,7 +110,7 @@ const Result = ({
             <RotateCcw className="h-4 w-4" />
           </button>
           <button
-            onClick={() => router.replace("/")}
+            onClick={goHome}
             className="flex items-center gap-2 rounded-md bg-green-500 px-4 py-2 text-sm text-white"
             aria-label="Retry"
           >
@@ -112,7 +120,7 @@ const Result = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
         {questions.map((question, index) =>
           (question as MultiChoiceQuestionTypes).type === "multiChoice" ? (
             <MultiChoiceCard

@@ -1,31 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Stars, X } from "lucide-react";
-import { useContext, useState } from "react";
-import { createPDFPage, getPDFDocument } from "../viewer/utils";
+import { Stars } from "lucide-react";
+import { use, useContext, useState } from "react";
 import { env } from "@/env";
-import { prompts } from "@/data/static-data/prompts";
+import { generatePrompt, prompts } from "@/data/static-data/prompts";
 import Input from "@/components/ui/input";
 import { ViewerContext } from "../viewer/Viewer";
 import GeneratingCover from "./GeneratingCover";
 import { saveQuiz } from "@/lib/quizStorage";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
-
-const splitTexts = (pdfString: string[], chunkSize = 30000) => {
-  //const paragraphs = (text.match(/[^]+?(?:\n\s*\n|$)/g) || []) as string[]; // split by paragraphs and handle null
-  const chunks: string[] = [];
-  let chunk = "";
-
-  for (let para of pdfString) {
-    if ((chunk + para).length > chunkSize) {
-      chunks.push(chunk);
-      chunk = "";
-    }
-    chunk += para + "\n";
-  }
-  if (chunk) chunks.push(chunk);
-  return chunks;
-};
+import XButton from "@/components/ui/XButton";
+import { getPDFTexts, splitChunks, splitTexts } from "./utils";
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
@@ -37,6 +22,7 @@ const GenerateQuestionMenu = ({
   const [questionType, setQuestionType] = useState<string>("multiChoice");
   const [amountOfQuestions, setAmountOfQuestions] = useState<number>(10);
   const [range, setRange] = useState({ from: 1, to: numOfPages });
+  const [userPrompt, setUserPrompt] = useState<string>("");
   const pdfURL = useContext(ViewerContext).pdfURL;
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [questions, setQuestions] = useState<
@@ -44,25 +30,6 @@ const GenerateQuestionMenu = ({
   >([]);
   const [error, setError] = useState("");
   const router = useRouter();
-
-  const getPDFTexts = async () => {
-    //TODO: Remove another getPDFDocument
-    //TODO:Change variable name render array
-
-    const pdfDocument = await getPDFDocument(pdfURL);
-    const renderArray: any[] = [];
-    for (let index = range.from - 1; index < range.to; index++) {
-      const renderer = async () => {
-        const pdfPage = await createPDFPage(pdfDocument, index + 1);
-        const text = await pdfPage.getTextContent();
-        return text.items.map((item: any) => item.str).join("\n");
-      };
-      renderArray.push(renderer());
-    }
-
-    const pdfTexts = await Promise.all(renderArray);
-    return pdfTexts;
-  };
 
   const generateQuestionWithOpenAI = async (
     text: string,
@@ -88,26 +55,21 @@ const GenerateQuestionMenu = ({
       Authorization: `Bearer ${apiKey}`,
     };
 
-    const generatePrompt = `  
-  - fillInAnswer questions must only contain one gap and one correct answer.  
-  - I will be using JSON.parse in JavaScript to parse the output, so the response must be a valid JSON array of objects.  
-  - At least 75% of the questions should be calculations when the topic involves Maths or Physics. The remaining 25% can be conceptual/theoretical.  
-  - Include questions about sentence types like Declarative, Complex, Simple, Active Voice, and Passive Voice.  
-  - Strictly return only a JSON array of ${amountOfQuestionsEach} questions. Do NOT include explanations, markdown, or any introductory or closing text.  
-  - Each question object must include: question, options (array of 4 strings), answer (letter A-D), choosenAnswer (empty string or array), explanation, type (multiChoice or fillAnswer), and isCorrect (false).  
-  - For multiple-choice questions, use difficulty-based answer randomization:  
-    • If the question is **Easy**, place the correct answer randomly in **Option A or B**.  
-    • If the question is **Medium**, place it randomly in **Option B or C**.  
-    • If the question is **Hard**, place it randomly in **Option C or D**.  
-  - Assign difficulty levels based on how complex or calculative the question is. You may optionally include a "difficulty" field to clarify.  
-  - Avoid repetition of correct answer positions throughout the question set. Spread answers across A, B, C, and D as much as possible.  
-  - All options should be relevant and logical distractors. No silly or unrelated choices.  
-  - Make sure you are asking questions that are relevant to the text provided only. the questions should be based strictly on the texts only
-`;
+    console.log(
+      prompt +
+        generatePrompt(amountOfQuestionsEach) +
+        `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`,
+    );
 
     const body = {
       messages: [
-        { role: "user", content: prompt + generatePrompt },
+        {
+          role: "user",
+          content:
+            prompt +
+            generatePrompt(amountOfQuestionsEach) +
+            `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`,
+        },
         { role: "user", content: text },
       ],
       max_tokens: 4096,
@@ -152,18 +114,19 @@ const GenerateQuestionMenu = ({
     console.log("Saving quiz with questions:", questions);
     const id = uuidv4(); // Generate a unique ID for the quiz
     if (!questions.length) return; // No questions to save
+    //TODO: Add name of pdf
     saveQuiz(id, questions);
     setQuestions([]);
     setRange({ from: 1, to: numOfPages }); // Reset range
     router.push(`/quiz/${id}`); // Redirect to the quiz page
-    setOpenQuestionMenu(false);
+    // setOpenQuestionMenu(false);
   };
 
   const generateQuestions = async () => {
     setIsGenerating(true);
     let response: (MultiChoiceQuestionTypes | FillAnswerTypes)[] = [];
-    const pdfTexts = await getPDFTexts();
-    const chunks = splitTexts(pdfTexts);
+    const pdfTexts = await getPDFTexts(pdfURL, range); // Get texts from PDF
+    const chunks = splitChunks(splitTexts(pdfTexts), amountOfQuestions); // Break chunks if needed
     let error = "";
 
     for (let index = 0; index < chunks.length; index++) {
@@ -189,8 +152,6 @@ const GenerateQuestionMenu = ({
       }
     }
 
-    //  console.log(response);
-
     if (error) {
       if (response.length) {
         setError("An Error occured while generating questions");
@@ -201,6 +162,7 @@ const GenerateQuestionMenu = ({
     }
 
     setIsGenerating(false);
+    console.log(response);
     handleSaveAndRedirectToQuiz(response);
     // return response;
   };
@@ -221,29 +183,24 @@ const GenerateQuestionMenu = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 backdrop-blur-sm">
       {!isGenerating ? (
         <form
           onSubmit={async (event) => {
             event.preventDefault();
             await generateQuestions();
           }}
-          className="flex max-w-[390px] flex-col gap-6 rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)] md:max-w-[420px]"
+          className="flex max-h-screen max-w-[420px] flex-col gap-6 overflow-y-auto rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)] md:max-w-[500px]"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-xl">Generate Questions</h2>
-              <h3 className="text-sm text-gray-500">
+              <h3 className="text-xs text-gray-500">
                 Select the type of question
               </h3>
             </div>
 
-            <button
-              onClick={() => setOpenQuestionMenu(false)}
-              className="rounded-full border border-gray-border p-2 hover:bg-gray-100/10"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <XButton onClick={() => setOpenQuestionMenu(false)} />
           </div>
 
           {/* Options */}
@@ -277,19 +234,23 @@ const GenerateQuestionMenu = ({
             ))}
           </div>
 
-          {/* TODO We will adding the pages it should generate from and the amount of questions it should generate */}
-          <div className="flex flex-col items-center gap-3">
-            <label className="text-nowrap text-sm">Amount of question:</label>
+          {/* Amount of questions and range */}
+          <div className="start flex flex-col gap-3">
+            <label htmlFor="amountOfQuestions" className="text-nowrap text-sm">
+              Amount of question:
+            </label>
             <Input
               onChange={(e) => setAmountOfQuestions(Number(e.target.value))}
+              id="amountOfQuestions"
               value={amountOfQuestions}
               type="number"
               min={10}
               max={60}
-              className="focus:outline-1 focus:outline-primary"
+              className="bg-border focus:outline-1 focus:outline-primary"
             />
           </div>
-          <div className="flex w-full flex-col items-center gap-3">
+          {/* Range */}
+          <div className="flex w-full flex-col items-start gap-3">
             <label className="text-nowrap text-sm">Range of pages:</label>
             <div className="flex w-full items-center gap-3">
               <Input
@@ -300,7 +261,7 @@ const GenerateQuestionMenu = ({
                 onChange={(e) =>
                   setRange({ ...range, from: Number(e.target.value) })
                 }
-                className="focus:outline-1 focus:outline-primary"
+                className="bg-border focus:outline-1 focus:outline-primary"
               />
               <span>-</span>
               <Input
@@ -311,14 +272,33 @@ const GenerateQuestionMenu = ({
                 onChange={(e) =>
                   setRange({ ...range, to: Number(e.target.value) })
                 }
-                className="focus:outline-1 focus:outline-primary"
+                className="bg-border focus:outline-1 focus:outline-primary"
               />
             </div>
           </div>
-
+          {/* User Prompt */}
+          <div className="flex w-full flex-col gap-3">
+            <label htmlFor="userPrompt" className="text-sm">
+              User Prompt (Optional):
+            </label>
+            <textarea
+              id="userPrompt"
+              value={userPrompt}
+              onChange={(e) => setUserPrompt(e.target.value)}
+              className="h-36 resize-none rounded bg-border p-3 text-xs ring-primary focus:outline-none focus:ring-1"
+              placeholder="Enter your custom prompt here..."
+            />
+          </div>
+          {/* Geneerate Button */}
           <Button type="submit" className="flex items-center">
             Generate Questions <Stars />
           </Button>
+          <div className="text-center text-[11px] text-gray-500">
+            AI might make mistakes, so some answers in the generated questions
+            could be incorrect. While the explanations might be accurate, it's
+            always a good idea to verify the answers through additional
+            research.
+          </div>
         </form>
       ) : (
         <GeneratingCover
