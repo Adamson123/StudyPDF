@@ -33,7 +33,7 @@ const GeneratingCover = ({
             "Generating questons..."
           )}
         </h2>
-        <p className="w-[390px] text-center text-xs text-gray-500">
+        <p className="max-w-[390px] text-center text-xs text-gray-500">
           {error
             ? `${error}. Please try again.`
             : `This may take a while, depending on the number of pages and the

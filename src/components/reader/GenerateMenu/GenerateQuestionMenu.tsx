@@ -161,9 +161,9 @@ const GenerateQuestionMenu = ({
       return;
     }
 
-    setIsGenerating(false);
     console.log(response);
     handleSaveAndRedirectToQuiz(response);
+    setIsGenerating(false);
     // return response;
   };
 
