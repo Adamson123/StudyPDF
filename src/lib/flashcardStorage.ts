@@ -12,7 +12,7 @@ type AllStoredFlashcards = StoredFlashcard[];
 /**
  * Retrieves all flashcards from localStorage.
  */
-const getAllFlashcardsFromStorage = (): AllStoredFlashcards => {
+export const getAllFlashcardsFromStorage = (): AllStoredFlashcards => {
   if (typeof window === "undefined") return [];
   const data = localStorage.getItem(LOCAL_STORAGE_KEY);
   return data ? (JSON.parse(data) as AllStoredFlashcards) : [];

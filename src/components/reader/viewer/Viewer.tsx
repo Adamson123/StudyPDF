@@ -35,7 +35,7 @@ const Viewer = () => {
   const [selectionBoxMode, setSelectionBoxMode] = useState(false);
   const [pdfInfo, setPdfInfo] = useState({
     url: window.location.origin + "/Split.pdf",
-    name: "",
+    name: "pdf-name",
   });
 
   useEffect(() => {

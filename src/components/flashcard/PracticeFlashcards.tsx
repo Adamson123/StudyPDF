@@ -93,7 +93,7 @@ const PracticeFlashcards = ({
         >
           <div
             className={cn(
-              "flex w-full flex-grow items-center justify-center border-b",
+              "flex w-full flex-grow items-center justify-center border-b text-center",
               flashcardLevel.border,
             )}
           >

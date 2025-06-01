@@ -20,17 +20,17 @@ const Popup = ({
     <PopUpWrapper>
       <div className="flex w-full max-w-md flex-col items-center justify-center gap-4 rounded-lg bg-background p-6 shadow-lg">
         {/* <h2 className="text-xl font-semibold">Popup Title</h2> */}
-        <p className="text-white">{message}</p>
+        <p className="text-center text-white">{message}</p>
         <div className="flex w-full items-center justify-center gap-4">
           <button
             onClick={cancelBtnFunc}
-            className={cn("rounded bg-red-500 p-2 px-3", cancelBtnColor)}
+            className={cn("rounded bg-red-500 px-3 py-1.5", cancelBtnColor)}
           >
             Cancel
           </button>
           <button
             onClick={executeBtnFunc}
-            className={cn("rounded bg-green-500 px-3 py-2", executeBtnColor)}
+            className={cn("rounded bg-green-500 px-3 py-1.5", executeBtnColor)}
           >
             {executeBtnLabel}
           </button>

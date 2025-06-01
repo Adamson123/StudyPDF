@@ -12,7 +12,7 @@ type AllStoredQuizzes = StoredQuiz[];
 /**
  * Retrieves all quizzes from localStorage.
  */
-const getAllQuizzesFromStorage = (): AllStoredQuizzes => {
+export const getAllQuizzesFromStorage = (): AllStoredQuizzes => {
   if (typeof window === "undefined") return [];
   const data = localStorage.getItem(LOCAL_STORAGE_KEY);
   return data ? (JSON.parse(data) as AllStoredQuizzes) : [];
@@ -29,12 +29,10 @@ const saveAllQuizzesToStorage = (quizzes: AllStoredQuizzes): void => {
 /**
  * Gets a specific quiz by its ID from localStorage.
  */
-export const getQuizById = (
-  id: string,
-): (MultiChoiceQuestionTypes | FillAnswerTypes)[] | undefined => {
+export const getQuizById = (id: string): StoredQuiz => {
   const allQuizzes = getAllQuizzesFromStorage();
   const quiz = allQuizzes.find((q) => q.id === id);
-  return quiz?.questions;
+  return quiz as StoredQuiz;
 };
 
 /**

@@ -13,11 +13,14 @@ const Quiz = () => {
   console.log("Quiz ID:", id);
   const [questions, setQuestions] = useState(questionsMock);
   const [startQuiz, setStartQuiz] = useState(false);
+  const [title, setTitle] = useState("");
 
   useEffect(() => {
     const localQuestions = getQuizById(id);
     if (localQuestions) {
-      setQuestions(localQuestions);
+      const { title, questions } = localQuestions;
+      setQuestions(questions);
+      setTitle(title);
     }
 
     const warnOnPageReload = (event: BeforeUnloadEvent) => {
@@ -38,7 +41,7 @@ const Quiz = () => {
     <main className="flex w-full flex-col gap-6 overflow-y-auto bg-background p-6">
       <div className="flex items-center justify-between border-gray-border bg-background">
         <div className="">
-          <h2 className="text-2xl">CIT108.pdf</h2>
+          <h2 className="text-2xl">{title}</h2>
           <h3 className="text-sm text-gray-500">
             Total Questions: {questions.length}
           </h3>
