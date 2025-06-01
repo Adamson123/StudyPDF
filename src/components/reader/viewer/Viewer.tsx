@@ -6,7 +6,7 @@ import PDFPage from "@/components/reader/viewer/pdfPage";
 import { getPDFDocument } from "./utils";
 import SelectionMenu from "./SelectionMenu";
 import Header from "../Header";
-import LeftSection from "../left-section/LeftSection";
+import Sidebar from "../../sidebar/Sidebar";
 import { Loader2 } from "lucide-react";
 import AddComment from "./comment/AddComment";
 import Comment from "./comment/Comment";
@@ -24,7 +24,7 @@ const Viewer = () => {
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   const [pdfPages, setPdfPages] = useState<PDFPage[]>([]);
-  const [showLeftSection, setShowLeftSection] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [scale, setScale] = useState(0.7);
   const [loading, setLoading] = useState(true);
   const [selectionClass, setSelectionClass] = useState("");
@@ -133,8 +133,8 @@ const Viewer = () => {
     <ViewerContext.Provider value={{ pdfInfo }}>
       <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-6">
         <Header
-          setShowLeftSection={setShowLeftSection}
-          showLeftSection={showLeftSection}
+          setShowSidebar={setShowSidebar}
+          showSidebar={showSidebar}
           incrementScale={incrementScale}
           decrementScale={decrementScale}
           numOfPages={pdfPages.length}
@@ -145,7 +145,7 @@ const Viewer = () => {
           setMessage={setMessage}
         />
         {/* Add Optimization */}
-        <LeftSection showLeftSection={showLeftSection} />
+        <Sidebar showSidebar={showSidebar} />
         {loading ? (
           <div className="text-md flex flex-col items-center gap-1">
             Loading PDF...

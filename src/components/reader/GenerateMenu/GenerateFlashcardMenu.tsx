@@ -31,6 +31,7 @@ const GenerateFlashcardsMenu = ({
   const [error, setError] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [flashcards, setFlashcards] = useState<FlashcardTypes[]>([]);
+  const [title, setTitle] = useState("");
   const router = useRouter();
 
   const generateQuestionWithOpenAI = async (
@@ -106,7 +107,7 @@ const GenerateFlashcardsMenu = ({
     console.log("Saving quiz with flashcards:", flashcards);
     const id = uuidv4(); // Generate a unique ID for the quiz
     if (!flashcards.length) return; // No questions to save
-    saveFlashcard({ id, title: pdfInfo.name, cardsToSave: flashcards });
+    saveFlashcard({ id, title, cardsToSave: flashcards });
     setFlashcards([]);
     setRange({ from: 1, to: numOfPages }); // Reset range
     router.push(`/flashcard/${id}`); // Redirect to the quiz page
@@ -200,6 +201,7 @@ const GenerateFlashcardsMenu = ({
           <div className="space-y-1 text-sm">
             <label htmlFor="name">Flashcard Name</label>
             <Input
+              onChange={(event) => setTitle(event.target.value)}
               id="name"
               placeholder="Enter flashcard name"
               className="bg-border focus:outline-1 focus:outline-primary"

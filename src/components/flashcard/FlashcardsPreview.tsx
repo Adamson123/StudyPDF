@@ -8,10 +8,12 @@ const FlashcardsPreview = ({
   setPracticeFlashcards,
   flashcards,
   setFlashcards,
+  flashcardInfo,
 }: {
   setPracticeFlashcards: Dispatch<SetStateAction<boolean>>;
   flashcards: FlashcardTypes[];
   setFlashcards: Dispatch<SetStateAction<FlashcardTypes[]>>;
+  flashcardInfo: { id: string; title: string };
 }) => {
   const [showEditFlashcards, setShowEditFlashcards] = useState(false);
   const [flashcardToEdit, setFlashcardToEdit] = useState<
@@ -53,7 +55,7 @@ const FlashcardsPreview = ({
       <div className="mx-auto w-full rounded border">
         <div className="flex justify-between gap-2 border-b p-5 text-sm">
           <h2 className="">Learning Progress</h2>
-          <h3 className="text-gray-400">36 Total cards</h3>
+          <h3 className="text-gray-400">{flashcards.length} Total cards</h3>
         </div>
         <div className="space-y-4 p-5">
           {[
@@ -116,6 +118,7 @@ const FlashcardsPreview = ({
             flashcard={flashcard}
             index={index}
             setFlashcardToEdit={setFlashcardToEdit}
+            flashcardInfo={flashcardInfo}
           />
         ))}
       </div>
@@ -125,6 +128,7 @@ const FlashcardsPreview = ({
           setShowEditFlashcards={setShowEditFlashcards}
           flashcardToEdit={flashcardToEdit}
           setFlashcardToEdit={setFlashcardToEdit}
+          flashcardInfo={flashcardInfo}
         />
       )}
     </div>

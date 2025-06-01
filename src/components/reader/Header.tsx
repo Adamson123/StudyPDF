@@ -50,8 +50,8 @@ const GenerateMenu = ({
 };
 
 const Header = ({
-  setShowLeftSection,
-  showLeftSection,
+  setShowSidebar,
+  showSidebar,
   incrementScale,
   decrementScale,
   numOfPages,
@@ -60,8 +60,8 @@ const Header = ({
   setPdfInfo,
   setMessage,
 }: {
-  setShowLeftSection: Dispatch<SetStateAction<boolean>>;
-  showLeftSection: boolean;
+  setShowSidebar: Dispatch<SetStateAction<boolean>>;
+  showSidebar: boolean;
   incrementScale: () => void;
   decrementScale: () => void;
   numOfPages: number;
@@ -169,9 +169,9 @@ const Header = ({
       <div className="flex items-center gap-3">
         {/* Left section toggle */}
         <PanelLeftDashed
-          onClick={() => setShowLeftSection((prev) => !prev)}
+          onClick={() => setShowSidebar((prev) => !prev)}
           strokeWidth={"1.2"}
-          className={`h-6 w-6 cursor-pointer ${showLeftSection ? "stroke-primary" : "stroke-white"}`}
+          className={`h-6 w-6 cursor-pointer ${showSidebar ? "stroke-primary" : "stroke-white"}`}
         />
 
         <div className="flex h-7 items-center gap-2 border-l border-gray-border pl-3">

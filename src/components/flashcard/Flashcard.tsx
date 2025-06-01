@@ -2,12 +2,14 @@ import { cn } from "@/lib/utils";
 import { Pencil, Trash2 } from "lucide-react";
 import { getColorClass } from "./utils";
 import { Dispatch, SetStateAction } from "react";
+import { saveFlashcard } from "@/lib/flashcardStorage";
 
 const Flashcard = ({
   flashcard,
   setFlashCards,
   index,
   setFlashcardToEdit,
+  flashcardInfo,
 }: {
   flashcard: FlashcardTypes;
   setFlashCards: Dispatch<SetStateAction<FlashcardTypes[]>>;
@@ -15,16 +17,23 @@ const Flashcard = ({
   setFlashcardToEdit: Dispatch<
     SetStateAction<(FlashcardTypes & { index: number }) | null>
   >;
+  flashcardInfo: { id: string; title: string };
   index: number;
 }) => {
   const flashcardLevel = getColorClass(flashcard.level);
   const deleteFlashcard = () => {
-    setFlashCards((prev) => prev.filter((f, i) => index !== i));
+    setFlashCards((prev) => {
+      const flashcards = prev.filter((f, i) => index !== i);
+      saveFlashcard({ ...flashcardInfo, cardsToSave: flashcards });
+      return flashcards;
+    });
   };
+  flashcard.level && console.log(flashcard, flashcardLevel);
+
   return (
     <div
       className={cn(
-        "relative space-y-6 rounded bg-border/35 p-7 pb-16 transition-all",
+        `relative space-y-6 rounded bg-border/35 p-7 pb-16 transition-all`,
         flashcardLevel.color,
       )}
     >

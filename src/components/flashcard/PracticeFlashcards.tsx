@@ -3,40 +3,59 @@ import { Button } from "../ui/button";
 import { getColorClass } from "./utils";
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useState } from "react";
+import { saveFlashcard } from "@/lib/flashcardStorage";
 
 const PracticeFlashcards = ({
   setPracticeFlashcards,
   flashcards,
   setFlashcards,
+  flashcardInfo,
 }: {
   setPracticeFlashcards: Dispatch<SetStateAction<boolean>>;
   flashcards: FlashcardTypes[];
   setFlashcards: Dispatch<SetStateAction<FlashcardTypes[]>>;
+  flashcardInfo: { id: string; title: string };
 }) => {
+  const randomizeFlashcards = () => {
+    const shuffledFlashcards = [...flashcards]
+      .map((card, index) => ({ ...card, id: index }))
+      .sort(() => Math.random() - 0.5);
+    return shuffledFlashcards;
+  };
+
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [shuffledFlashcards, setShuffledFlashcards] = useState<
+    (FlashcardTypes & { id: number })[]
+  >(randomizeFlashcards());
 
   // const flashcardLevel = getColorClass(flashcard.level);
   const updateFlashcardLevel = (level: string) => {
+    const flashcardWidthID = shuffledFlashcards[
+      currentFlashcardIndex
+    ] as FlashcardTypes & { id: number };
+
     const updatedFlashcards = flashcards.map((flashcard, i) => {
-      if (i === currentFlashcardIndex) {
+      if (i === flashcardWidthID.id) {
         return { ...flashcard, level };
       }
       return flashcard;
     });
 
     setFlashcards(updatedFlashcards);
+    saveFlashcard({ ...flashcardInfo, cardsToSave: updatedFlashcards });
     if (currentFlashcardIndex < flashcards.length - 1) {
       setCurrentFlashcardIndex(currentFlashcardIndex + 1);
     } else {
-      setCurrentFlashcardIndex(0);
+      // setCurrentFlashcardIndex(0);
+      setPracticeFlashcards(false);
     }
     setShowAnswer(false);
     return updatedFlashcards;
   };
 
   const flashcardLevel = getColorClass(
-    (flashcards[currentFlashcardIndex] as FlashcardTypes).level,
+    (shuffledFlashcards[currentFlashcardIndex] as FlashcardTypes).level,
   );
 
   return (
@@ -61,14 +80,14 @@ const PracticeFlashcards = ({
           {/* Progress */}
           <progress
             value={currentFlashcardIndex}
-            max={flashcards.length}
+            max={shuffledFlashcards.length}
             className="h-2 w-full"
           />
         </div>
         {/* Card */}
         <div
           className={cn(
-            `flex min-h-72 w-full flex-col rounded bg-border/55 p-3 text-sm text-white`,
+            `flex min-h-80 w-full flex-col rounded bg-border/55 p-3 text-sm text-white`,
             flashcardLevel.color,
           )}
         >
@@ -79,10 +98,10 @@ const PracticeFlashcards = ({
             )}
           >
             {" "}
-            {flashcards[currentFlashcardIndex]?.front}
+            {shuffledFlashcards[currentFlashcardIndex]?.front}
           </div>
           <div className={`pt-3 text-center ${!showAnswer && "blur"}`}>
-            {flashcards[currentFlashcardIndex]?.back}
+            {shuffledFlashcards[currentFlashcardIndex]?.back}
           </div>
         </div>
         {!showAnswer ? (
@@ -112,7 +131,11 @@ const PracticeFlashcards = ({
                 onClick={() => updateFlashcardLevel(level.level)}
                 key={i}
                 variant="outline"
-                className={cn(`flex-1 p-7 text-white`, level.color)}
+                className={cn(
+                  `flex-1 p-7 text-white`,
+                  level.color,
+                  `hover:${level.color} hover:opacity-[0.9]`,
+                )}
               >
                 {level.level.charAt(0).toUpperCase() + level.level.slice(1)}
               </Button>

@@ -1,6 +1,5 @@
 "use client";
 import Quiz from "@/components/quiz/Quiz";
-import { useParams } from "next/navigation";
 
 const QuizPage = () => {
   return (

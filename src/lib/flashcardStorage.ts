@@ -29,10 +29,10 @@ const saveAllFlashcardsToStorage = (flashcards: AllStoredFlashcards): void => {
 /**
  * Gets a specific flashcard set by its ID from localStorage.
  */
-export const getFlashcardById = (id: string): FlashcardTypes[] | undefined => {
+export const getFlashcardById = (id: string): StoredFlashcard | undefined => {
   const allFlashcards = getAllFlashcardsFromStorage();
   const flashcardSet = allFlashcards.find((f) => f.id === id);
-  return flashcardSet?.cards;
+  return flashcardSet;
 };
 
 /**

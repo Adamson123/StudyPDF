@@ -2,12 +2,14 @@ import React, { Dispatch, SetStateAction } from "react";
 import { Button } from "../ui/button";
 import XButton from "../ui/XButton";
 import { Check } from "lucide-react";
+import { saveFlashcard } from "@/lib/flashcardStorage";
 
 const EditFlashcards = ({
   setShowEditFlashcards,
   setFlashcards,
   flashcardToEdit,
   setFlashcardToEdit,
+  flashcardInfo,
 }: {
   setShowEditFlashcards: Dispatch<SetStateAction<boolean>>;
   setFlashcards: Dispatch<SetStateAction<FlashcardTypes[]>>;
@@ -15,6 +17,7 @@ const EditFlashcards = ({
   setFlashcardToEdit: Dispatch<
     SetStateAction<(FlashcardTypes & { index: number }) | null>
   >;
+  flashcardInfo: { id: string; title: string };
 }) => {
   const [newFlashcard, setNewFlashcard] = React.useState<FlashcardTypes>({
     front: flashcardToEdit?.front || "",
@@ -24,14 +27,20 @@ const EditFlashcards = ({
 
   const handleSave = () => {
     if (!flashcardToEdit) {
-      setFlashcards((prev) => [...prev, newFlashcard]);
+      setFlashcards((prev) => {
+        const flashcards = [...prev, newFlashcard];
+        saveFlashcard({ ...flashcardInfo, cardsToSave: flashcards });
+        return flashcards;
+      });
       setShowEditFlashcards(false);
     } else {
-      setFlashcards((prev) =>
-        prev.map((flashcard, i) =>
+      setFlashcards((prev) => {
+        const flashcards = prev.map((flashcard, i) =>
           i === flashcardToEdit.index ? newFlashcard : flashcard,
-        ),
-      );
+        );
+        saveFlashcard({ ...flashcardInfo, cardsToSave: flashcards });
+        return flashcards;
+      });
       setShowEditFlashcards(false);
       setFlashcardToEdit(null);
     }
