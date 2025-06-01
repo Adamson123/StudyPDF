@@ -38,10 +38,15 @@ class PDFPage {
     const pdfPage = await createPDFPage(pdfDocument, this.index);
     const viewport = pdfPage.getViewport({ scale: this.scale });
 
+    const DPR = window.devicePixelRatio || 1;
+
     // const resolution = 2; // Set the resolution to 2x
     // // Resize canvas
-    this.pdfCanvas.width = viewport.width;
-    this.pdfCanvas.height = viewport.height;
+    this.pdfCanvas.width = viewport.width * DPR;
+    this.pdfCanvas.height = viewport.height * DPR;
+
+    this.pdfCanvas.style.width = `${viewport.width}px`;
+    this.pdfCanvas.style.height = `${viewport.height}px`;
 
     // Kill previous render
     try {
@@ -53,6 +58,9 @@ class PDFPage {
     }
 
     const context = this.pdfCanvas.getContext("2d");
+    if (context) {
+      context.scale(DPR, DPR);
+    }
 
     // Start render task
     this.renderTask = pdfPage.render({
