@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import PopUpWrapper from "./PopUpWrapper";
 
 const Popup = ({
   executeBtnLabel,
@@ -16,7 +17,7 @@ const Popup = ({
   cancelBtnFunc: () => any;
 }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <PopUpWrapper>
       <div className="flex w-full max-w-md flex-col items-center justify-center gap-4 rounded-lg bg-background p-6 shadow-lg">
         {/* <h2 className="text-xl font-semibold">Popup Title</h2> */}
         <p className="text-white">{message}</p>
@@ -35,7 +36,7 @@ const Popup = ({
           </button>
         </div>
       </div>
-    </div>
+    </PopUpWrapper>
   );
 };
 

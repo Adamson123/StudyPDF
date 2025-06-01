@@ -1,24 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
-import React from "react";
 
 const GeneratingCover = ({
-  amountOfQuestions,
-  questionsLength,
+  amountOfData,
+  dataLength,
   handleTryAgain,
   handleContinue,
   handleCancel,
   error,
+  type,
 }: {
-  amountOfQuestions: number;
-  questionsLength: number;
+  amountOfData: number;
+  dataLength: number;
   handleTryAgain: () => void;
   handleContinue: () => void;
   handleCancel: () => void;
   error: string;
+  type: "question" | "flashcard";
 }) => {
   return (
-    <div className="flex flex-col items-center gap-6 rounded-md border border-gray-border bg-background p-7 py-10 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
+    <div className="flex w-full max-w-[500px] flex-col items-center gap-6 rounded-md border border-gray-border bg-background p-7 py-10 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
       {error ? (
         <span className="text-6xl">😥</span>
       ) : (
@@ -30,7 +31,7 @@ const GeneratingCover = ({
           {error ? (
             <span className="text-red-500">{error}</span>
           ) : (
-            "Generating questons..."
+            `Generating ${type}s...`
           )}
         </h2>
         <p className="max-w-[390px] text-center text-xs text-gray-500">
@@ -42,7 +43,7 @@ const GeneratingCover = ({
       </div>
       {/*  */}
       <p className="text-2xl">
-        {questionsLength}/{amountOfQuestions}
+        {dataLength}/{amountOfData}
       </p>
       {/*  */}
       {error && (
@@ -62,12 +63,12 @@ const GeneratingCover = ({
               Cancel
             </Button>
           </div>
-          {questionsLength ? (
+          {dataLength ? (
             <p
               onClick={handleContinue}
               className="cursor-pointer underline hover:text-primary"
             >
-              Continue with {questionsLength} questions
+              Continue with {dataLength} {type}s
             </p>
           ) : (
             ""

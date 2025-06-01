@@ -78,7 +78,7 @@ const Result = ({
   const { totalQuestions, correctAnswers, incorrectAnswers, score } = result;
 
   return (
-    <div className="flex flex-col items-center gap-10 overflow-auto bg-background px-5 py-5">
+    <div className="flex flex-col items-center gap-10 overflow-auto bg-background py-5">
       <div className="flex w-full flex-col items-center gap-3">
         <div className="text-lg font-semibold">
           {score}% {getRemark(score)}

@@ -2,6 +2,7 @@ const LOCAL_STORAGE_KEY = "AllQuizzes"; // Or your existing key, e.g., "question
 
 type StoredQuiz = {
   id: string;
+  title: string;
   questions: (MultiChoiceQuestionTypes | FillAnswerTypes)[];
   // Add any other metadata you store per quiz, e.g., title, lastPlayed
 };
@@ -40,14 +41,22 @@ export const getQuizById = (
  * Saves (adds or updates) a specific quiz to localStorage.
  */
 export const saveQuiz = (
-  id: string,
-  questionsToSave: (MultiChoiceQuestionTypes | FillAnswerTypes)[],
+  {
+    id,
+    title,
+    questionsToSave,
+  }: {
+    id: string;
+    title: string;
+    questionsToSave: (MultiChoiceQuestionTypes | FillAnswerTypes)[];
+  },
   // title?: string, // Optional: if you want to save other metadata
 ): void => {
   let allQuizzes = getAllQuizzesFromStorage();
   const quizIndex = allQuizzes.findIndex((q) => q.id === id);
 
   const newQuizData: StoredQuiz = {
+    title,
     id,
     questions: questionsToSave,
     // title: title || `Quiz ${id}`, // Example title

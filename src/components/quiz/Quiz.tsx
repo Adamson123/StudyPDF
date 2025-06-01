@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { questionsMock } from "@/data/static-data/questionMock";
 import { getQuizById } from "@/lib/quizStorage";
 import { QuizActive } from "./QuizActive";
-import Preview from "./Preview";
+import QuestionsPreview from "./QuestionsPreview";
 import { Play } from "lucide-react";
+import { useParams } from "next/navigation";
 
-const Quiz = ({ id }: { id: string }) => {
+const Quiz = () => {
+  const { id } = useParams() as { id: string };
+  console.log("Quiz ID:", id);
   const [questions, setQuestions] = useState(questionsMock);
   const [startQuiz, setStartQuiz] = useState(false);
 
@@ -57,7 +60,7 @@ const Quiz = ({ id }: { id: string }) => {
           setQuestions={setQuestions}
         />
       ) : (
-        <Preview questions={questions} setStartQuiz={setStartQuiz} />
+        <QuestionsPreview questions={questions} setStartQuiz={setStartQuiz} />
       )}
     </main>
   );

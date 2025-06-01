@@ -13,7 +13,9 @@ import Comment from "./comment/Comment";
 import { Message } from "./Message";
 import HighlightMenu from "./HighlightMenu";
 
-export const ViewerContext = createContext<{ pdfURL: string }>({ pdfURL: "" });
+export const ViewerContext = createContext<{ pdfInfo: PdfInfoTypes }>({
+  pdfInfo: { name: "", url: "" },
+});
 
 export type CommentType = { text: string; class: string };
 
@@ -31,25 +33,28 @@ const Viewer = () => {
   const [highlightClass, setHighlightClass] = useState("");
   //TODO:  Add selection box mode
   const [selectionBoxMode, setSelectionBoxMode] = useState(false);
-  const [pdfURL, setPdfURL] = useState(window.location.origin + "/Split.pdf");
+  const [pdfInfo, setPdfInfo] = useState({
+    url: window.location.origin + "/Split.pdf",
+    name: "",
+  });
 
   useEffect(() => {
     (async () => {
-      const pdfDocument = await getPDFDocument(pdfURL);
+      const pdfDocument = await getPDFDocument(pdfInfo.url);
 
       const pdfPages: PDFPage[] = [];
-      const renderArray: any[] = [];
+      const pdfPromises: Promise<void>[] = [];
       for (let index = 1; index <= pdfDocument.numPages; index++) {
         const pdfPage = new PDFPage(
           index,
           pdfsContainer.current as HTMLDivElement,
         );
         // await pdfPage.render(pdfDocument, scale);
-        renderArray.push(pdfPage.render(pdfDocument, scale));
+        pdfPromises.push(pdfPage.render(pdfDocument, scale));
         pdfPages.push(pdfPage);
       }
 
-      await Promise.all(renderArray);
+      await Promise.all(pdfPromises);
 
       setLoading(false);
 
@@ -74,13 +79,16 @@ const Viewer = () => {
         scale.toString(),
       );
     })();
-  }, [pdfURL]);
+  }, [pdfInfo]);
 
   const updateScale = async (scale: number) => {
     setScale(scale);
+    const renderPromises: Promise<void>[] = [];
     for (const pdfPage of pdfPages) {
-      await pdfPage.updateScale(scale);
+      // await pdfPage.updateScale(scale);
+      renderPromises.push(pdfPage.updateScale(scale));
     }
+    await Promise.all(renderPromises);
     document.documentElement.style.setProperty(
       "--total-scale-factor",
       scale.toString(),
@@ -122,7 +130,7 @@ const Viewer = () => {
   };
 
   return (
-    <ViewerContext.Provider value={{ pdfURL }}>
+    <ViewerContext.Provider value={{ pdfInfo }}>
       <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-6">
         <Header
           setShowLeftSection={setShowLeftSection}
@@ -133,7 +141,7 @@ const Viewer = () => {
           pdfsContainer={pdfsContainer}
           // it will set the selection box mode to true or false
           setSelectionBoxMode={setSelectionBoxMode}
-          setPdfURL={setPdfURL}
+          setPdfInfo={setPdfInfo}
           setMessage={setMessage}
         />
         {/* Add Optimization */}

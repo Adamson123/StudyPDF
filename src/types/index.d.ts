@@ -21,3 +21,8 @@ interface FlashcardTypes {
   back: string;
   level: string;
 }
+
+interface PdfInfoTypes {
+  name: string;
+  url: string;
+}

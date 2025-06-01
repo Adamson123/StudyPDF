@@ -5,8 +5,6 @@ import {
   Plus,
   PanelLeftDashed,
   ChevronsRight,
-  Star,
-  SquareDashed,
   Stars,
   File,
   FileQuestion,
@@ -59,7 +57,7 @@ const Header = ({
   numOfPages,
   pdfsContainer,
   setSelectionBoxMode,
-  setPdfURL,
+  setPdfInfo,
   setMessage,
 }: {
   setShowLeftSection: Dispatch<SetStateAction<boolean>>;
@@ -69,7 +67,7 @@ const Header = ({
   numOfPages: number;
   pdfsContainer: RefObject<HTMLDivElement>;
   setSelectionBoxMode: Dispatch<SetStateAction<boolean>>;
-  setPdfURL: Dispatch<SetStateAction<string>>;
+  setPdfInfo: Dispatch<SetStateAction<PdfInfoTypes>>;
   setMessage: Dispatch<SetStateAction<MessageType>>;
 }) => {
   const [pageNum, setPageNum] = useState("1");
@@ -161,7 +159,7 @@ const Header = ({
     const file = e.target.files?.[0];
     if (!file) return;
     const fileURL = URL.createObjectURL(file);
-    setPdfURL(fileURL);
+    setPdfInfo({ url: fileURL, name: file.name });
     setMessage({ text: "Loading PDF...", autoTaminate: false });
     setPageNum("1");
   };

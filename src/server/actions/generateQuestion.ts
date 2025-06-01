@@ -1,6 +1,6 @@
 "use server";
 
-import { prompts } from "@/data/static-data/prompts";
+import { questionPrompts } from "@/data/static-data/questionPrompts";
 import { env } from "@/env";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -12,7 +12,7 @@ const generateQuestion = async (
   docBuffer: ArrayBuffer,
   questionType: string,
 ) => {
-  const prompt = prompts[questionType] || prompts.mixed;
+  const prompt = questionPrompts[questionType] || questionPrompts.mixed;
 
   try {
     const result = await model.generateContent([

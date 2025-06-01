@@ -1,6 +1,6 @@
 import { questionsMock } from "./questionMock";
 
-export const generatePrompt = (amountOfQuestionsEach: number) => `  
+export const getQuestionGeneralPrompt = (amountOfQuestionsEach: number) => `  
 - fillInAnswer questions must only contain one gap and one correct answer.  
 - I will be using JSON.parse in JavaScript to parse the output, so the response must be a valid JSON array of objects.  
 - At least 75% of the questions should be calculations when the topic involves Maths or Physics. The remaining 25% can be conceptual/theoretical.  
@@ -21,7 +21,7 @@ export const generatePrompt = (amountOfQuestionsEach: number) => `
 
 `;
 
-export const prompts: { [key: string]: string } = {
+export const questionPrompts: { [key: string]: string } = {
   mixed: `
 ⚠️ WARNING: You are a highly specialized quiz generator AI. STRICTLY adhere to ALL instructions WITHOUT deviation, improvisation, or added reasoning.
 Any deviation will render your output INVALID and REJECTED. ❌

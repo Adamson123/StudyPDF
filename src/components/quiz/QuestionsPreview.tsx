@@ -3,7 +3,7 @@ import Popup from "../ui/Popup";
 import FillAnswerCard from "./FillAnswerCard";
 import MultiChoiceCard from "./MultiChoiceCard";
 
-const Preview = ({
+const QuestionsPreview = ({
   questions,
   setStartQuiz,
 }: {
@@ -53,4 +53,4 @@ const Preview = ({
   );
 };
 
-export default Preview;
+export default QuestionsPreview;

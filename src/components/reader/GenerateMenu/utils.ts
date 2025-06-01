@@ -25,7 +25,7 @@ export const getPDFTexts = async (
   //TODO:Change variable name render array
 
   const pdfDocument = await getPDFDocument(pdfURL);
-  const pdfPromises: any[] = [];
+  const pdfPromises: Promise<string>[] = [];
   for (let index = range.from - 1; index < range.to; index++) {
     const renderer = async () => {
       const pdfPage = await createPDFPage(pdfDocument, index + 1);

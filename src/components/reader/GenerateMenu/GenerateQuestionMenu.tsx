@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
-import { use, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { env } from "@/env";
-import { generatePrompt, prompts } from "@/data/static-data/prompts";
-import Input from "@/components/ui/input";
+import {
+  getQuestionGeneralPrompt,
+  questionPrompts,
+} from "@/data/static-data/questionPrompts";
 import { ViewerContext } from "../viewer/Viewer";
 import GeneratingCover from "./GeneratingCover";
 import { saveQuiz } from "@/lib/quizStorage";
@@ -11,6 +13,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import XButton from "@/components/ui/XButton";
 import { getPDFTexts, splitChunks, splitTexts } from "./utils";
+import PopUpWrapper from "@/components/ui/PopUpWrapper";
+import OtherCustomInput from "./OtherCustomInput";
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
@@ -23,7 +27,7 @@ const GenerateQuestionMenu = ({
   const [amountOfQuestions, setAmountOfQuestions] = useState<number>(10);
   const [range, setRange] = useState({ from: 1, to: numOfPages });
   const [userPrompt, setUserPrompt] = useState<string>("");
-  const pdfURL = useContext(ViewerContext).pdfURL;
+  const { pdfInfo } = useContext(ViewerContext);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [questions, setQuestions] = useState<
     (MultiChoiceQuestionTypes | FillAnswerTypes)[]
@@ -45,7 +49,7 @@ const GenerateQuestionMenu = ({
       `📝 Generating ${amountOfQuestionsEach}  questions for chunk ${index + 1}/${chunks.length}`,
     );
 
-    const prompt = prompts[questionType] || prompts.mixed;
+    const prompt = questionPrompts[questionType] || questionPrompts.mixed;
 
     const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
     const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
@@ -57,7 +61,7 @@ const GenerateQuestionMenu = ({
 
     console.log(
       prompt +
-        generatePrompt(amountOfQuestionsEach) +
+        getQuestionGeneralPrompt(amountOfQuestionsEach) +
         `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`,
     );
 
@@ -67,7 +71,7 @@ const GenerateQuestionMenu = ({
           role: "user",
           content:
             prompt +
-            generatePrompt(amountOfQuestionsEach) +
+            getQuestionGeneralPrompt(amountOfQuestionsEach) +
             `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`,
         },
         { role: "user", content: text },
@@ -114,8 +118,7 @@ const GenerateQuestionMenu = ({
     console.log("Saving quiz with questions:", questions);
     const id = uuidv4(); // Generate a unique ID for the quiz
     if (!questions.length) return; // No questions to save
-    //TODO: Add name of pdf
-    saveQuiz(id, questions);
+    saveQuiz({ id, title: pdfInfo.name, questionsToSave: questions });
     setQuestions([]);
     setRange({ from: 1, to: numOfPages }); // Reset range
     router.push(`/quiz/${id}`); // Redirect to the quiz page
@@ -125,7 +128,7 @@ const GenerateQuestionMenu = ({
   const generateQuestions = async () => {
     setIsGenerating(true);
     let response: (MultiChoiceQuestionTypes | FillAnswerTypes)[] = [];
-    const pdfTexts = await getPDFTexts(pdfURL, range); // Get texts from PDF
+    const pdfTexts = await getPDFTexts(pdfInfo.url, range); // Get texts from PDF
     const chunks = splitChunks(splitTexts(pdfTexts), amountOfQuestions); // Break chunks if needed
     let error = "";
 
@@ -183,14 +186,15 @@ const GenerateQuestionMenu = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 backdrop-blur-sm">
+    <PopUpWrapper>
       {!isGenerating ? (
         <form
           onSubmit={async (event) => {
             event.preventDefault();
+            setError("");
             await generateQuestions();
           }}
-          className="flex max-h-screen max-w-[420px] flex-col gap-6 overflow-y-auto rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)] md:max-w-[500px]"
+          className="flex max-h-screen w-full max-w-[500px] flex-col gap-6 overflow-y-auto rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -234,61 +238,15 @@ const GenerateQuestionMenu = ({
             ))}
           </div>
 
-          {/* Amount of questions and range */}
-          <div className="start flex flex-col gap-3">
-            <label htmlFor="amountOfQuestions" className="text-nowrap text-sm">
-              Amount of question:
-            </label>
-            <Input
-              onChange={(e) => setAmountOfQuestions(Number(e.target.value))}
-              id="amountOfQuestions"
-              value={amountOfQuestions}
-              type="number"
-              min={10}
-              max={60}
-              className="bg-border focus:outline-1 focus:outline-primary"
-            />
-          </div>
-          {/* Range */}
-          <div className="flex w-full flex-col items-start gap-3">
-            <label className="text-nowrap text-sm">Range of pages:</label>
-            <div className="flex w-full items-center gap-3">
-              <Input
-                type="number"
-                min={1}
-                max={numOfPages}
-                value={range.from}
-                onChange={(e) =>
-                  setRange({ ...range, from: Number(e.target.value) })
-                }
-                className="bg-border focus:outline-1 focus:outline-primary"
-              />
-              <span>-</span>
-              <Input
-                type="number"
-                min={1}
-                max={numOfPages}
-                value={range.to}
-                onChange={(e) =>
-                  setRange({ ...range, to: Number(e.target.value) })
-                }
-                className="bg-border focus:outline-1 focus:outline-primary"
-              />
-            </div>
-          </div>
-          {/* User Prompt */}
-          <div className="flex w-full flex-col gap-3">
-            <label htmlFor="userPrompt" className="text-sm">
-              User Prompt (Optional):
-            </label>
-            <textarea
-              id="userPrompt"
-              value={userPrompt}
-              onChange={(e) => setUserPrompt(e.target.value)}
-              className="h-36 resize-none rounded bg-border p-3 text-xs ring-primary focus:outline-none focus:ring-1"
-              placeholder="Enter your custom prompt here..."
-            />
-          </div>
+          <OtherCustomInput
+            amountOfData={amountOfQuestions}
+            setAmountOfData={setAmountOfQuestions}
+            numOfPages={numOfPages}
+            range={range}
+            setRange={setRange}
+            setUserPrompt={setUserPrompt}
+            userPrompt={userPrompt}
+          />
           {/* Geneerate Button */}
           <Button type="submit" className="flex items-center">
             Generate Questions <Stars />
@@ -302,15 +260,16 @@ const GenerateQuestionMenu = ({
         </form>
       ) : (
         <GeneratingCover
-          questionsLength={questions.length}
-          amountOfQuestions={amountOfQuestions}
+          dataLength={questions.length}
+          amountOfData={amountOfQuestions}
           handleTryAgain={handleTryAgain}
           handleContinue={handleContinue}
           handleCancel={handleCancel}
           error={error}
+          type="question"
         />
       )}
-    </div>
+    </PopUpWrapper>
   );
 };
 
