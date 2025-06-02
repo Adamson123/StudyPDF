@@ -40,10 +40,16 @@ const GenerateQuestionMenu = ({
     index: number,
     chunks: string[],
   ) => {
-    const amountOfQuestionsEach = !index
+    let amountOfQuestionsEach = !index
       ? Math.floor(amountOfQuestions / chunks.length) +
         (amountOfQuestions % chunks.length)
       : Math.floor(amountOfQuestions / chunks.length);
+
+    //To make sure the questions are complete, we will add the remaining questions to the last chunk
+    if (index === chunks.length - 1) {
+      const remainingQuestions = amountOfQuestions - questions.length;
+      amountOfQuestionsEach = remainingQuestions;
+    }
 
     console.log(
       `📝 Generating ${amountOfQuestionsEach}  questions for chunk ${index + 1}/${chunks.length}`,
@@ -165,7 +171,7 @@ const GenerateQuestionMenu = ({
     }
 
     console.log(response);
-    handleSaveAndRedirectToQuiz(response);
+    await handleSaveAndRedirectToQuiz(response);
     setIsGenerating(false);
     // return response;
   };
@@ -193,6 +199,9 @@ const GenerateQuestionMenu = ({
             event.preventDefault();
             setError("");
             await generateQuestions();
+          }}
+          style={{
+            scrollbarColor: "hsl(var(--border)) transparent",
           }}
           className="flex max-h-screen w-full max-w-[500px] flex-col gap-6 overflow-y-auto rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]"
         >
@@ -246,6 +255,7 @@ const GenerateQuestionMenu = ({
             setRange={setRange}
             setUserPrompt={setUserPrompt}
             userPrompt={userPrompt}
+            type="question"
           />
           {/* Geneerate Button */}
           <Button type="submit" className="flex items-center">

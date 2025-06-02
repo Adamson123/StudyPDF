@@ -9,6 +9,7 @@ const OtherCustomInput = ({
   setRange,
   setUserPrompt,
   userPrompt,
+  type,
 }: {
   setAmountOfData: Dispatch<SetStateAction<number>>;
   amountOfData: number;
@@ -17,13 +18,14 @@ const OtherCustomInput = ({
   setRange: Dispatch<SetStateAction<{ from: number; to: number }>>;
   userPrompt: string;
   setUserPrompt: Dispatch<SetStateAction<string>>;
+  type: "question" | "flashcard";
 }) => {
   return (
     <div className="flex flex-col gap-6">
       {/* Amount of questions and range */}
       <div className="start flex flex-col gap-2">
         <label htmlFor="amountOfData" className="text-nowrap text-sm">
-          Amount of question:
+          Amount of {type} (10 - 70):
         </label>
         <Input
           onChange={(e) => setAmountOfData(Number(e.target.value))}
