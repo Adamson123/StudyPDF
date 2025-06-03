@@ -81,7 +81,7 @@ progress::-moz-progress-bar {
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  background-image: url("/loader.svg");
+  background-image: url("/loader-2.svg");
   background-repeat: no-repeat;
   background-position: center;
   animation: spinl 1s linear infinite;

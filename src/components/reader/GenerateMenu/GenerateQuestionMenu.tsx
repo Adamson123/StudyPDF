@@ -15,6 +15,7 @@ import XButton from "@/components/ui/XButton";
 import { getPDFTexts, splitChunks, splitTexts } from "./utils";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import OtherCustomInput from "./OtherCustomInput";
+import Input from "@/components/ui/input";
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
@@ -39,6 +40,7 @@ const GenerateQuestionMenu = ({
     (MultiChoiceQuestionTypes | FillAnswerTypes)[]
   >([]);
   const [error, setError] = useState("");
+  const [title, setTitle] = useState<string>("");
   const router = useRouter();
 
   const generateQuestionWithOpenAI = useCallback(
@@ -134,7 +136,7 @@ const GenerateQuestionMenu = ({
       console.log("Saving quiz with questions:", questions);
       const id = uuidv4(); // Generate a unique ID for the quiz
       if (!questions.length) return; // No questions to save
-      saveQuiz({ id, title: pdfInfo.name, questionsToSave: questions });
+      saveQuiz({ id, title, questionsToSave: questions });
       setQuestions([]);
       setRange({ from: 1, to: numOfPages }); // Reset range
       router.push(`/quiz/${id}`); // Redirect to the quiz page
@@ -235,7 +237,18 @@ const GenerateQuestionMenu = ({
 
             <XButton onClick={() => setOpenQuestionMenu(false)} />
           </div>
-
+          {/* Name */}
+          <div className="space-y-1 text-sm">
+            <label htmlFor="name">Flashcard Name</label>
+            <Input
+              onChange={(event) => setTitle(event.target.value)}
+              id="name"
+              placeholder="Enter flashcard name"
+              className="bg-border focus:outline-1 focus:outline-primary"
+              value={title}
+              required
+            />
+          </div>
           {/* Options */}
           <div className="flex flex-col gap-3">
             {[

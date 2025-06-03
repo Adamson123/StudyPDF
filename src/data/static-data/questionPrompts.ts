@@ -18,6 +18,7 @@ export const getQuestionGeneralPrompt = (amountOfQuestionsEach: number) => `
 - ⚠️ After randomizing the position of the correct answer, make sure the \`answer\` field is updated to reflect the **correct letter (A-D)** based on its new position in the \`options\` array.
 - Use this exact function to determine the correct answer field:
   const getAnswerLetter = (options, correctAnswer) => ['A','B','C','D'][options.findIndex(o => o === correctAnswer)];
+- Make sure the \`answer\` value relates with the \`explanation\` field value.
 
 `;
 

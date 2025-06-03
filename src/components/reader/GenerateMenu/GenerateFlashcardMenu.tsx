@@ -221,6 +221,8 @@ const GenerateFlashcardsMenu = ({
               id="name"
               placeholder="Enter flashcard name"
               className="bg-border focus:outline-1 focus:outline-primary"
+              required
+              value={title}
             />
           </div>
           {/* TODO: Add Auto determine amount of questions */}

@@ -290,7 +290,7 @@ const Viewer = () => {
         ) : (
           <div
             onClick={closeHighlightMenu}
-            className={`relative mt-10 flex flex-col gap-3`}
+            className={`relative mt-10 flex flex-col gap-1`}
             ref={pdfsContainer}
           ></div>
         )}
