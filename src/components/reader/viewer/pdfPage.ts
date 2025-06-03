@@ -106,8 +106,8 @@ class PDFPage {
       container: this.textLayer,
     });
 
-    await textLayer.render();
     this.loader.style.display = "none";
+    await textLayer.render();
 
     const textLayerSpan = this.textLayer.querySelectorAll("span")!;
     textLayerSpan.forEach((span, index) => {

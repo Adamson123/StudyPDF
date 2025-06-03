@@ -41,14 +41,20 @@ const GenerateFlashcardsMenu = ({
   const router = useRouter();
 
   const generateQuestionWithOpenAI = useCallback(
-    async (text: string, index: number, chunks: string[]) => {
+    async (
+      text: string,
+      index: number,
+      chunks: string[],
+      generatedFlashcards: FlashcardTypes[],
+    ) => {
       let amountOfFlashcardsEach = !index
         ? Math.floor(amountOfFlashcards / chunks.length) +
           (amountOfFlashcards % chunks.length)
         : Math.floor(amountOfFlashcards / chunks.length);
 
       if (index === chunks.length - 1) {
-        const remainingQuestions = amountOfFlashcards - flashcards.length;
+        const remainingQuestions =
+          amountOfFlashcards - generateFlashcards.length;
         amountOfFlashcardsEach = remainingQuestions;
       }
 
@@ -141,6 +147,7 @@ const GenerateFlashcardsMenu = ({
         text as string,
         index,
         chunks,
+        response,
       );
       if (!flashcard.error && flashcard.length) {
         response = response.length ? [...response, ...flashcard] : flashcard;

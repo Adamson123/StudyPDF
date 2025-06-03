@@ -20,15 +20,9 @@ import Input from "@/components/ui/input";
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
   numOfPages,
-  onQuestionsGenerated, // Callback for when questions are generated
-  onSaveQuiz, // Callback for when the quiz is saved
 }: {
   setOpenQuestionMenu: React.Dispatch<React.SetStateAction<boolean>>;
   numOfPages: number;
-  onQuestionsGenerated?: (
-    questions: (MultiChoiceQuestionTypes | FillAnswerTypes)[],
-  ) => void;
-  onSaveQuiz?: (quizId: string) => void;
 }) => {
   const [questionType, setQuestionType] = useState<string>("multiChoice");
   const [amountOfQuestions, setAmountOfQuestions] = useState<number>(10);
@@ -48,7 +42,7 @@ const GenerateQuestionMenu = ({
       text: string,
       index: number,
       chunks: string[],
-      onChunkGenerated?: (chunkIndex: number, questions: any[]) => void, // Callback for chunk generation
+      generatedQuestions: (FillAnswerTypes | MultiChoiceQuestionTypes)[],
     ) => {
       let amountOfQuestionsEach = !index
         ? Math.floor(amountOfQuestions / chunks.length) +
@@ -56,7 +50,8 @@ const GenerateQuestionMenu = ({
         : Math.floor(amountOfQuestions / chunks.length);
 
       if (index === chunks.length - 1) {
-        const remainingQuestions = amountOfQuestions - questions.length;
+        const remainingQuestions =
+          amountOfQuestions - generatedQuestions.length;
         amountOfQuestionsEach = remainingQuestions;
       }
 
@@ -136,13 +131,14 @@ const GenerateQuestionMenu = ({
       console.log("Saving quiz with questions:", questions);
       const id = uuidv4(); // Generate a unique ID for the quiz
       if (!questions.length) return; // No questions to save
+      console.log({ id, title });
       saveQuiz({ id, title, questionsToSave: questions });
       setQuestions([]);
       setRange({ from: 1, to: numOfPages }); // Reset range
       router.push(`/quiz/${id}`); // Redirect to the quiz page
       // setOpenQuestionMenu(false);
     },
-    [pdfInfo.name, numOfPages, router],
+    [pdfInfo.name, numOfPages, router, title],
   );
 
   const generateQuestions = useCallback(async () => {
@@ -160,6 +156,7 @@ const GenerateQuestionMenu = ({
         text as string,
         index,
         chunks,
+        response,
       );
       if (!questions.error && questions.length) {
         // Skip if no questions generated
@@ -239,11 +236,11 @@ const GenerateQuestionMenu = ({
           </div>
           {/* Name */}
           <div className="space-y-1 text-sm">
-            <label htmlFor="name">Flashcard Name</label>
+            <label htmlFor="name">Quiz Name</label>
             <Input
               onChange={(event) => setTitle(event.target.value)}
               id="name"
-              placeholder="Enter flashcard name"
+              placeholder="Enter quiz name"
               className="bg-border focus:outline-1 focus:outline-primary"
               value={title}
               required
