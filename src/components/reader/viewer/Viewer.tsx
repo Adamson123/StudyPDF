@@ -38,6 +38,134 @@ const Viewer = () => {
     name: "pdf-name",
   });
 
+  // const renderPDFsOnView = async (pdfPages: PDFPage[]) => {
+  //   const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
+  //   const pdfContainers =
+  //     pdfsContainerElement?.querySelectorAll(".pdfContainer");
+
+  //   if (!pdfContainers?.length) return;
+
+  //   for (let index = 0; index < pdfContainers.length; index++) {
+  //     const container = pdfContainers[index] as HTMLDivElement;
+  //     const rect = container.getBoundingClientRect();
+
+  //     const pdfPage = pdfPages[index] as PDFPage;
+  //     if (!pdfPage) continue; // Skip if pdfPage is undefined
+  //     if (rect.top < window.innerHeight || (rect.bottom > 0 && rect.top < 0)) {
+  //       //console.log(pdfPages, "pdfPages");
+  //       console.log(`rendering ${index}`);
+  //       if (!pdfPage.isRendered) {
+  //         await pdfPage.load();
+  //         await pdfPage.render();
+  //         console.log(`rendered ${index}`);
+  //       }
+  //     } else {
+  //       console.log(`trying to cancel pdf ${index} ${pdfPage.isRendered}`);
+  //       if (pdfPage.isRendered) {
+  //         console.log(`cancelling pdf ${index}`);
+  //         pdfPage.cancel();
+  //         console.log(`cancelled pdf ${index}`);
+  //       }
+  //     }
+  //   }
+  // };
+
+  // ...existing code...
+  const renderPDFsOnView = async (currentPdfPages: PDFPage[]) => {
+    const pdfsContainerElement = pdfsContainer.current;
+    if (!pdfsContainerElement || !currentPdfPages.length) return;
+
+    const RENDER_BUFFER = 2; // Pages to render before/after visible ones
+    const MAX_CONCURRENT_RENDERS = 2; // Limit simultaneous rendering operations
+
+    const pagesToProcess: { page: PDFPage; rect: DOMRect; index: number }[] =
+      [];
+    for (let i = 0; i < currentPdfPages.length; i++) {
+      const pageInstance = currentPdfPages[i]!;
+      const pageElement = pdfsContainerElement.querySelector(
+        `#pdfContainer-${pageInstance.index}`,
+      );
+      if (pageElement) {
+        pagesToProcess.push({
+          page: pageInstance,
+          rect: pageElement.getBoundingClientRect(),
+          index: i,
+        });
+      }
+    }
+
+    let firstVisibleIndex = -1;
+    let lastVisibleIndex = -1;
+
+    for (let i = 0; i < pagesToProcess.length; i++) {
+      const { rect } = pagesToProcess[i]!;
+      const isInView = rect.bottom > 0 && rect.top < window.innerHeight;
+      if (isInView) {
+        if (firstVisibleIndex === -1) firstVisibleIndex = i;
+        lastVisibleIndex = i;
+      }
+    }
+
+    const pagesToActuallyRender: PDFPage[] = [];
+    const pagesToCancel: PDFPage[] = [];
+
+    if (firstVisibleIndex !== -1) {
+      // If any page is visible
+      const renderStartIndex = Math.max(0, firstVisibleIndex - RENDER_BUFFER);
+      const renderEndIndex = Math.min(
+        currentPdfPages.length - 1,
+        lastVisibleIndex + RENDER_BUFFER,
+      );
+
+      for (let i = 0; i < pagesToProcess.length; i++) {
+        const { page } = pagesToProcess[i]!;
+        if (i >= renderStartIndex && i <= renderEndIndex) {
+          if (!page.isRendered) {
+            pagesToActuallyRender.push(page);
+          }
+        } else {
+          if (page.isRendered) {
+            pagesToCancel.push(page);
+          }
+        }
+      }
+    } else {
+      // No pages visible, cancel all rendered ones
+      pagesToProcess.forEach((p) => {
+        if (p.page.isRendered) pagesToCancel.push(p.page);
+      });
+    }
+
+    // Cancel pages
+    for (const pageToCancel of pagesToCancel) {
+      if (pageToCancel.isRendered) {
+        // Double check
+        console.log(`cancelling pdf ${pageToCancel.index}`);
+        pageToCancel.cancel();
+        console.log(`cancelled pdf ${pageToCancel.index}`);
+      }
+    }
+
+    // Render pages in batches
+    for (
+      let i = 0;
+      i < pagesToActuallyRender.length;
+      i += MAX_CONCURRENT_RENDERS
+    ) {
+      const batch = pagesToActuallyRender.slice(i, i + MAX_CONCURRENT_RENDERS);
+      const renderPromises = batch.map(async (p) => {
+        if (!p.isRendered) {
+          // Check again before rendering
+          console.log(`rendering ${p.index}`);
+          await p.load(); // Ensure viewport is up-to-date
+          await p.render();
+          console.log(`rendered ${p.index}`);
+        }
+      });
+      await Promise.all(renderPromises);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       const pdfDocument = await getPDFDocument(pdfInfo.url);
@@ -48,28 +176,34 @@ const Viewer = () => {
         const pdfPage = new PDFPage(
           index,
           pdfsContainer.current as HTMLDivElement,
+          pdfDocument,
+          scale,
         );
-        // await pdfPage.render(pdfDocument, scale);
-        pdfPromises.push(pdfPage.render(pdfDocument, scale));
+        await pdfPage.load();
+        //   pdfPromises.push(pdfPage.render(pdfDocument, scale));
         pdfPages.push(pdfPage);
+        //await pdfPages[index]?.render();
       }
 
-      await Promise.all(pdfPromises);
+      //  await Promise.all(pdfPromises);
 
       setLoading(false);
 
       const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
       if (pdfsContainerElement) pdfsContainerElement.innerHTML = ""; // Clear the container before appending new pages
-      pdfPages.forEach((pdfPage) => {
+      for (let index = 0; index < pdfPages.length; index++) {
+        const pdfPage = pdfPages[index] as PDFPage;
         if (
           pdfsContainer.current?.querySelectorAll(".pdfContainer").length !==
           pdfPages.length
         ) {
           pdfsContainer.current?.appendChild(pdfPage.pdfContainer);
         }
-      });
+      }
 
+      await renderPDFsOnView(pdfPages);
       setPdfPages(pdfPages);
+
       setMessage({
         text: "PDF Loaded Successfully",
         autoTaminate: true,
@@ -143,6 +277,8 @@ const Viewer = () => {
           setSelectionBoxMode={setSelectionBoxMode}
           setPdfInfo={setPdfInfo}
           setMessage={setMessage}
+          renderPDFsOnView={renderPDFsOnView}
+          pdfPages={pdfPages}
         />
         {/* Add Optimization */}
         <Sidebar showSidebar={showSidebar} />

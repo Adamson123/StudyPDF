@@ -21,6 +21,7 @@ import Input from "../ui/input";
 import { MessageType } from "./viewer/Message";
 import GenerateQuestionMenu from "./GenerateMenu/GenerateQuestionMenu";
 import GenerateFlashcardMenu from "./GenerateMenu/GenerateFlashcardMenu";
+import PDFPage from "./viewer/pdfPage";
 
 const GenerateMenu = ({
   setOpenQuestionMenu,
@@ -59,6 +60,8 @@ const Header = ({
   setSelectionBoxMode,
   setPdfInfo,
   setMessage,
+  renderPDFsOnView,
+  pdfPages,
 }: {
   setShowSidebar: Dispatch<SetStateAction<boolean>>;
   showSidebar: boolean;
@@ -69,6 +72,8 @@ const Header = ({
   setSelectionBoxMode: Dispatch<SetStateAction<boolean>>;
   setPdfInfo: Dispatch<SetStateAction<PdfInfoTypes>>;
   setMessage: Dispatch<SetStateAction<MessageType>>;
+  renderPDFsOnView: (pdfPages: PDFPage[]) => Promise<void>;
+  pdfPages: PDFPage[];
 }) => {
   const [pageNum, setPageNum] = useState("1");
   const [onPageNumInput, setOnPageNumInput] = useState(false);
@@ -95,7 +100,7 @@ const Header = ({
     //setPageNum(value);
   };
   useEffect(() => {
-    const updatePagNumOnScroll = () => {
+    const updatePageNumOnScroll = async () => {
       if (onPageNumInput) return;
       const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
       if (!pdfsContainerElement) return;
@@ -112,8 +117,10 @@ const Header = ({
 
       const pagePos: PagePos[] = [];
 
-      pages.forEach((page, index) => {
+      for (let index = 0; index < pages.length; index++) {
+        const page = pages[index] as HTMLDivElement;
         const rect = page.getBoundingClientRect();
+
         if (rect.top < window.innerHeight && rect.bottom > 0) {
           currentPageNum = index + 1;
 
@@ -122,9 +129,10 @@ const Header = ({
             bottom: rect.bottom,
             top: rect.top,
           });
-          return;
+
+          break;
         }
-      });
+      }
 
       if (pagePos.length > 1) {
         const firstPage = pagePos[0] as PagePos;
@@ -140,20 +148,40 @@ const Header = ({
         }
       }
 
+      await renderPDFsOnView(pdfPages);
       setPageNum(currentPageNum.toString());
+
+      // clearTimeout(timeout);
+      //console.log({ timeout });
     };
 
-    const updatePagNumOnScrollEnd = () => {
-      setOnPageNumInput(false);
+    // const handleScrollEnd = () => {
+    //   setOnPageNumInput(false);
+    // };
+
+    const DEBOUNCE_DELAY = 150; // Milliseconds, adjust as needed
+    let scrollTimeoutId: NodeJS.Timeout;
+
+    const debouncedScrollHandler = () => {
+      clearTimeout(scrollTimeoutId);
+      scrollTimeoutId = setTimeout(async () => {
+        await updatePageNumOnScroll();
+      }, DEBOUNCE_DELAY);
     };
 
-    window.addEventListener("scroll", updatePagNumOnScroll);
-    window.addEventListener("scrollend", updatePagNumOnScrollEnd);
+    const handleScrollEnd = () => {
+      setOnPageNumInput(false); // Reset flag when scrolling stops
+      clearTimeout(scrollTimeoutId); // Clear any pending scroll timeout
+      updatePageNumOnScroll(); // Ensure final state is rendered
+    };
+
+    window.addEventListener("scroll", debouncedScrollHandler);
+    window.addEventListener("scrollend", handleScrollEnd);
     return () => {
-      window.removeEventListener("scroll", updatePagNumOnScroll);
-      window.removeEventListener("scrollend", updatePagNumOnScrollEnd);
+      window.removeEventListener("scroll", debouncedScrollHandler);
+      window.removeEventListener("scrollend", handleScrollEnd);
     };
-  }, [onPageNumInput]);
+  }, [onPageNumInput, pdfPages]);
 
   const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
