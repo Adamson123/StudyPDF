@@ -173,7 +173,7 @@ const GenerateFlashcardsMenu = ({
 
     console.log(response);
     await handleSaveAndRedirectToQuiz(response);
-    setIsGenerating(false);
+    //  setIsGenerating(false);
   }, [
     amountOfFlashcards,
     generateQuestionWithOpenAI,

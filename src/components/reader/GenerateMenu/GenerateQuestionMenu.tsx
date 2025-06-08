@@ -183,7 +183,7 @@ const GenerateQuestionMenu = ({
 
     console.log(response);
     await handleSaveAndRedirectToQuiz(response);
-    setIsGenerating(false);
+    // setIsGenerating(false);
     // return response;
   }, [
     amountOfQuestions,
