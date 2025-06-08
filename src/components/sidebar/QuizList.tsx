@@ -1,14 +1,18 @@
-import { deleteQuizById, getAllQuizzesFromStorage } from "@/lib/quizStorage";
+import { getAllQuizzesFromStorage } from "@/lib/quizStorage";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import Popup from "../ui/Popup";
+import { useContext, useMemo, useState } from "react";
+import { ViewerContext } from "../reader/viewer/Viewer";
 
 const QuizList = () => {
   const [openDropDown, setOpenDropDown] = useState(false);
-  const [quizIdToDelete, setQuizIdToDelete] = useState("");
+  const { setDataToDelete, dataToDelete } = useContext(ViewerContext);
   const router = useRouter();
-  const quizzes = useMemo(getAllQuizzesFromStorage, [quizIdToDelete]);
+  const quizzes = useMemo(() => {
+    console.log("rendered in  quizzes");
+
+    return getAllQuizzesFromStorage();
+  }, [dataToDelete.type === "quiz" ? dataToDelete.id : ""]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -42,24 +46,13 @@ const QuizList = () => {
             <Trash2
               onClick={(e) => {
                 e.stopPropagation(); // Prevents the click from propagating to the parent div
-                setQuizIdToDelete(quiz.id); // Set the quiz ID to show the popup for deletion confirmation
+                setDataToDelete({ id: quiz.id, type: "quiz" });
               }}
               className="h-5 w-5 cursor-pointer stroke-primary hover:fill-primary"
             />
           </div>
         ))}
       </div>
-      {quizIdToDelete && (
-        <Popup
-          message="Are you sure you want to delete this quiz"
-          cancelBtnFunc={() => setQuizIdToDelete("")}
-          executeBtnLabel="Delete"
-          executeBtnFunc={() => {
-            deleteQuizById(quizIdToDelete);
-            setQuizIdToDelete("");
-          }}
-        />
-      )}
     </div>
   );
 };

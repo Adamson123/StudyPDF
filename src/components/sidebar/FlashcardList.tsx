@@ -1,13 +1,19 @@
 import { getAllFlashcardsFromStorage } from "@/lib/flashcardStorage";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
+import { ViewerContext } from "../reader/viewer/Viewer";
 
 const FlashcardList = () => {
   const [openDropDown, setOpenDropDown] = useState(false);
   const router = useRouter();
-  //TODO Use usememo to optimize performance
-  const flashcards = useMemo(getAllFlashcardsFromStorage, []);
+  const { setDataToDelete, dataToDelete } = useContext(ViewerContext);
+
+  const flashcards = useMemo(() => {
+    console.log("rendered flashcards haha");
+
+    return getAllFlashcardsFromStorage();
+  }, [dataToDelete.type === "flashcard" ? dataToDelete.id : ""]);
 
   return (
     <div className="flex -translate-y-1 flex-col gap-1">
@@ -38,7 +44,13 @@ const FlashcardList = () => {
             <span className="overflow-hidden text-nowrap">
               {card.title || card.id}
             </span>
-            <Trash2 className="h-5 w-5 cursor-pointer stroke-primary hover:fill-primary" />
+            <Trash2
+              onClick={(e) => {
+                e.stopPropagation(); // Prevents the click from propagating to the parent div
+                setDataToDelete({ id: card.id, type: "flashcard" });
+              }}
+              className="h-5 w-5 cursor-pointer stroke-primary hover:fill-primary"
+            />
           </div>
         ))}
       </div>

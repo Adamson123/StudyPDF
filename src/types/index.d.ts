@@ -21,8 +21,11 @@ interface FlashcardTypes {
   back: string;
   level: string;
 }
-
 interface PdfInfoTypes {
   name: string;
   url: string;
+}
+interface DataToDeleteTypes {
+  id: string;
+  type: "flashcard" | "quiz" | "";
 }

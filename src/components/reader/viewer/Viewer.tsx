@@ -1,7 +1,14 @@
 "use client";
 
 import "pdfjs-dist/web/pdf_viewer.css";
-import { createContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import PDFPage from "@/components/reader/viewer/pdfPage";
 import { getPDFDocument } from "./utils";
 import SelectionMenu from "./SelectionMenu";
@@ -12,9 +19,21 @@ import AddComment from "./comment/AddComment";
 import Comment from "./comment/Comment";
 import { Message } from "./Message";
 import HighlightMenu from "./HighlightMenu";
+import Popup from "@/components/ui/Popup";
+import { deleteFlashcardById } from "@/lib/flashcardStorage";
+import { deleteQuizById } from "@/lib/quizStorage";
 
-export const ViewerContext = createContext<{ pdfInfo: PdfInfoTypes }>({
+export const ViewerContext = createContext<{
+  pdfInfo: PdfInfoTypes;
+  setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
+  dataToDelete: DataToDeleteTypes;
+}>({
   pdfInfo: { name: "", url: "" },
+  dataToDelete: {
+    id: "",
+    type: "",
+  },
+  setDataToDelete: () => {},
 });
 
 export type CommentType = { text: string; class: string };
@@ -37,40 +56,11 @@ const Viewer = () => {
     url: window.location.origin + "/Split.pdf",
     name: "pdf-name",
   });
+  const [dataToDelete, setDataToDelete] = useState<DataToDeleteTypes>({
+    id: "",
+    type: "",
+  });
 
-  // const renderPDFsOnView = async (pdfPages: PDFPage[]) => {
-  //   const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
-  //   const pdfContainers =
-  //     pdfsContainerElement?.querySelectorAll(".pdfContainer");
-
-  //   if (!pdfContainers?.length) return;
-
-  //   for (let index = 0; index < pdfContainers.length; index++) {
-  //     const container = pdfContainers[index] as HTMLDivElement;
-  //     const rect = container.getBoundingClientRect();
-
-  //     const pdfPage = pdfPages[index] as PDFPage;
-  //     if (!pdfPage) continue; // Skip if pdfPage is undefined
-  //     if (rect.top < window.innerHeight || (rect.bottom > 0 && rect.top < 0)) {
-  //       //console.log(pdfPages, "pdfPages");
-  //       console.log(`rendering ${index}`);
-  //       if (!pdfPage.isRendered) {
-  //         await pdfPage.load();
-  //         await pdfPage.render();
-  //         console.log(`rendered ${index}`);
-  //       }
-  //     } else {
-  //       console.log(`trying to cancel pdf ${index} ${pdfPage.isRendered}`);
-  //       if (pdfPage.isRendered) {
-  //         console.log(`cancelling pdf ${index}`);
-  //         pdfPage.cancel();
-  //         console.log(`cancelled pdf ${index}`);
-  //       }
-  //     }
-  //   }
-  // };
-
-  // ...existing code...
   const renderPDFsOnView = async (currentPdfPages: PDFPage[]) => {
     const pdfsContainerElement = pdfsContainer.current;
     if (!pdfsContainerElement || !currentPdfPages.length) return;
@@ -180,12 +170,8 @@ const Viewer = () => {
           scale,
         );
         await pdfPage.load();
-        //   pdfPromises.push(pdfPage.render(pdfDocument, scale));
         pdfPages.push(pdfPage);
-        //await pdfPages[index]?.render();
       }
-
-      //  await Promise.all(pdfPromises);
 
       setLoading(false);
 
@@ -264,7 +250,7 @@ const Viewer = () => {
   };
 
   return (
-    <ViewerContext.Provider value={{ pdfInfo }}>
+    <ViewerContext.Provider value={{ pdfInfo, setDataToDelete, dataToDelete }}>
       <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-6">
         <Header
           setShowSidebar={setShowSidebar}
@@ -282,6 +268,7 @@ const Viewer = () => {
         />
         {/* Add Optimization */}
         <Sidebar showSidebar={showSidebar} />
+
         {loading ? (
           <div className="text-md flex flex-col items-center gap-1">
             Loading PDF...
@@ -294,6 +281,7 @@ const Viewer = () => {
             ref={pdfsContainer}
           ></div>
         )}
+
         {selectionClass && (
           <AddComment
             selectionClass={selectionClass}
@@ -302,6 +290,7 @@ const Viewer = () => {
             pdfsContainer={pdfsContainer}
           />
         )}
+
         {comment.text && (
           <Comment
             comment={comment}
@@ -309,6 +298,7 @@ const Viewer = () => {
             pdfsContainer={pdfsContainer}
           />
         )}
+
         {highlightClass && (
           <HighlightMenu
             setHighlightClass={setHighlightClass}
@@ -316,6 +306,7 @@ const Viewer = () => {
             highlightClass={highlightClass}
           />
         )}
+
         <SelectionMenu
           pdfsContainer={pdfsContainer}
           openAddComment={openAddComment}
@@ -324,6 +315,25 @@ const Viewer = () => {
         />
 
         <Message message={message} setMessage={setMessage} />
+        {dataToDelete.id && (
+          <Popup
+            message="Are you sure you want to delete this quiz"
+            cancelBtnFunc={() => setDataToDelete({ id: "", type: "" })}
+            executeBtnLabel="Delete"
+            executeBtnFunc={() => {
+              switch (dataToDelete.type) {
+                case "quiz":
+                  deleteQuizById(dataToDelete.id);
+                  break;
+                case "flashcard":
+                  deleteFlashcardById(dataToDelete.id);
+                default:
+                  break;
+              }
+              setDataToDelete({ id: "", type: "" });
+            }}
+          />
+        )}
       </main>
     </ViewerContext.Provider>
   );
