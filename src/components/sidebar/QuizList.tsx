@@ -34,24 +34,26 @@ const QuizList = () => {
         }}
         className={`flex flex-col gap-1 overflow-y-auto ${openDropDown ? "max-h-max" : "max-h-0"} listOverflow transition-all duration-300 ease-in-out`}
       >
-        {quizzes.map((quiz, i) => (
-          <div
-            onClick={() => router.push(`/quiz/${quiz.id}`)}
-            key={i}
-            className="flex cursor-pointer items-center justify-between rounded border border-primary bg-primary/15 p-3 text-xs transition-colors hover:bg-primary/70"
-          >
-            <span className="overflow-hidden text-nowrap">
-              {quiz.title || quiz.id}
-            </span>
-            <Trash2
-              onClick={(e) => {
-                e.stopPropagation(); // Prevents the click from propagating to the parent div
-                setDataToDelete({ id: quiz.id, type: "quiz" });
-              }}
-              className="h-5 w-5 cursor-pointer stroke-primary hover:fill-primary"
-            />
-          </div>
-        ))}
+        {quizzes.length
+          ? quizzes.map((quiz, i) => (
+              <div
+                onClick={() => router.push(`/quiz/${quiz.id}`)}
+                key={i}
+                className="flex cursor-pointer items-center justify-between rounded border border-primary bg-primary/15 p-3 text-xs transition-colors hover:bg-primary/70"
+              >
+                <span className="overflow-hidden text-nowrap">
+                  {quiz.title || quiz.id}
+                </span>
+                <Trash2
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevents the click from propagating to the parent div
+                    setDataToDelete({ id: quiz.id, type: "quiz" });
+                  }}
+                  className="h-5 w-5 cursor-pointer stroke-primary hover:fill-primary"
+                />
+              </div>
+            ))
+          : ""}
       </div>
     </div>
   );
