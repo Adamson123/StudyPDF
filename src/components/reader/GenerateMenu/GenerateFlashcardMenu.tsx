@@ -1,27 +1,16 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useState,
-  useCallback,
-} from "react";
-import { ViewerContext } from "../viewer/Viewer";
-import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   flashcardPrompt,
   getFlashcardGeneralPrompt,
 } from "@/data/static-data/flashcardPrompt";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
-import { env } from "@/env";
-import { saveFlashcard } from "@/lib/flashcardStorage";
-import { getPDFTexts, splitChunks, splitTexts } from "./utils";
 import XButton from "@/components/ui/XButton";
 import Input from "@/components/ui/input";
 import OtherCustomInput from "./OtherCustomInput";
 import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
 import GeneratingCover from "./GeneratingCover";
-import { v4 as uuidv4 } from "uuid";
+import useGenerateData from "./useGenerateData";
 
 const GenerateFlashcardsMenu = ({
   setOpenFlashCardMenu,
@@ -31,172 +20,36 @@ const GenerateFlashcardsMenu = ({
   numOfPages: number;
 }) => {
   const [amountOfFlashcards, setAmountOfFlashcards] = useState<number>(10);
-  const [range, setRange] = useState({ from: 1, to: numOfPages });
-  const { pdfInfo } = useContext(ViewerContext);
   const [userPrompt, setUserPrompt] = useState("");
-  const [error, setError] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [flashcards, setFlashcards] = useState<FlashcardTypes[]>([]);
   const [title, setTitle] = useState("");
-  const router = useRouter();
 
-  const generateQuestionWithOpenAI = useCallback(
-    async (
-      text: string,
-      index: number,
-      chunks: string[],
-      generatedFlashcards: FlashcardTypes[],
-    ) => {
-      let amountOfFlashcardsEach = !index
-        ? Math.floor(amountOfFlashcards / chunks.length) +
-          (amountOfFlashcards % chunks.length)
-        : Math.floor(amountOfFlashcards / chunks.length);
+  const getPrompt = (amountOfFlashcardsEach: number) => {
+    return (
+      flashcardPrompt +
+      getFlashcardGeneralPrompt(amountOfFlashcardsEach) +
+      `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`
+    );
+  };
 
-      if (index === chunks.length - 1) {
-        const remainingQuestions =
-          amountOfFlashcards - generateFlashcards.length;
-        amountOfFlashcardsEach = remainingQuestions;
-      }
-
-      console.log(
-        `📝 Generating ${amountOfFlashcardsEach} flashcard for chunk ${index + 1}/${chunks.length}`,
-      );
-
-      const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
-      const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      };
-
-      const body = {
-        messages: [
-          {
-            role: "user",
-            content:
-              flashcardPrompt +
-              getFlashcardGeneralPrompt(amountOfFlashcardsEach) +
-              `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`,
-          },
-          { role: "user", content: text },
-        ],
-        max_tokens: 4096,
-        temperature: 0.8,
-        top_p: 1,
-        model: "gpt-4o",
-      };
-
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        });
-
-        const data = await res.json();
-        const output = data.choices?.[0]?.message?.content || "error";
-
-        if (output === "error") return { error: "Error generating flashcards" };
-
-        let trimmedOutput = [];
-        try {
-          trimmedOutput = JSON.parse(
-            output.replace("```json", "").replace("```", "").trim(),
-          );
-          console.log(`✅ Chunk ${index + 1} saved.`);
-          return trimmedOutput;
-        } catch (error) {
-          console.error(`❌ Error parsing JSON for chunk ${index + 1}:`, error);
-          console.error("Raw output:", output);
-          return { error: "Error generating flashcards😥" };
-        }
-      } catch (err) {
-        console.error(`❌ Error on chunk ${index + 1}:`, err);
-        return { error: "Error generating flashcards😥" };
-      }
-    },
-    [amountOfFlashcards, flashcards.length, userPrompt],
-  );
-
-  const handleSaveAndRedirectToQuiz = useCallback(
-    async (flashcards: FlashcardTypes[]) => {
-      console.log("Saving quiz with flashcards:", flashcards);
-      const id = uuidv4(); // Generate a unique ID for the quiz
-      if (!flashcards.length) return; // No questions to save
-      saveFlashcard({ id, title, cardsToSave: flashcards });
-      setFlashcards([]);
-      setRange({ from: 1, to: numOfPages }); // Reset range
-      router.push(`/flashcard/${id}`); // Redirect to the quiz page
-    },
-    [numOfPages, router, title],
-  );
-
-  const generateFlashcards = useCallback(async () => {
-    setIsGenerating(true);
-    let response: FlashcardTypes[] = [];
-    const pdfTexts = await getPDFTexts(pdfInfo.url, range); // Get texts from PDF
-    const chunks = splitChunks(splitTexts(pdfTexts), amountOfFlashcards); // Break chunks if needed
-    let error = "";
-
-    for (let index = 0; index < chunks.length; index++) {
-      const text = chunks[index];
-      console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
-
-      const flashcard = await generateQuestionWithOpenAI(
-        text as string,
-        index,
-        chunks,
-        response,
-      );
-      if (!flashcard.error && flashcard.length) {
-        response = response.length ? [...response, ...flashcard] : flashcard;
-        setFlashcards(response);
-      }
-
-      if (flashcard.error) error = "error";
-
-      if (index < chunks.length - 1) {
-        console.log("Sleeping for 5 seconds to avoid rate limits...");
-        await new Promise((r) => setTimeout(r, 5000));
-      }
-    }
-
-    if (error) {
-      if (response.length) {
-        setError("An Error occurred while generating flashcards");
-      } else {
-        setError("Error generating flashcards");
-      }
-      return;
-    }
-
-    console.log(response);
-    await handleSaveAndRedirectToQuiz(response);
-    //  setIsGenerating(false);
-  }, [
-    amountOfFlashcards,
-    generateQuestionWithOpenAI,
-    handleSaveAndRedirectToQuiz,
-    pdfInfo.url,
+  const {
+    isGenerating,
+    setError,
+    generateData: generateFlashcards,
     range,
-  ]);
-
-  const handleTryAgain = useCallback(async () => {
-    setError("");
-    await generateFlashcards();
-  }, [generateFlashcards]);
-
-  const handleContinue = useCallback(() => {
-    setError("");
-    setIsGenerating(false);
-  }, []);
-
-  const handleCancel = useCallback(() => {
-    setError("");
-    setIsGenerating(false);
-    setFlashcards([]);
-  }, []);
+    setRange,
+    error,
+    handleCancel,
+    handleContinue,
+    handleTryAgain,
+    data: flashcards,
+  } = useGenerateData({
+    numOfPages,
+    getPrompt,
+    type: "flashcard",
+    userPrompt,
+    amountOfData: amountOfFlashcards,
+    title,
+  });
 
   return (
     <PopUpWrapper>

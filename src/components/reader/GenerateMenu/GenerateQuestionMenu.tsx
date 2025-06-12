@@ -1,21 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
-import { useContext, useState, useCallback } from "react";
-import { env } from "@/env";
+import { useState } from "react";
 import {
   getQuestionGeneralPrompt,
   questionPrompts,
 } from "@/data/static-data/questionPrompts";
-import { ViewerContext } from "../viewer/Viewer";
 import GeneratingCover from "./GeneratingCover";
-import { saveQuiz } from "@/lib/quizStorage";
-import { v4 as uuidv4 } from "uuid";
-import { useRouter } from "next/navigation";
 import XButton from "@/components/ui/XButton";
-import { getPDFTexts, splitChunks, splitTexts } from "./utils";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import OtherCustomInput from "./OtherCustomInput";
 import Input from "@/components/ui/input";
+import useGenerateData from "./useGenerateData";
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
@@ -25,190 +20,39 @@ const GenerateQuestionMenu = ({
   numOfPages: number;
 }) => {
   const [questionType, setQuestionType] = useState<string>("multiChoice");
-  const [amountOfQuestions, setAmountOfQuestions] = useState<number>(10);
-  const [range, setRange] = useState({ from: 1, to: numOfPages });
   const [userPrompt, setUserPrompt] = useState<string>("");
-  const { pdfInfo } = useContext(ViewerContext);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [questions, setQuestions] = useState<
-    (MultiChoiceQuestionTypes | FillAnswerTypes)[]
-  >([]);
-  const [error, setError] = useState("");
+  const [amountOfQuestions, setAmountOfQuestions] = useState<number>(10);
   const [title, setTitle] = useState<string>("");
-  const router = useRouter();
 
-  const generateQuestionWithOpenAI = useCallback(
-    async (
-      text: string,
-      index: number,
-      chunks: string[],
-      generatedQuestions: (FillAnswerTypes | MultiChoiceQuestionTypes)[],
-    ) => {
-      let amountOfQuestionsEach = !index
-        ? Math.floor(amountOfQuestions / chunks.length) +
-          (amountOfQuestions % chunks.length)
-        : Math.floor(amountOfQuestions / chunks.length);
+  const getPrompt = (amountOfQuestionsEach: number) => {
+    const questionPrompt =
+      questionPrompts[questionType] || questionPrompts.mixed;
+    return (
+      questionPrompt +
+      getQuestionGeneralPrompt(amountOfQuestionsEach) +
+      `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`
+    );
+  };
 
-      if (index === chunks.length - 1) {
-        const remainingQuestions =
-          amountOfQuestions - generatedQuestions.length;
-        amountOfQuestionsEach = remainingQuestions;
-      }
-
-      console.log(
-        `📝 Generating ${amountOfQuestionsEach} questions for chunk ${
-          index + 1
-        }/${chunks.length}`,
-      );
-
-      const prompt = questionPrompts[questionType] || questionPrompts.mixed;
-
-      const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
-      const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      };
-
-      console.log(
-        prompt +
-          getQuestionGeneralPrompt(amountOfQuestionsEach) +
-          `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`,
-      );
-
-      const body = {
-        messages: [
-          {
-            role: "user",
-            content:
-              prompt +
-              getQuestionGeneralPrompt(amountOfQuestionsEach) +
-              `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`,
-          },
-          { role: "user", content: text },
-        ],
-        max_tokens: 4096,
-        temperature: 0.8,
-        top_p: 1,
-        model: "gpt-4o",
-      };
-
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        });
-
-        const data = await res.json();
-        const output = data.choices?.[0]?.message?.content || "error";
-
-        if (output === "error") return { error: "Error generating questions" };
-
-        let trimmedOutput = [];
-        try {
-          trimmedOutput = JSON.parse(
-            output.replace("```json", "").replace("```", "").trim(),
-          );
-          console.log(`✅ Chunk ${index + 1} saved.`);
-          return trimmedOutput;
-        } catch (error) {
-          console.error(`❌ Error parsing JSON for chunk ${index + 1}:`, error);
-          console.error("Raw output:", output);
-          return { error: "Error generating questions😥" };
-        }
-      } catch (err) {
-        console.error(`❌ Error on chunk ${index + 1}:`, err);
-        return { error: "Error generating questions😥" };
-      }
-    },
-    [amountOfQuestions, questionType, userPrompt, questions.length],
-  );
-
-  const handleSaveAndRedirectToQuiz = useCallback(
-    async (questions: (FillAnswerTypes | MultiChoiceQuestionTypes)[]) => {
-      console.log("Saving quiz with questions:", questions);
-      const id = uuidv4(); // Generate a unique ID for the quiz
-      if (!questions.length) return; // No questions to save
-      console.log({ id, title });
-      saveQuiz({ id, title, questionsToSave: questions });
-      setQuestions([]);
-      setRange({ from: 1, to: numOfPages }); // Reset range
-      router.push(`/quiz/${id}`); // Redirect to the quiz page
-      // setOpenQuestionMenu(false);
-    },
-    [pdfInfo.name, numOfPages, router, title],
-  );
-
-  const generateQuestions = useCallback(async () => {
-    setIsGenerating(true);
-    let response: (MultiChoiceQuestionTypes | FillAnswerTypes)[] = [];
-    const pdfTexts = await getPDFTexts(pdfInfo.url, range); // Get texts from PDF
-    const chunks = splitChunks(splitTexts(pdfTexts), amountOfQuestions); // Break chunks if needed
-    let error = "";
-
-    for (let index = 0; index < chunks.length; index++) {
-      const text = chunks[index];
-      console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
-
-      const questions = await generateQuestionWithOpenAI(
-        text as string,
-        index,
-        chunks,
-        response,
-      );
-      if (!questions.error && questions.length) {
-        // Skip if no questions generated
-        response = response.length ? [...response, ...questions] : questions;
-        setQuestions(response);
-      }
-
-      if (questions.error) error = "error";
-
-      if (index < chunks.length - 1) {
-        console.log("Sleeping for 5 seconds to avoid rate limits...");
-        await new Promise((r) => setTimeout(r, 5000));
-      }
-    }
-
-    if (error) {
-      if (response.length) {
-        setError("An Error occured while generating questions");
-      } else {
-        setError("Error generating questions");
-      }
-      return;
-    }
-
-    console.log(response);
-    await handleSaveAndRedirectToQuiz(response);
-    // setIsGenerating(false);
-    // return response;
-  }, [
-    amountOfQuestions,
-    generateQuestionWithOpenAI,
-    handleSaveAndRedirectToQuiz,
-    pdfInfo.url,
+  const {
+    isGenerating,
+    setError,
+    generateData: generateQuestions,
     range,
-  ]);
-
-  const handleTryAgain = useCallback(async () => {
-    setError("");
-    await generateQuestions();
-  }, [generateQuestions]);
-
-  const handleContinue = useCallback(() => {
-    setError("");
-    setIsGenerating(false);
-    handleSaveAndRedirectToQuiz(questions);
-  }, [handleSaveAndRedirectToQuiz, questions]);
-
-  const handleCancel = useCallback(() => {
-    setError("");
-    setIsGenerating(false);
-    setQuestions([]);
-  }, []);
+    setRange,
+    error,
+    handleCancel,
+    handleContinue,
+    handleTryAgain,
+    data: questions,
+  } = useGenerateData({
+    numOfPages,
+    getPrompt,
+    type: "quiz",
+    userPrompt,
+    amountOfData: amountOfQuestions,
+    title,
+  });
 
   return (
     <PopUpWrapper>

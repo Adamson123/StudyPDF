@@ -1,4 +1,4 @@
-import Flashcard from "./Flashcard";
+import Card from "./Card";
 import { Button } from "../ui/button";
 import { Play, Plus } from "lucide-react";
 import EditFlashcards from "./EditFlashcards";
@@ -111,7 +111,7 @@ const FlashcardsPreview = ({
       {/* Flashcards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {flashcards.map((flashcard, index) => (
-          <Flashcard
+          <Card
             key={index}
             setFlashCards={setFlashcards}
             // setShowEditFlashcards={setShowEditFlashcards}
