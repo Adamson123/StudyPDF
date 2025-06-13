@@ -3,3 +3,5 @@
 # TODO: Add an option to include everything in the PDF instead of just text.
 
 # TODO: Make sure Amount of questions or flashcards generated are the amount specified by the user.
+
+# TODO: Keep the “Search PDF by Number” input synced with whatever page the user is currently looking at.
