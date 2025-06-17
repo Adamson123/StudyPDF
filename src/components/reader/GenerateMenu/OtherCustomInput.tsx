@@ -73,7 +73,7 @@ const OtherCustomInput = ({
           id="userPrompt"
           value={userPrompt}
           onChange={(e) => setUserPrompt(e.target.value)}
-          className="h-36 resize-none rounded bg-border p-3 text-xs ring-primary focus:outline-none focus:ring-1"
+          className="h-40 resize-none rounded bg-border p-3 text-xs ring-primary focus:outline-none focus:ring-1"
           placeholder="Enter your custom prompt here..."
         />
       </div>

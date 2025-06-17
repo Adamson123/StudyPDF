@@ -22,12 +22,7 @@ import { questionsMock } from "./questionMock";
 
 // `;
 
-export const getQuestionGeneralPrompt = (amountOfQuestionsEach: number) => `
-- fillInAnswer questions must only contain one gap and one correct answer.
-- I will be using JSON.parse in JavaScript to parse the output, so the response must be a valid JSON array of objects.
-- At least 75% of the questions should be calculations when the topic involves Maths or Physics. The remaining 25% can be conceptual/theoretical.
-- Include questions about sentence types like Declarative, Complex, Simple, Active Voice, and Passive Voice.
-- Strictly return only a JSON array of ${amountOfQuestionsEach} questions. Do NOT include explanations, markdown, or any introductory or closing text.
+const multiChoiceGneneralPrompt = `
 - Each question object must include:
   • \`question\` (string),
   • \`options\` (array of 4 strings),
@@ -52,12 +47,29 @@ export const getQuestionGeneralPrompt = (amountOfQuestionsEach: number) => `
 const getAnswerLetter = (options, correctAnswer) =>
   ['A','B','C','D'][options.findIndex(o => o === correctAnswer)];
 \`\`\`
+`;
+
+export const getQuestionGeneralPrompt = (
+  amountOfQuestionsEach: number,
+  type: string,
+) => {
+  console.log({ amountOfQuestionsEach, type });
+
+  return `
+- fillInAnswer questions must only contain one gap and one correct answer.
+- I will be using JSON.parse in JavaScript to parse the output, so the response must be a valid JSON array of objects.
+- At least 75% of the questions should be calculations when the topic involves Maths or Physics. The remaining 25% can be conceptual/theoretical.
+- Include questions about sentence types like Declarative, Complex, Simple, Active Voice, and Passive Voice.
+- Strictly return only a JSON array of ${amountOfQuestionsEach} questions. Do NOT include explanations, markdown, or any introductory or closing text.
+
+${type === "multiChoice" && multiChoiceGneneralPrompt}
 
 ⚠️ The \`answer\` field **must match** the correct option in the \`options\` array.
 ⚠️ The \`explanation\` must always support the correct answer. No contradictions.
 
 All options must be relevant and make logical sense. No silly or unrelated distractors. No repetition. No fluff. Just clean, sharp question objects. 🔥💯
 `;
+};
 
 export const questionPrompts: { [key: string]: string } = {
   mixed: `

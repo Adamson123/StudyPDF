@@ -22,6 +22,7 @@ import { MessageType } from "./viewer/Message";
 import GenerateQuestionMenu from "./GenerateMenu/GenerateQuestionMenu";
 import GenerateFlashcardMenu from "./GenerateMenu/GenerateFlashcardMenu";
 import PDFPage from "./viewer/pdfPage";
+import debouncedHandler from "@/utils/debounceHandler";
 
 const GenerateMenu = ({
   setOpenQuestionMenu,
@@ -97,8 +98,17 @@ const Header = ({
       });
     }
 
+    let scrollTimeoutId: NodeJS.Timeout | any = null;
+
+    const debouncedFunc = debouncedHandler(
+      () => renderPDFsOnView(pdfPages),
+      scrollTimeoutId,
+    );
+
+    debouncedFunc();
     //setPageNum(value);
   };
+
   useEffect(() => {
     const updatePageNumOnScroll = async () => {
       if (onPageNumInput) return;
@@ -130,6 +140,9 @@ const Header = ({
             top: rect.top,
           });
 
+          //  break;
+        }
+        if (pagePos.length >= 2) {
           break;
         }
       }
@@ -158,16 +171,12 @@ const Header = ({
     // const handleScrollEnd = () => {
     //   setOnPageNumInput(false);
     // };
+    let scrollTimeoutId: NodeJS.Timeout | any = null;
 
-    const DEBOUNCE_DELAY = 150; // Milliseconds, adjust as needed
-    let scrollTimeoutId: NodeJS.Timeout;
-
-    const debouncedScrollHandler = () => {
-      clearTimeout(scrollTimeoutId);
-      scrollTimeoutId = setTimeout(async () => {
-        await updatePageNumOnScroll();
-      }, DEBOUNCE_DELAY);
-    };
+    const debouncedFunc = debouncedHandler(
+      updatePageNumOnScroll,
+      scrollTimeoutId,
+    );
 
     const handleScrollEnd = () => {
       setOnPageNumInput(false); // Reset flag when scrolling stops
@@ -175,10 +184,10 @@ const Header = ({
       updatePageNumOnScroll(); // Ensure final state is rendered
     };
 
-    window.addEventListener("scroll", debouncedScrollHandler);
+    window.addEventListener("scroll", debouncedFunc);
     window.addEventListener("scrollend", handleScrollEnd);
     return () => {
-      window.removeEventListener("scroll", debouncedScrollHandler);
+      window.removeEventListener("scroll", debouncedFunc);
       window.removeEventListener("scrollend", handleScrollEnd);
     };
   }, [onPageNumInput, pdfPages]);
@@ -193,7 +202,7 @@ const Header = ({
   };
 
   return (
-    <div className="fixed left-0 right-0 top-0 z-[100] flex w-full items-center justify-between gap-3 bg-background px-3 py-[7px] shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
+    <header className="fixed left-0 right-0 top-0 z-[100] flex w-full items-center justify-between gap-3 bg-background px-3 py-[7px] shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
       <div className="flex items-center gap-3">
         {/* Left section toggle */}
         <PanelLeftDashed
@@ -277,7 +286,7 @@ const Header = ({
           numOfPages={numOfPages}
         />
       )}
-    </div>
+    </header>
   );
 };
 

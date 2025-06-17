@@ -14,6 +14,7 @@ function useGenerateData<T>({
   getPrompt,
   amountOfData,
   title,
+  questionType,
 }: {
   getPrompt: (amountOfDataEach: number) => string;
   numOfPages: number;
@@ -21,6 +22,7 @@ function useGenerateData<T>({
   userPrompt: string;
   amountOfData: number;
   title: string;
+  questionType: string;
 }) {
   const [range, setRange] = useState({ from: 1, to: numOfPages });
   const { pdfInfo } = useContext(ViewerContext);
@@ -73,6 +75,7 @@ function useGenerateData<T>({
         top_p: 1,
         model: "gpt-4o",
       };
+      console.log({ amountOfData });
 
       try {
         const res = await fetch(url, {
@@ -103,7 +106,8 @@ function useGenerateData<T>({
         return { error: "Error generating data😥" };
       }
     },
-    [amountOfData, userPrompt, data.length],
+
+    [amountOfData, userPrompt, data.length, questionType],
   );
 
   const handleSaveAndRedirect = useCallback(

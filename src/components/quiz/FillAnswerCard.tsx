@@ -35,9 +35,11 @@ const FillAnswerCard = ({
   const handleSubmitAnswer = () => {
     if (choosenAnswer.length) return;
     const pickedAnswers = answerInputs.current.map(
-      (answer) => answer?.value.trim() || "",
+      (answer) => answer?.value.trimEnd().trimStart() || "",
     );
-    const isCorrect = pickedAnswers.every((ans, i) => ans === answer[i]);
+    const isCorrect = pickedAnswers.every(
+      (pickedAnswer, i) => pickedAnswer === answer[i],
+    );
     setCurrentQuestion(
       (prev) =>
         ({

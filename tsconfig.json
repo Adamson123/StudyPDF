@@ -22,7 +22,7 @@
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "incremental": true,
-
+    "types": ["node", "next-auth", "vitest/globals"],
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
@@ -36,7 +36,9 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "vitest.config.ts", // Include Vitest config
+    "vitest.setup.ts"
   ],
   "exclude": ["node_modules"]
 }

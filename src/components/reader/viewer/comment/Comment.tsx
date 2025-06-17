@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { Check } from "lucide-react";
 import { Dispatch, RefObject, SetStateAction, useState } from "react";
 import { CommentType } from "../Viewer";
 
@@ -37,29 +37,33 @@ const Comment = ({
     setComment({ text: "", class: "" });
   };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65">
-      <div className="flex flex-col justify-start gap-3 rounded-lg bg-background p-7">
-        <div className="flex items-start justify-between gap-3">
-          <Button onClick={handleSave}>Save</Button>
-          <Button className="self-end bg-transparent hover:bg-gray-border">
-            <Trash className="h-14 w-14" />
-          </Button>
-        </div>
+    <div
+      onClick={handleClose}
+      className={`fixed inset-0 flex flex-col justify-end bg-black/10`}
+    >
+      <div
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+        className={`flex flex-col gap-5 border-t border-gray-border bg-background p-5`}
+      >
         <textarea
           value={commentInput}
-          onChange={(event) => {
-            setCommentInput(event.target.value);
+          onChange={(event) => setCommentInput(event.target.value)}
+          style={{
+            scrollbarWidth: "none",
           }}
-          placeholder="Edit Comment"
-          className="min-h-40 min-w-[400px] resize-none rounded-md p-3 text-xs"
-        />
-
-        <Button
-          onClick={handleClose}
-          className="border-2 border-gray-border bg-transparent hover:bg-gray-border"
-        >
-          Close
-        </Button>
+          className="h-[84px] w-full resize-none rounded bg-transparent px-3 text-xs outline-none"
+          placeholder="Add a comment"
+        />{" "}
+        <div className="flex w-full justify-between">
+          <Button onClick={handleClose}>Cancel</Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleSave}>
+              Save <Check />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

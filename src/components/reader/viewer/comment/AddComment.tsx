@@ -20,6 +20,10 @@ const AddComment = ({
 
   const handleSaveComment = () => {
     if (!selectionClass) return;
+    if (!commentInput) {
+      alert("Please enter commnet");
+      return;
+    }
 
     const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
 
