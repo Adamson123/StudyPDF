@@ -20,43 +20,45 @@ const FillAnswerCard = ({
     React.SetStateAction<FillAnswerTypes | MultiChoiceQuestionTypes>
   >;
 }) => {
-  const answerInputs = useRef<(HTMLInputElement | null)[]>([]);
+  const answerInputs = useRef<(HTMLInputElement | null)[]>([]); // Keep as array, access [0]
 
   useEffect(() => {
-    const inputs = answerInputs.current;
-    if (inputs.length) {
-      inputs.forEach((input, i) => {
-        console.log("Setting input value", choosenAnswer[i], i);
-        if (input) input!.value = (choosenAnswer[i] as string) || "";
-      });
+    const input = answerInputs.current[0];
+    if (input) {
+      if (choosenAnswer.length) {
+        input.value = (choosenAnswer[0] as string) || "";
+      } else {
+        input.value = ""; // Clear if no chosen answer yet or question changes
+      }
     }
-  }, [answer]);
+  }, [choosenAnswer, question.question]); // question.question to reset if question changes
 
   const handleSubmitAnswer = () => {
     if (choosenAnswer.length) return;
-    const pickedAnswers = answerInputs.current.map(
-      (answer) => answer?.value.trimEnd().trimStart() || "",
-    );
-    const isCorrect = pickedAnswers.every(
-      (pickedAnswer, i) => pickedAnswer === answer[i],
-    );
+    // Ensure answer[0] exists for comparison, though prompt implies it will.
+    const pickedAnswer = answerInputs.current[0]?.value.trim() || "";
+    const isCorrect = answer && answer.length > 0 && pickedAnswer === answer[0];
+    const pickedAnswers = [pickedAnswer]; // Store as an array as per FillAnswerTypes
+
     setCurrentQuestion(
       (prev) =>
         ({
           ...prev,
-          choosenAnswer: pickedAnswers,
+          choosenAnswer: pickedAnswers, // choosenAnswer is string[]
           isCorrect,
         }) as FillAnswerTypes,
     );
     setQuestions(
       (prev) =>
         prev.map((q, i) =>
-          i === index ? { ...q, choosenAnswer: pickedAnswers, isCorrect } : q,
+          i === index
+            ? { ...q, choosenAnswer: pickedAnswers, isCorrect }
+            : q,
         ) as (FillAnswerTypes | MultiChoiceQuestionTypes)[],
     );
   };
 
-  const getAnswerInputIndex = (i: number) => (i + 1) / 2 - 1;
+  // const getAnswerInputIndex = (i: number) => (i + 1) / 2 - 1; // No longer needed
 
   return (
     <div className="flex max-w-[600px] snap-center flex-col items-start gap-5 rounded-md border border-gray-border p-5">
@@ -65,49 +67,52 @@ const FillAnswerCard = ({
         Question {index + 1} of {numberOfQuestions}
       </div>
 
-      {/* Question */}
+      {/* Question Display */}
       <div className="w-full flex-grow text-xs font-semibold leading-[23px]">
-        {question.split(/\*\*(.*?)\*\*/).map((part, i) =>
-          i % 2 === 0 ? (
+        {question.split(/(____)/g).map((part, i) =>
+          part === "____" ? (
             <span key={i} className="font-semibold">
-              {part}
+              {" "}
+              ____{" "}
             </span>
           ) : (
-            <span key={i}>
-              &nbsp;
-              <Input
-                ref={(el) => {
-                  answerInputs.current[getAnswerInputIndex(i)] = el;
-                }}
-                className={`"bg-gray-400/15" inline h-7 w-auto ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)] === answer[getAnswerInputIndex(i)] ? "bg-green-500/40" : "bg-red-500/40")}`}
-              />{" "}
-              &nbsp;
+            <span key={i} className="font-semibold">
+              {part}
             </span>
           ),
         )}
       </div>
-      {/* Answer */}
 
-      {choosenAnswer.length ? (
+      {/* Input Field for Answer */}
+      {!choosenAnswer.length ? (
+        <Input
+          ref={(el) => {
+            answerInputs.current[0] = el;
+          }}
+          className="h-7 w-auto bg-gray-400/15"
+          placeholder="Type your answer here..."
+        />
+      ) : (
+        // Display submitted answer in a styled input (read-only)
+        <Input
+          ref={(el) => {
+            answerInputs.current[0] = el;
+          }}
+          className={`h-7 w-auto ${question.isCorrect ? "bg-green-500/40 border-green-700" : "bg-red-500/40 border-red-700"}`}
+          defaultValue={(choosenAnswer[0] as string) || ""}
+          readOnly
+        />
+      )}
+
+      {/* Display Correct Answer after submission */}
+      {choosenAnswer.length && answer && answer.length > 0 ? (
         <div className="flex w-full flex-col gap-2">
-          <div className="text-md underline">Answer</div>
+          <div className="text-md underline">Correct Answer</div>
           <div className="w-full flex-grow text-xs font-semibold leading-[23px]">
-            {question.split(/\*\*(.*?)\*\*/).map((part, i) =>
-              i % 2 === 0 ? (
-                <span key={i} className="font-semibold">
-                  {part}
-                </span>
-              ) : (
-                <span key={i} className="text-green-500">
-                  {part}
-                </span>
-              ),
-            )}
+            <span className="font-bold">{answer[0]}</span>
           </div>
         </div>
-      ) : (
-        ""
-      )}
+      ) : null}
 
       <div className="w-full border-b pb-3">
         {!choosenAnswer.length && (
@@ -117,10 +122,14 @@ const FillAnswerCard = ({
 
       {/* Explanation */}
       <div
-        className={`flex w-full flex-col gap-2 ${choosenAnswer.length ? "" : "blur"}`}
+        className={`flex w-full flex-col gap-2 ${
+          choosenAnswer.length ? "" : "blur"
+        }`}
       >
         <div className="text-md underline">Explanation</div>
-        <div className="text-sm font-semibold text-gray-500">{explanation}</div>
+        <div className="text-sm font-semibold text-gray-500">
+          {explanation}
+        </div>
       </div>
     </div>
   );

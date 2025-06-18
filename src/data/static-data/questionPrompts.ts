@@ -115,12 +115,12 @@ ONLY use real **definitions, concepts, explanations, and examples** from the doc
 - Sentence length: 12–18 words MAXIMUM.
 - Exactly 1 missing words — NEVER more.
 - Missing words MUST be nouns, verbs, adjectives, or adverbs TAKEN DIRECTLY from the document.
-- MARK missing words with **double asterisks**, e.g., "**word**" (NO underscores, blanks, or other marks).
+- MARK missing words with ____ (four underscores), e.g., "A ____ is used".
 - The sentence MUST remain clear and understandable WITH the gaps.
 
 🔹 Format example:
 {
-  question: "A **telescope** is used to observe distant objects.",
+  question: "A ____ is used to observe distant objects.",
   answer: ["telescope"],
   choosenAnswer: [],
   explanation: "A telescope is used to observe distant objects.",
@@ -129,7 +129,7 @@ ONLY use real **definitions, concepts, explanations, and examples** from the doc
 }
 
 📊 Gaps distribution:
-- 100% of fillInAnswer questions should have ONLY 1 gap, e.g., "The **telescope** is used to observe distant objects."
+- 100% of fillInAnswer questions should have ONLY 1 gap, e.g., "The ____ is used to observe distant objects."
 
 ---
 
@@ -217,13 +217,13 @@ Generate only **"fillInAnswer"** question objects based on an educational docume
 - Sentence length: 12–18 words MAXIMUM.
 - Only **1** missing word allowed (100% of the time).
 - The missing word must be a noun, verb, adjective, or adverb TAKEN DIRECTLY from the document.
-- Mark missing word using **double asterisks**, e.g., "The **sun** rises in the east."
+- Mark missing word using ____ (four underscores), e.g., "The ____ rises in the east."
 - Sentence must still be clear WITH the gap (no confusion or ambiguity).
 - No made-up examples or content — only extract from definitions, explanations, and examples in the document.
 
 🔹 Format example:
 {
-  question: "Photosynthesis occurs in the **chloroplasts** of plant cells.",
+  question: "Photosynthesis occurs in the ____ of plant cells.",
   answer: ["chloroplasts"],
   choosenAnswer: [],
   explanation: "Photosynthesis occurs in the chloroplasts of plant cells.",
