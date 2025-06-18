@@ -120,11 +120,21 @@ const FillAnswerCard = ({
         )}
       </div>
 
+      {/* Justification Prompt */}
+      {choosenAnswer.length > 0 && question.justification_prompt && (
+        <div className="flex w-full flex-col gap-2 pt-2">
+          <div className="text-md underline">Reflection Prompt</div>
+          <div className="text-sm font-semibold text-gray-600">
+            {question.justification_prompt}
+          </div>
+        </div>
+      )}
+
       {/* Explanation */}
       <div
         className={`flex w-full flex-col gap-2 ${
-          choosenAnswer.length ? "" : "blur"
-        }`}
+          choosenAnswer.length > 0 ? "" : "blur"
+        } ${choosenAnswer.length > 0 && question.justification_prompt ? "pt-2" : ""}`}
       >
         <div className="text-md underline">Explanation</div>
         <div className="text-sm font-semibold text-gray-500">

@@ -32,6 +32,12 @@ const multiChoiceGneneralPrompt = `
   • \`type\` ("multiChoice" or "fillAnswer"),
   • \`isCorrect\` (boolean, false).
 
+🎯 **Crafting Plausible Distractors:**
+- Distractor options should be plausible and tempting to students who have an incomplete understanding or common misconceptions about the topic.
+- Avoid distractors that are obviously incorrect, irrelevant to the question's context, or humorous.
+- Each distractor should ideally represent a specific common error or misunderstanding.
+- All options (including the correct answer and distractors) should be grammatically consistent with the question stem and of similar length and complexity.
+
 📊 Correct Answer Distribution Rules:
 - Exactly or closely match this distribution:
   • 30% of correct answers must be in Option A
@@ -41,6 +47,31 @@ const multiChoiceGneneralPrompt = `
 
 ❌ Do NOT place the correct answer in the same position (e.g., A) more than **twice in a row**.
 ✅ If a letter has already been used two times in a row, **randomly pick from the other options**.
+Strive for a good variety in correct answer positions throughout the entire set of questions, not just locally.
+
+🔢 **Numerical Question Guidance**: For questions involving numerical data, calculations, or variables:
+  - Ensure numbers and variables are realistic for the context.
+  - Avoid values leading to trivial answers, overly complex calculations (unless specified by difficulty), or mathematical errors like division by zero.
+  - Distractor options should also be plausible and not easily identifiable as incorrect due to numerical absurdity.
+
+🧠 **Higher-Order Thinking**:
+- Aim to create questions that assess not just recall, but also understanding, application, analysis, and evaluation.
+- Encourage critical thinking by asking 'why,' 'how,' 'compare,' 'what if,' or 'predict,' where appropriate for the topic.
+- Vary the cognitive skills tested, drawing from different levels of understanding (e.g., from simple recall to application and analysis).
+
+🌍 **Scenario-Based & Application Questions:**
+- Where appropriate, frame some questions within brief real-world or hypothetical scenarios to test application of knowledge.
+- Scenarios must be concise, directly relevant to the concept, and avoid excessive complexity or cognitive load unrelated to the core question.
+- Example: Instead of 'Define X', present a mini-case and ask how X applies, or what is the outcome based on X.
+- The question must still clearly test a specific concept, with the scenario providing context.
+
+🤔 **Optional Justification Prompt:**
+- For some questions (e.g., 25-50% of them, or as you deem appropriate to enhance learning), include an optional string field named \`justification_prompt\`.
+- This prompt should encourage the user to reflect on their choice. Examples:
+    - 'Briefly explain why you chose this answer.'
+    - 'Why is the correct answer the most appropriate, and what makes one of the distractors incorrect?'
+    - For Fill-in-the-Blank: 'How does this term fit into the broader concept discussed in the sentence?'
+- If no justification prompt is generated for a particular question, this field can be omitted or be an empty string.
 
 ✅ After assigning the correct answer to the desired position in \`options\`, update the \`answer\` field using this logic:
 \`\`\`ts
@@ -116,7 +147,13 @@ ONLY use real **definitions, concepts, explanations, and examples** from the doc
 - Exactly 1 missing words — NEVER more.
 - Missing words MUST be nouns, verbs, adjectives, or adverbs TAKEN DIRECTLY from the document.
 - MARK missing words with ____ (four underscores), e.g., "A ____ is used".
+- Focus on missing words that represent key concepts or important details from the text, rather than trivial or overly common words. The sentence should encapsulate a significant piece of information.
 - The sentence MUST remain clear and understandable WITH the gaps.
+
+🤔 **Optional Justification Prompt:**
+- For some questions (e.g., 25-50% of them), include an optional string field named \`justification_prompt\`.
+- This prompt should encourage the user to reflect on their choice. E.g., 'How does this term fit into the broader concept discussed in the sentence?'
+- If omitted, the field can be left out or be an empty string.
 
 🔹 Format example:
 {
@@ -125,7 +162,8 @@ ONLY use real **definitions, concepts, explanations, and examples** from the doc
   choosenAnswer: [],
   explanation: "A telescope is used to observe distant objects.",
   type: "fillInAnswer",
-  isCorrect: false
+  isCorrect: false,
+  justification_prompt: "Explain the role of the missing word in this context."
 }
 
 📊 Gaps distribution:
@@ -141,6 +179,33 @@ ONLY use real **definitions, concepts, explanations, and examples** from the doc
 - Correct answer must be a single uppercase letter: A, B, C, or D.
 - Answer options MUST be randomly ordered for each question.
 
+🎯 **Crafting Plausible Distractors:**
+- Distractor options should be plausible and tempting to students who have an incomplete understanding or common misconceptions about the topic.
+- Avoid distractors that are obviously incorrect, irrelevant to the question's context, or humorous.
+- Each distractor should ideally represent a specific common error or misunderstanding.
+- All options (including the correct answer and distractors) should be grammatically consistent with the question stem and of similar length and complexity.
+
+🔢 **Numerical Question Guidance**: For questions involving numerical data, calculations, or variables:
+  - Ensure numbers and variables are realistic for the context.
+  - Avoid values leading to trivial answers, overly complex calculations (unless specified by difficulty), or mathematical errors like division by zero.
+  - Distractor options should also be plausible and not easily identifiable as incorrect due to numerical absurdity.
+
+🧠 **Higher-Order Thinking**:
+- Aim to create questions that assess not just recall, but also understanding, application, analysis, and evaluation.
+- Encourage critical thinking by asking 'why,' 'how,' 'compare,' 'what if,' or 'predict,' where appropriate for the topic.
+- Vary the cognitive skills tested, drawing from different levels of understanding (e.g., from simple recall to application and analysis).
+
+🌍 **Scenario-Based & Application Questions:**
+- Where appropriate, frame some questions within brief real-world or hypothetical scenarios to test application of knowledge.
+- Scenarios must be concise, directly relevant to the concept, and avoid excessive complexity or cognitive load unrelated to the core question.
+- Example: Instead of 'Define X', present a mini-case and ask how X applies, or what is the outcome based on X.
+- The question must still clearly test a specific concept, with the scenario providing context.
+
+🤔 **Optional Justification Prompt:**
+- For some questions (e.g., 25-50% of them), include an optional string field named \`justification_prompt\`.
+- This prompt should encourage the user to reflect on their choice. E.g., 'Why is this answer correct and another option incorrect?'
+- If omitted, the field can be left out or be an empty string.
+
 🔹 Format example:
 {
   question: "Which gas do plants absorb during photosynthesis?",
@@ -149,7 +214,8 @@ ONLY use real **definitions, concepts, explanations, and examples** from the doc
   choosenAnswer: "",
   explanation: "Plants absorb carbon dioxide during photosynthesis. The other gases are not involved.",
   type: "multiChoice",
-  isCorrect: false
+  isCorrect: false,
+  justification_prompt: "Why do you think this is the best answer?"
 }
 
 ---
@@ -218,8 +284,14 @@ Generate only **"fillInAnswer"** question objects based on an educational docume
 - Only **1** missing word allowed (100% of the time).
 - The missing word must be a noun, verb, adjective, or adverb TAKEN DIRECTLY from the document.
 - Mark missing word using ____ (four underscores), e.g., "The ____ rises in the east."
+- Focus on missing words that represent key concepts or important details from the text, rather than trivial or overly common words. The sentence should encapsulate a significant piece of information.
 - Sentence must still be clear WITH the gap (no confusion or ambiguity).
 - No made-up examples or content — only extract from definitions, explanations, and examples in the document.
+
+🤔 **Optional Justification Prompt:**
+- For some questions (e.g., 25-50% of them), include an optional string field named \`justification_prompt\`.
+- This prompt should encourage the user to reflect on their choice. E.g., 'How does this term fit into the broader concept discussed in the sentence?'
+- If omitted, the field can be left out or be an empty string.
 
 🔹 Format example:
 {
@@ -228,7 +300,8 @@ Generate only **"fillInAnswer"** question objects based on an educational docume
   choosenAnswer: [],
   explanation: "Photosynthesis occurs in the chloroplasts of plant cells.",
   type: "fillInAnswer",
-  isCorrect: false
+  isCorrect: false,
+  justification_prompt: "Explain the role of the missing word in this context."
 }
 
 ---
@@ -266,6 +339,33 @@ calculation questions (or questions that requires calculation) should take up 80
   - Options should be in RANDOM order (do NOT put correct answers in the same position every time).
   - Question must be straight to the point, testing COMPREHENSION (not just recall).
   - Include a short explanation showing why the correct option is valid.
+
+🎯 **Crafting Plausible Distractors:**
+- Distractor options should be plausible and tempting to students who have an incomplete understanding or common misconceptions about the topic.
+- Avoid distractors that are obviously incorrect, irrelevant to the question's context, or humorous.
+- Each distractor should ideally represent a specific common error or misunderstanding.
+- All options (including the correct answer and distractors) should be grammatically consistent with the question stem and of similar length and complexity.
+
+🔢 **Numerical Question Guidance**: For questions involving numerical data, calculations, or variables:
+  - Ensure numbers and variables are realistic for the context.
+  - Avoid values leading to trivial answers, overly complex calculations (unless specified by difficulty), or mathematical errors like division by zero.
+  - Distractor options should also be plausible and not easily identifiable as incorrect due to numerical absurdity.
+
+🧠 **Higher-Order Thinking**:
+- Aim to create questions that assess not just recall, but also understanding, application, analysis, and evaluation.
+- Encourage critical thinking by asking 'why,' 'how,' 'compare,' 'what if,' or 'predict,' where appropriate for the topic.
+- Vary the cognitive skills tested, drawing from different levels of understanding (e.g., from simple recall to application and analysis).
+
+🌍 **Scenario-Based & Application Questions:**
+- Where appropriate, frame some questions within brief real-world or hypothetical scenarios to test application of knowledge.
+- Scenarios must be concise, directly relevant to the concept, and avoid excessive complexity or cognitive load unrelated to the core question.
+- Example: Instead of 'Define X', present a mini-case and ask how X applies, or what is the outcome based on X.
+- The question must still clearly test a specific concept, with the scenario providing context.
+
+🤔 **Optional Justification Prompt:**
+- For some questions (e.g., 25-50% of them), include an optional string field named \`justification_prompt\`.
+- This prompt should encourage the user to reflect on their choice. E.g., 'Why is this answer correct and another option incorrect?'
+- If omitted, the field can be left out or be an empty string.
   
   🔹 Format example:
   {
@@ -275,7 +375,8 @@ calculation questions (or questions that requires calculation) should take up 80
     choosenAnswer: "",
     explanation: "Mitochondria are known as the powerhouse of the cell because they produce ATP.",
     type: "multiChoice",
-    isCorrect: false
+    isCorrect: false,
+    justification_prompt: "Why do you think this is the best answer?"
   }
   
   ---

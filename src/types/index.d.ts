@@ -6,6 +6,7 @@ interface MultiChoiceQuestionTypes {
   explanation: string;
   type: string;
   isCorrect: boolean;
+  justification_prompt?: string;
 }
 
 interface FillAnswerTypes {
@@ -15,6 +16,7 @@ interface FillAnswerTypes {
   explanation: string;
   type: string;
   isCorrect: false;
+  justification_prompt?: string;
 }
 interface FlashcardTypes {
   front: string;
