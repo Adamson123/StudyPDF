@@ -53,14 +53,14 @@ class PDFPage {
 
     // const resolution = 2; // Set the resolution to 2x
     // // Resize canvas
-    this.pdfCanvas.width = this.viewport.width * DPR;
-    this.pdfCanvas.height = this.viewport.height * DPR;
+    this.pdfCanvas.width = Math.round(this.viewport.width * DPR);
+    this.pdfCanvas.height = Math.round(this.viewport.height * DPR);
 
-    this.pdfCanvas.style.width = `${this.viewport.width}px`;
-    this.pdfCanvas.style.height = `${this.viewport.height}px`;
+    this.pdfCanvas.style.width = `${Math.round(this.viewport.width)}px`;
+    this.pdfCanvas.style.height = `${Math.round(this.viewport.height)}px`;
 
-    this.pdfContainer.style.width = `${this.viewport.width}px`;
-    this.pdfContainer.style.height = `${this.viewport.height}px`;
+    this.pdfContainer.style.width = `${Math.round(this.viewport.width)}px`;
+    this.pdfContainer.style.height = `${Math.round(this.viewport.height)}px`;
 
     this.pdfContainer.appendChild(this.pdfCanvas);
   }
@@ -78,6 +78,10 @@ class PDFPage {
 
     const context = this.pdfCanvas.getContext("2d");
     if (context) {
+      context.imageSmoothingEnabled = false;
+      // (context as any).mozImageSmoothingEnabled = false; // Firefox
+      // (context as any).webkitImageSmoothingEnabled = false; // WebKit/Blink (Chrome, Safari)
+      // (context as any).msImageSmoothingEnabled = false; // IE/Edge (older)
       context.scale(DPR, DPR);
     }
 
