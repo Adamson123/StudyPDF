@@ -41,7 +41,13 @@ export const getPDFDocument = async (
     window.location.origin + "/pdf.worker.min.mjs";
   return new Promise((resolve, reject) => {
     pdfJS
-      .getDocument(path)
+      .getDocument({
+        url: path,
+        cMapUrl: window.location.origin + "/pdfjs-resources/cmaps/",
+        cMapPacked: true,
+        standardFontDataUrl:
+          window.location.origin + "/pdfjs-resources/standard_fonts/",
+      })
       .promise.then((document: any) => {
         resolve(document);
       })
