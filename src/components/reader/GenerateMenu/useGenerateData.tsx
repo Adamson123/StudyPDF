@@ -75,7 +75,6 @@ function useGenerateData<T>({
         top_p: 1,
         model: "gpt-4o",
       };
-      console.log({ amountOfData });
 
       try {
         const res = await fetch(url, {

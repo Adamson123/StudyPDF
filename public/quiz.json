@@ -1,0 +1,332 @@
+[
+  {
+    "question": "What is the result of the vector sum of two vectors A(3i + 4j) and B(5i - 2j)?",
+    "options": ["8i + 2j", "8i - 6j", "2i + 6j", "5i + 4j"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The vector sum is calculated by adding the components: A + B = (3i + 4j) + (5i - 2j) = 8i + 2j.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Which of these is NOT a type of vector?",
+    "options": [
+      "Unit vector",
+      "Orthogonal vector",
+      "Scalar vector",
+      "Position vector"
+    ],
+    "answer": "C",
+    "choosenAnswer": "",
+    "explanation": "A scalar is not a vector, while unit, orthogonal, and position vectors are valid types.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "If a vector has components 6i and 8j, what is its magnitude?",
+    "options": ["14", "10", "48", "7"],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The magnitude is calculated as the square root of (6^2 + 8^2) = √100 = 10.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What are the components of the vector 7i + 4j in terms of unit vectors?",
+    "options": [
+      "7 in i, 4 in j",
+      "4 in i, 7 in j",
+      "7 in x, 4 in y",
+      "4 in x, 7 in y"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The vector is expressed as 7 units in the i direction and 4 units in the j direction.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the dot product of two vectors A(2i + 3j) and B(4i + j)?",
+    "options": ["11", "14", "21", "10"],
+    "answer": "C",
+    "choosenAnswer": "",
+    "explanation": "Dot product is calculated as (2*4 + 3*1) = 8 + 3 = 21.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Two vectors are said to be equal if:",
+    "options": [
+      "They have the same magnitude and direction",
+      "Their dot product equals zero",
+      "Their cross product equals zero",
+      "They have the same magnitude but different directions"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "Equal vectors must have identical magnitude and direction.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the vector projection of A(6i + 8j) onto B(3i + 4j)?",
+    "options": ["7.2i + 9.6j", "6i + 8j", "0.96i + 1.28j", "4.8i + 6.4j"],
+    "answer": "D",
+    "choosenAnswer": "",
+    "explanation": "Projection formula: [(A·B)/|B|^2] * B = (6*3 + 8*4)/25 * (3i + 4j) = 4.8i + 6.4j.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the gradient of a line passing through points (1, 2) and (4, 8)?",
+    "options": ["2", "3", "4", "1"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "Gradient = (y2 - y1) / (x2 - x1) = (8 - 2) / (4 - 1) = 6 / 3 = 2.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Which of the following represents the equation of a circle with center (2, 3) and radius 5?",
+    "options": [
+      "(x - 2)^2 + (y - 3)^2 = 25",
+      "x^2 + y^2 = 25",
+      "(x + 2)^2 + (y + 3)^2 = 25",
+      "(x - 2)^2 + (y - 3)^2 = 5"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The equation of a circle is (x - h)^2 + (y - k)^2 = r^2, where (h, k) is the center and r is the radius.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the cross product of two vectors A(2i + 3j + k) and B(i + 4j - 2k)?",
+    "options": [
+      "-10i + 5j + 5k",
+      "10i - 5j - 5k",
+      "10i + 5j - 5k",
+      "-10i - 5j + 5k"
+    ],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "Cross product is calculated using the determinant of the matrix: |i  j  k| |2  3  1| |1  4 -2| = 10i - 5j - 5k.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the distance between points (3, 4) and (7, 1)?",
+    "options": ["5", "7.2", "6", "5.83"],
+    "answer": "D",
+    "choosenAnswer": "",
+    "explanation": "Distance = √((7-3)^2 + (1-4)^2) = √(16 + 9) = √25 = 5.83.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "The angle between two perpendicular vectors is:",
+    "options": ["0 degrees", "90 degrees", "45 degrees", "180 degrees"],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "Perpendicular vectors meet at 90 degrees.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Which of the following rules applies to the vector cross product?",
+    "options": [
+      "Distributive law applies",
+      "Vector cross product is commutative",
+      "Resulting vector is parallel to both vectors",
+      "Dot product equals zero"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The cross product follows the distributive law but is not commutative; the result is perpendicular, not parallel.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the unit vector of a vector A(3i + 4j)?",
+    "options": ["0.6i + 0.8j", "3i + 4j", "5i + 0j", "1i + 4j"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "Unit vector = A/|A| = (3i + 4j)/5 = 0.6i + 0.8j.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "If the direction cosines of a vector are l = 0.8, m = 0.6, and n = 0, what is their sum of squares?",
+    "options": ["1", "0.36", "1.44", "0.64"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The sum of squares of direction cosines is always 1: l^2 + m^2 + n^2 = 0.8^2 + 0.6^2 + 0 = 1.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "If a vector has a magnitude of 10 and forms a 60-degree angle with the x-axis, what is its x-component?",
+    "options": ["5", "8.66", "10", "6.35"],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The x-component = magnitude * cos(angle) = 10 * cos(60°) = 8.66.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the geometric interpretation of the scalar product of two vectors?",
+    "options": [
+      "It gives the area of the parallelogram formed",
+      "It gives the projection of one vector onto another",
+      "It determines if vectors are collinear",
+      "It gives the volume of the parallelotope formed"
+    ],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The scalar product is used to find the projection of one vector onto another.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the equation of a straight line passing through (3, 2) with a slope of 4?",
+    "options": [
+      "y - 2 = 4(x - 3)",
+      "y = 4x + 2",
+      "y = 4x - 10",
+      "y - 3 = 4(x - 2)"
+    ],
+    "answer": "C",
+    "choosenAnswer": "",
+    "explanation": "Using the point-slope form: y - 2 = 4(x - 3), rearranging gives y = 4x - 10.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Which condition must hold for two vectors to be orthogonal?",
+    "options": [
+      "Their dot product is zero",
+      "Their cross product is zero",
+      "They have the same magnitude",
+      "They are in the same direction"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "Orthogonal vectors have a dot product equal to zero.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the midpoint of the line segment joining the points (2, 5) and (6, 9)?",
+    "options": ["(4, 7)", "(3, 5)", "(5, 7)", "(4, 6)"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "Midpoint = [(x1 + x2)/2, (y1 + y2)/2] = [(2 + 6)/2, (5 + 9)/2] = (4, 7).",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the parametric equation of a circle with center (h, k) and radius r?",
+    "options": [
+      "(x - h)^2 + (y - k)^2 = r^2",
+      "x = h + r*cos(t), y = k + r*sin(t)",
+      "x = r*cos(t), y = r*sin(t)",
+      "(x - h)/a^2 + (y - k)/b^2 = 1"
+    ],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The parametric equations for a circle are derived from trigonometric functions, incorporating the center and radius.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "If a parabola has its vertex at the origin and its axis is vertical, what is its general equation?",
+    "options": [
+      "x^2 = 4py",
+      "y^2 = 4px",
+      "(x - h)^2 = 4p(y - k)",
+      "y = ax^2 + bx + c"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "A parabola with a vertical axis has the general equation x^2 = 4py, where p is the distance from the vertex to the focus.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Find the length of the tangent drawn from a point outside the circle at distance d from the center, given the radius is r.",
+    "options": ["sqrt(d^2 + r^2)", "sqrt(d^2 - r^2)", "d - r", "r + d"],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The length of the tangent from an external point is calculated as sqrt(d^2 - r^2).",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "What is the directrix of a parabola with the equation y^2 = 4px?",
+    "options": ["x = -p", "x = p", "y = -p", "y = p"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "The directrix of a parabola y^2 = 4px is x = -p, as it is a fixed line equidistant from the focus.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "If two circles touch externally, what is the distance between their centers?",
+    "options": [
+      "Equal to the sum of their radii",
+      "Less than the sum of their radii",
+      "Equal to the difference of their radii",
+      "Greater than the sum of their radii"
+    ],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "When two circles touch externally, the distance between their centers equals the sum of their radii.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Calculate the area of a sector of a circle with radius 7 cm and angle 60°.",
+    "options": ["25.67 cm^2", "51.33 cm^2", "14.67 cm^2", "77.00 cm^2"],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The area of a sector = (θ/360) * π * r^2. Substituting θ=60°, r=7: (60/360) * π * 7^2 = 51.33 cm^2.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "The eccentricity of a circle is:",
+    "options": ["1", "0", "Greater than 1", "Between 0 and 1"],
+    "answer": "B",
+    "choosenAnswer": "",
+    "explanation": "The eccentricity of a circle is 0, as its focus and center coincide.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Find the coordinates of the focus for a parabola y^2 = -8x.",
+    "options": ["(-2, 0)", "(0, -2)", "(2, 0)", "(0, 2)"],
+    "answer": "A",
+    "choosenAnswer": "",
+    "explanation": "In the equation y^2 = -4px, the focus is at (-p, 0). For 4p = 8, p = 2: focus = (-2, 0).",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "The length of the major axis of an ellipse with equation x^2/16 + y^2/9 = 1 is:",
+    "options": ["6", "4", "8", "10"],
+    "answer": "C",
+    "choosenAnswer": "",
+    "explanation": "The length of the major axis is 2a, where a^2 is the larger denominator. Here, a^2 = 16, so 2a = 8.",
+    "type": "multiChoice",
+    "isCorrect": false
+  },
+  {
+    "question": "Find the distance between the foci of a hyperbola with equation x^2/25 - y^2/16 = 1.",
+    "options": ["10", "12", "14", "16"],
+    "answer": "C",
+    "choosenAnswer": "",
+    "explanation": "The distance between foci is 2c, where c^2 = a^2 + b^2. Here, c^2 = 25 + 16 = 41, so 2c = 14.",
+    "type": "multiChoice",
+    "isCorrect": false
+  }
+]

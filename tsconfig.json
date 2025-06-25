@@ -22,7 +22,12 @@
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "incremental": true,
-    "types": ["node", "next-auth", "vitest/globals"],
+    "types": [
+      "node",
+      "next-auth",
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ],
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {

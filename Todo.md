@@ -5,3 +5,5 @@
 # TODO: Make sure Amount of questions or flashcards generated are the amount specified by the user.
 
 # TODO: Keep the “Search PDF by Number” input synced with whatever page the user is currently looking at.
+
+# TODO: If try again is tapped on data generation on flashcards and questions ,we won't be restarting the data generation

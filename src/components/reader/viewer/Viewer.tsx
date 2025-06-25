@@ -39,10 +39,11 @@ export type CommentType = { text: string; class: string };
 const Viewer = () => {
   const pdfsContainer = useRef<HTMLDivElement>(null);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
-
   const [showSidebar, setShowSidebar] = useState(false);
-  const [scale, setScale] = useState(0.7);
-
+  const constant = window.innerWidth < 640 ? -0.01 : 0.1;
+  const [scale, setScale] = useState(
+    1 - (1 / window.innerWidth) * 100 + constant,
+  );
   const [selectionClass, setSelectionClass] = useState("");
   const [comment, setComment] = useState<CommentType>({ text: "", class: "" });
   const [message, setMessage] = useState({ text: "", autoTaminate: false });
@@ -57,7 +58,6 @@ const Viewer = () => {
     id: "",
     type: "",
   });
-
   const { renderPDFsOnView, loadingPDF, pdfPages } = useRender({
     pdfInfo,
     pdfsContainer,
@@ -69,7 +69,6 @@ const Viewer = () => {
     setScale(scale);
     const renderPromises: Promise<void>[] = [];
     for (const pdfPage of pdfPages) {
-      // await pdfPage.updateScale(scale);
       renderPromises.push(pdfPage.updateScale(scale));
     }
     await Promise.all(renderPromises);
@@ -77,6 +76,7 @@ const Viewer = () => {
       "--total-scale-factor",
       scale.toString(),
     );
+    console.log({ scale });
   };
 
   const incrementScale = () => {
@@ -141,11 +141,11 @@ const Viewer = () => {
         ) : (
           <div
             onClick={closeHighlightMenu}
-            className={`relative mt-10 flex flex-col gap-1`}
+            className={`relative mt-5 flex flex-col gap-1`}
             ref={pdfsContainer}
           ></div>
         )}
-
+        {/* 
         {selectionClass && (
           <AddComment
             selectionClass={selectionClass}
@@ -176,7 +176,7 @@ const Viewer = () => {
           openAddComment={openAddComment}
           setMessage={setMessage}
           setHighlightClass={setHighlightClass}
-        />
+        /> */}
 
         <Message message={message} setMessage={setMessage} />
         {dataToDelete.id && (
@@ -191,7 +191,9 @@ const Viewer = () => {
                   break;
                 case "flashcard":
                   deleteFlashcardById(dataToDelete.id);
+                  break;
                 default:
+                  deleteQuizById("quiz");
                   break;
               }
               setDataToDelete({ id: "", type: "" });

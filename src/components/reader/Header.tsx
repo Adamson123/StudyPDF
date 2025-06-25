@@ -163,14 +163,8 @@ const Header = ({
 
       await renderPDFsOnView(pdfPages);
       setPageNum(currentPageNum.toString());
-
-      // clearTimeout(timeout);
-      //console.log({ timeout });
     };
 
-    // const handleScrollEnd = () => {
-    //   setOnPageNumInput(false);
-    // };
     let scrollTimeoutId: NodeJS.Timeout | any = null;
 
     const debouncedFunc = debouncedHandler(
@@ -208,16 +202,17 @@ const Header = ({
         <PanelLeftDashed
           onClick={() => setShowSidebar((prev) => !prev)}
           strokeWidth={"1.2"}
-          className={`h-6 w-6 cursor-pointer ${showSidebar ? "stroke-primary" : "stroke-white"}`}
+          className={`h-5 w-5 cursor-pointer ${showSidebar ? "stroke-primary" : "stroke-white"}`}
         />
 
-        <div className="flex h-7 items-center gap-2 border-l border-gray-border pl-3">
-          <Search className="h-[18px] w-[18px]" />{" "}
+        <div className="flex h-7 items-center gap-2 border-l border-gray-border pl-3 text-xs">
+          <Search className="h-[17px] w-[17px]" />{" "}
           <Input
+            id="page-input"
             value={pageNum}
             onChange={handlePageNumChange}
             type="number"
-            className="text-md h-8 w-10 bg-gray-100/5"
+            className="h-8 w-10 bg-gray-100/5"
           />
           /{numOfPages}
         </div>
@@ -228,14 +223,14 @@ const Header = ({
           onClick={decrementScale}
           className="flex h-8 w-9 cursor-pointer items-center justify-center rounded-l border border-r-[3px] bg-gray-border"
         >
-          <Minus className="h-6 w-6" />
+          <Minus className="h-5 w-5" />
         </button>
 
         <button
           onClick={incrementScale}
           className="flex h-8 w-9 cursor-pointer items-center justify-center rounded-r bg-gray-border"
         >
-          <Plus className="h-6 w-6" />
+          <Plus className="h-5 w-5" />
         </button>
       </div>
       {/* Right section */}
@@ -250,15 +245,16 @@ const Header = ({
         /> */}
 
         {/* <Star className="h-[18px] w-[18px]" /> */}
-        <MessageSquareText className="h-[18px] w-[18px]" />
+        <MessageSquareText className="h-[17px] w-[17px]" />
 
-        <div className="relative flex h-[18px] w-[18px] cursor-pointer items-center justify-center">
+        <div className="relative flex h-[17px] w-[17px] cursor-pointer items-center justify-center">
           <File className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
           <Input
             onChange={handlePdfSelection}
             type="file"
             accept="application/pdf"
             className="h-full w-full cursor-pointer opacity-0"
+            id="pdf-file-input"
           />
         </div>
         <div

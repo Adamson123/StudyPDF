@@ -38,8 +38,6 @@ const HighlightMenu = ({
     } else {
       //TODO: Fix bug of red always, we will use dataset next time
       setHighlightColor(firstHighlight.style.borderBottomColor);
-      firstHighlight.style.borderBottomColor =
-        firstHighlight.style.borderBottomColor;
       console.log(firstHighlight.style.borderBottomColor);
     }
 
