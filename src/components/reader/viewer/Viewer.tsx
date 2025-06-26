@@ -115,7 +115,7 @@ const Viewer = () => {
 
   return (
     <ViewerContext.Provider value={{ pdfInfo, setDataToDelete, dataToDelete }}>
-      <main className="flex min-h-screen flex-col items-center justify-center p-3 pt-6">
+      <main className="flex-co tems-center flex min-h-screen justify-center p-3 pt-6">
         <Header
           setShowSidebar={setShowSidebar}
           showSidebar={showSidebar}

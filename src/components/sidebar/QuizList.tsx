@@ -18,7 +18,7 @@ const QuizList = () => {
     <div className="flex flex-col gap-1">
       <h2
         onClick={() => setOpenDropDown(!openDropDown)}
-        className="flex cursor-pointer items-center justify-between rounded border p-2"
+        className="flex cursor-pointer items-center justify-between rounded border p-4 text-2xl"
       >
         Quizzes{" "}
         {openDropDown ? (

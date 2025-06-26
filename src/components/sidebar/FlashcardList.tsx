@@ -19,7 +19,7 @@ const FlashcardList = () => {
     <div className="flex -translate-y-1 flex-col gap-1">
       <h2
         onClick={() => setOpenDropDown(!openDropDown)}
-        className="flex cursor-pointer items-center justify-between rounded border p-2"
+        className="flex cursor-pointer items-center justify-between rounded border p-4 text-2xl"
       >
         Flashcards{" "}
         {openDropDown ? (

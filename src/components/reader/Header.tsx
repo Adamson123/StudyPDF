@@ -80,6 +80,7 @@ const Header = ({
   const [onPageNumInput, setOnPageNumInput] = useState(false);
   const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
   const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
+  const [openGenerationMenu, setOpenGenerationMenu] = useState(false);
 
   const handlePageNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOnPageNumInput(true);
@@ -245,7 +246,7 @@ const Header = ({
         /> */}
 
         {/* <Star className="h-[18px] w-[18px]" /> */}
-        <MessageSquareText className="h-[17px] w-[17px]" />
+        {/* <MessageSquareText className="h-[17px] w-[17px]" /> */}
 
         <div className="relative flex h-[17px] w-[17px] cursor-pointer items-center justify-center">
           <File className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
@@ -257,15 +258,20 @@ const Header = ({
             id="pdf-file-input"
           />
         </div>
+        {/* generateMenu */}
         <div
+          onBlur={() => setOpenGenerationMenu(false)}
+          onClick={() => setOpenGenerationMenu(!openGenerationMenu)}
           tabIndex={0}
-          className="generateMenu relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
+          className="relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
         >
           <Stars className="h-[18px] w-[18px] cursor-pointer" />
-          <GenerateMenu
-            setOpenQuestionMenu={setOpenQuestionMenu}
-            setOpenFlashCardMenu={setOpenFlashCardMenu}
-          />
+          {openGenerationMenu && (
+            <GenerateMenu
+              setOpenQuestionMenu={setOpenQuestionMenu}
+              setOpenFlashCardMenu={setOpenFlashCardMenu}
+            />
+          )}
         </div>
 
         <ChevronsRight className="h-6 w-6" />

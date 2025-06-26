@@ -49,6 +49,7 @@ progress::-moz-progress-bar {
 .easyPercentage::-webkit-progress-value {
   background-color: #22c55e;
 }
+
 /* .textLayer br {
   pointer-events: none;
 } */

@@ -1,0 +1,28 @@
+.markdown table,
+th,
+td {
+  border: 1px solid;
+  padding: 0.5rem;
+  border-radius: 3px;
+}
+
+.markdown ul {
+  list-style-type: circle;
+  padding-left: 2rem;
+}
+
+.markdown h1 {
+  @apply mb-4 text-3xl font-bold;
+}
+.markdown h2 {
+  @apply mb-2 text-2xl font-semibold;
+}
+.markdown h3 {
+  @apply mb-1 text-xl font-semibold;
+}
+.markdown h4 {
+  @apply mb-1 text-lg font-semibold;
+}
+.markdown h5 {
+  @apply mb-1 text-base font-semibold;
+}
