@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { Dispatch, RefObject, SetStateAction, useState } from "react";
-import { CommentType } from "../Viewer";
+import { CommentType } from "../../Viewer";
 import Input from "@/components/ui/input";
 
 const AddComment = ({

@@ -8,14 +8,14 @@ import {
   useRef,
   useState,
 } from "react";
-import SelectionMenu from "./SelectionMenu";
+import SelectionMenu from "./anotation/comment/SelectionMenu";
 import Header from "../Header";
 import Sidebar from "../../sidebar/Sidebar";
 import { Loader2 } from "lucide-react";
-import AddComment from "./comment/AddComment";
-import Comment from "./comment/Comment";
-import { Message } from "./Message";
-import HighlightMenu from "./HighlightMenu";
+import AddComment from "./anotation/comment/AddComment";
+import Comment from "./anotation/comment/Comment";
+import { Message } from "./anotation/comment/Message";
+import HighlightMenu from "./anotation/comment/HighlightMenu";
 import Popup from "@/components/ui/Popup";
 import { deleteFlashcardById } from "@/lib/flashcardStorage";
 import { deleteQuizById } from "@/lib/quizStorage";

@@ -13,7 +13,7 @@ import {
   useRef,
 } from "react";
 import { MessageType } from "./Message";
-import { generateClass } from "./utils";
+import { generateClass } from "../../utils";
 
 export const copyToClipboard = () => {
   const selection = window.getSelection() as Selection;

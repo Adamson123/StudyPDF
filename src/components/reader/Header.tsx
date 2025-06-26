@@ -18,7 +18,7 @@ import {
   useState,
 } from "react";
 import Input from "../ui/input";
-import { MessageType } from "./viewer/Message";
+import { MessageType } from "./viewer/anotation/comment/Message";
 import GenerateQuestionMenu from "./GenerateMenu/GenerateQuestionMenu";
 import GenerateFlashcardMenu from "./GenerateMenu/GenerateFlashcardMenu";
 import PDFPage from "./viewer/pdfPage";
