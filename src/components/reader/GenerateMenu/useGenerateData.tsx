@@ -3,9 +3,14 @@ import { ViewerContext } from "../viewer/Viewer";
 import { useRouter } from "next/navigation";
 import { saveQuiz } from "@/lib/quizStorage";
 import { v4 as uuidv4 } from "uuid";
-import { getPDFTexts, splitChunks, splitTexts } from "./utils";
+import {
+  getPDFTexts,
+  splitChunks,
+  splitTexts,
+} from "../../../utils/pdfTextUtils";
 import { saveFlashcard } from "@/lib/flashcardStorage";
 import { env } from "@/env";
+import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 
 function useGenerateData<T>({
   numOfPages,
@@ -16,7 +21,7 @@ function useGenerateData<T>({
   title,
   questionType,
 }: {
-  getPrompt: (amountOfDataEach: number) => string;
+  getPrompt: (amountOfDataToGenerate: number) => string;
   numOfPages: number;
   type: "quiz" | "flashcard";
   userPrompt: string;
@@ -30,84 +35,98 @@ function useGenerateData<T>({
   const [data, setData] = useState<T[]>([]);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { generateDataWithOpenAI } = useGenerateDataWithOpenAI();
 
-  const generateDataWithOpenAI = useCallback(
-    async (
-      text: string,
-      index: number,
-      chunks: string[],
-      generatedData: T[],
-    ) => {
-      let amountOfDataEach = !index
-        ? Math.floor(amountOfData / chunks.length) +
-          (amountOfData % chunks.length)
-        : Math.floor(amountOfData / chunks.length);
+  const getAmountOfDataToGenerate = (
+    chunks: string[],
+    index: number,
+    generatedData: T[],
+  ) => {
+    let amountOfDataToGenerate = !index
+      ? Math.floor(amountOfData / chunks.length) +
+        (amountOfData % chunks.length)
+      : Math.floor(amountOfData / chunks.length);
 
-      if (index === chunks.length - 1) {
-        const remainingData = amountOfData - generatedData.length;
-        amountOfDataEach = remainingData;
-      }
+    if (index === chunks.length - 1) {
+      const remainingData = amountOfData - generatedData.length;
+      amountOfDataToGenerate = remainingData;
+    }
 
-      console.log(
-        `📝 Generating ${amountOfDataEach} data for chunk ${
-          index + 1
-        }/${chunks.length}`,
-      );
+    console.log(
+      `📝 Generating ${amountOfDataToGenerate} data for chunk ${
+        index + 1
+      }/${chunks.length}`,
+    );
+    return amountOfDataToGenerate;
+  };
 
-      const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
-      const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
+  // const generateDataWithOpenAI = useCallback(
+  //   async (
+  //     text: string,
+  //     index: number,
+  //     chunks: string[],
+  //     generatedData: T[],
+  //   ) => {
+  //     const amountOfDataToGenerate = getAmountOfDataToGenerate(
+  //       chunks,
+  //       index,
+  //       generatedData,
+  //     );
 
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      };
+  //     const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
+  //     const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
 
-      const body = {
-        messages: [
-          {
-            role: "user",
-            content: getPrompt(amountOfDataEach),
-          },
-          { role: "user", content: text },
-        ],
-        max_tokens: 4096,
-        temperature: 0.8,
-        top_p: 1,
-        model: "gpt-4o",
-      };
+  //     const headers = {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${apiKey}`,
+  //     };
 
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        });
+  //     const body = {
+  //       messages: [
+  //         {
+  //           role: "user",
+  //           content: getPrompt(amountOfDataToGenerate),
+  //         },
+  //         { role: "user", content: text },
+  //       ],
+  //       max_tokens: 4096,
+  //       temperature: 0.8,
+  //       top_p: 1,
+  //       model: "gpt-4o",
+  //     };
 
-        const data = await res.json();
-        const output = data.choices?.[0]?.message?.content || "error";
+  //     try {
+  //       const res = await fetch(url, {
+  //         method: "POST",
+  //         headers,
+  //         body: JSON.stringify(body),
+  //       });
 
-        if (output === "error") return { error: "Error generating data" };
+  //       const data = await res.json();
+  //       const output = data.choices?.[0]?.message?.content || "error";
 
-        let trimmedOutput = [];
-        try {
-          trimmedOutput = JSON.parse(
-            output.replace("```json", "").replace("```", "").trim(),
-          );
-          console.log(`✅ Chunk ${index + 1} saved.`);
-          return trimmedOutput;
-        } catch (error) {
-          console.error(`❌ Error parsing JSON for chunk ${index + 1}:`, error);
-          console.error("Raw output:", output);
-          return { error: "Error generating data😥" };
-        }
-      } catch (err) {
-        console.error(`❌ Error on chunk ${index + 1}:`, err);
-        return { error: "Error generating data😥" };
-      }
-    },
+  //       if (output === "error") return { error: "Error generating data" };
 
-    [amountOfData, userPrompt, data.length, questionType],
-  );
+  //       let trimmedOutput = [];
+  //       try {
+  //         trimmedOutput = JSON.parse(
+  //           output.replace("```json", "").replace("```", "").trim(),
+  //         );
+  //         console.log(`✅ Chunk ${index + 1} saved.`);
+  //         return trimmedOutput;
+  //       } catch (error) {
+  //         console.error(`❌ Error parsing JSON for chunk ${index + 1}:`, error);
+  //         console.error("Raw output:", output);
+  //         return { error: "Error generating data😥" };
+  //       }
+  //     } catch (err) {
+  //       console.error(`❌ Error on chunk ${index + 1}:`, err);
+  //       return { error: "Error generating data😥" };
+  //     }
+  //   },
+
+  //   [amountOfData, userPrompt, data.length, questionType],
+  // );
 
   const handleSaveAndRedirect = useCallback(
     async (data: T[]) => {
@@ -136,15 +155,22 @@ function useGenerateData<T>({
     let error = "";
 
     for (let index = 0; index < chunks.length; index++) {
-      const text = chunks[index];
+      const text = chunks[index] as string;
       console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
 
-      const data = await generateDataWithOpenAI(
-        text as string,
-        index,
+      const amountOfDataToGenerate = getAmountOfDataToGenerate(
         chunks,
+        index,
         response,
       );
+      const data = await generateDataWithOpenAI({
+        text: text,
+        prompt: getPrompt(amountOfDataToGenerate),
+        expect: "objectResponse",
+        arrayLength: chunks.length,
+        index,
+      });
+
       if (!data.error && data.length) {
         // Skip if no data generated
         response = response.length ? [...response, ...data] : data;
@@ -152,11 +178,6 @@ function useGenerateData<T>({
       }
 
       if (data.error) error = "error";
-
-      if (index < chunks.length - 1) {
-        console.log("Sleeping for 5 seconds to avoid rate limits...");
-        await new Promise((r) => setTimeout(r, 5000));
-      }
     }
 
     if (error) {
@@ -170,8 +191,6 @@ function useGenerateData<T>({
 
     console.log(response);
     await handleSaveAndRedirect(response);
-    // setIsGenerating(false);
-    // return response;
   }, [
     amountOfData,
     generateDataWithOpenAI,

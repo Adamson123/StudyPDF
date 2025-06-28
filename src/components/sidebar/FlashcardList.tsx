@@ -19,7 +19,7 @@ const FlashcardList = () => {
     <div className="flex -translate-y-1 flex-col gap-1">
       <h2
         onClick={() => setOpenDropDown(!openDropDown)}
-        className="flex cursor-pointer items-center justify-between rounded border p-4 text-2xl"
+        className="flex cursor-pointer items-center justify-between rounded border-b p-4 text-2xl"
       >
         Flashcards{" "}
         {openDropDown ? (
@@ -40,7 +40,7 @@ const FlashcardList = () => {
               <div
                 onClick={() => router.push(`/flashcard/${card.id}`)}
                 key={i}
-                className="flex cursor-pointer items-center justify-between rounded border border-primary bg-primary/15 p-3 text-xs transition-colors hover:bg-primary/70"
+                className="flex cursor-pointer items-center justify-between border-b border-primary bg-primary/15 p-3 text-xs transition-colors hover:bg-primary/50"
               >
                 <span className="overflow-hidden text-nowrap">
                   {card.title || card.id}

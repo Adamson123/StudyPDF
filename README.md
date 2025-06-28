@@ -1,29 +1,30 @@
-# Create T3 App
+### Welcome to StudyPDF 🚀
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+StudyPDF helps you learn smarter from your PDFs by generating quizzes, flashcards, and summaries using AI.
 
-## What's next? How do I make an app with this?
+##### Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- Fast PDF rendering ⚡
+- Easy to use 🧠
+- Beautiful interface 💅
+- Generate quizzes and flashcards from your PDFs
+- Persistent storage for your study materials
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+##### Future Roadmap
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- PDF summarization and key points extraction for exam prep
+- Chat with your PDF using AI
+- Search for text within your PDF
+- Draw boxes on a PDF to capture and extract specific parts
+- Choose between Gemini, OpenAI, or your own custom AI API
+- Use a database (not just local storage) for quizzes and flashcards
+- Ongoing bug fixes and improvements
 
-## Learn More
+##### Team
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+| Name | Role        |
+| ---- | ----------- |
+| Adam | Lead Dev    |
+| You  | Contributor |
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Stay tuned for more features!

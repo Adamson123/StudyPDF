@@ -1,8 +1,9 @@
-//TODO move createPDFPage and getPDFDocument to public utils
-import { createPDFPage, getPDFDocument } from "../viewer/utils";
+import {
+  createPDFPage,
+  getPDFDocument,
+} from "../components/reader/viewer/utils";
 
 export const splitTexts = (pdfString: string[], chunkSize = 30000) => {
-  //const paragraphs = (text.match(/[^]+?(?:\n\s*\n|$)/g) || []) as string[]; // split by paragraphs and handle null
   const chunks: string[] = [];
   let chunk = "";
 
@@ -19,14 +20,12 @@ export const splitTexts = (pdfString: string[], chunkSize = 30000) => {
 
 export const getPDFTexts = async (
   pdfURL: string,
-  range: { from: number; to: number },
+  range?: { from: number; to: number },
 ) => {
-  //TODO: Remove another getPDFDocument
-  //TODO:Change variable name render array
-
   const pdfDocument = await getPDFDocument(pdfURL);
+  const defaultRange = range || { from: 1, to: pdfDocument.numPages };
   const pdfPromises: Promise<string>[] = [];
-  for (let index = range.from - 1; index < range.to; index++) {
+  for (let index = defaultRange.from - 1; index < defaultRange.to; index++) {
     const renderer = async () => {
       const pdfPage = await createPDFPage(pdfDocument, index + 1);
       const text = await pdfPage.getTextContent();

@@ -9,6 +9,7 @@ import {
   File,
   FileQuestion,
   LucideFileStack,
+  LucideFileInput,
 } from "lucide-react";
 import {
   Dispatch,
@@ -203,7 +204,7 @@ const Header = ({
         <PanelLeftDashed
           onClick={() => setShowSidebar((prev) => !prev)}
           strokeWidth={"1.2"}
-          className={`h-5 w-5 cursor-pointer ${showSidebar ? "stroke-primary" : "stroke-white"}`}
+          className={`h-[1.40rem] w-[1.40rem] cursor-pointer ${showSidebar && "stroke-primary"}`}
         />
 
         <div className="flex h-7 items-center gap-2 border-l border-gray-border pl-3 text-xs">
@@ -222,7 +223,7 @@ const Header = ({
       <div className="flex items-center">
         <button
           onClick={decrementScale}
-          className="flex h-8 w-9 cursor-pointer items-center justify-center rounded-l border border-r-[3px] bg-gray-border"
+          className="flex h-8 w-9 cursor-pointer items-center justify-center rounded-l border border-r-[3px] border-r-gray-border bg-gray-border"
         >
           <Minus className="h-5 w-5" />
         </button>
@@ -249,7 +250,7 @@ const Header = ({
         {/* <MessageSquareText className="h-[17px] w-[17px]" /> */}
 
         <div className="relative flex h-[17px] w-[17px] cursor-pointer items-center justify-center">
-          <File className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
+          <LucideFileInput className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
           <Input
             onChange={handlePdfSelection}
             type="file"

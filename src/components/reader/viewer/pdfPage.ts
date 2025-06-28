@@ -42,7 +42,7 @@ class PDFPage {
   }
 
   async load() {
-    this.pdfCanvas.classList.add("pdfCanvas");
+    this.pdfCanvas.classList.add("pdfCanvas", "shadow-lg");
     this.pdfCanvas.id = `pdfCanvas-${this.index}`;
 
     const pdfDocument = this.pdfDocument as pdfJS.PDFDocumentProxy;

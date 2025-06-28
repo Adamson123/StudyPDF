@@ -120,7 +120,7 @@ ONLY use real **definitions, concepts, explanations, and examples** from the doc
 
 🔹 Format example:
 {
-  question: "A **telescope** is used to observe distant objects.",
+  question: "**telescope** is used to observe distant objects.",
   answer: ["telescope"],
   choosenAnswer: [],
   explanation: "A telescope is used to observe distant objects.",

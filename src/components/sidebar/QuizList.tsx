@@ -18,7 +18,7 @@ const QuizList = () => {
     <div className="flex flex-col gap-1">
       <h2
         onClick={() => setOpenDropDown(!openDropDown)}
-        className="flex cursor-pointer items-center justify-between rounded border p-4 text-2xl"
+        className="flex cursor-pointer items-center justify-between rounded border-b p-4 text-2xl"
       >
         Quizzes{" "}
         {openDropDown ? (
@@ -32,14 +32,14 @@ const QuizList = () => {
           scrollbarWidth: "thin",
           scrollbarColor: "var(--primary) transparent",
         }}
-        className={`flex flex-col gap-1 overflow-y-auto ${openDropDown ? "max-h-max" : "max-h-0"} listOverflow transition-all duration-300 ease-in-out`}
+        className={`flex flex-col overflow-y-auto ${openDropDown ? "max-h-max" : "max-h-0"} listOverflow transition-all duration-300 ease-in-out`}
       >
         {quizzes.length
           ? quizzes.map((quiz, i) => (
               <div
                 onClick={() => router.push(`/quiz/${quiz.id}`)}
                 key={i}
-                className="flex cursor-pointer items-center justify-between rounded border border-primary bg-primary/15 p-3 text-xs transition-colors hover:bg-primary/70"
+                className="flex cursor-pointer items-center justify-between border-b border-primary bg-primary/15 p-3 text-xs transition-colors hover:bg-primary/50"
               >
                 <span className="overflow-hidden text-nowrap">
                   {quiz.title || quiz.id}

@@ -49,7 +49,7 @@ const Quiz = () => {
         {!startQuiz && (
           <button
             onClick={() => setStartQuiz(true)}
-            className="flex items-center gap-2 rounded bg-green-500 p-2 px-3 text-sm text-white transition-all hover:bg-green-600"
+            className="flex items-center gap-2 text-nowrap rounded bg-green-500 p-2 px-3 text-sm text-white transition-all hover:bg-green-600"
           >
             Start Quiz <Play className="h-4 w-4 fill-white" />
           </button>

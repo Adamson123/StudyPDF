@@ -9,20 +9,25 @@ td {
 .markdown ul {
   list-style-type: circle;
   padding-left: 2rem;
+  font-size: 13px;
 }
 
 .markdown h1 {
   @apply mb-4 text-3xl font-bold;
 }
 .markdown h2 {
-  @apply mb-2 text-2xl font-semibold;
+  @apply mb-2 text-xl font-semibold;
 }
 .markdown h3 {
-  @apply mb-1 text-xl font-semibold;
-}
-.markdown h4 {
   @apply mb-1 text-lg font-semibold;
 }
+.markdown h4 {
+  @apply mb-1 text-sm font-semibold;
+}
 .markdown h5 {
-  @apply mb-1 text-base font-semibold;
+  @apply mb-1 text-xs font-semibold;
+}
+
+.markdown p {
+  font-size: 13px;
 }
