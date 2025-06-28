@@ -33,7 +33,7 @@ const FlashcardList = () => {
           scrollbarWidth: "thin",
           scrollbarColor: "var(--primary) transparent",
         }}
-        className={`flex flex-col gap-1 overflow-y-auto ${openDropDown ? "max-h-max" : "max-h-0"} listOverflow transition-all duration-300 ease-in-out`}
+        className={`flex flex-col overflow-y-auto ${openDropDown ? "max-h-max" : "max-h-0"} listOverflow transition-all duration-300 ease-in-out`}
       >
         {flashcards.length
           ? flashcards.map((card, i) => (
