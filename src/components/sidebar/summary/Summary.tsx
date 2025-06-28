@@ -4,13 +4,13 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import { Button } from "../../ui/button";
-import { Circle, RefreshCcw } from "lucide-react";
+import { Plus, RefreshCcw } from "lucide-react";
 import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 import { getPDFTexts, splitTexts } from "@/utils/pdfTextUtils";
 import { useContext, useState } from "react";
 import { ViewerContext } from "../../reader/viewer/Viewer";
 import { cn } from "@/lib/utils";
-import { replace } from "node_modules/cypress/types/lodash";
+import SummaryCard from "./SummaryCard";
 
 const Summary = () => {
   const [summary, setSummary] = useState("");
@@ -117,24 +117,19 @@ ${text}
     setIsGenerating(false);
   };
 
-  const generateBtnLabel = isGenerating
-    ? "Generating Summary..."
-    : "Re-generate Summary";
   return (
-    <div className="flex flex-col gap-3 px-4 pb-5">
+    <div className="flex flex-col gap-3 px-6 pb-5">
       <div className="self-center rounded-lg bg-primary/55 p-1">
         <Button onClick={generateSummary} className="p-5">
-          {summary || isGenerating ? generateBtnLabel : "Generate Summary"}
-          <RefreshCcw className={cn(isGenerating && "animate-spin")} />
+          Create a Summary
+          <Plus />
         </Button>
       </div>
-      <div className="markdown flex flex-col gap-2">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeHighlight]}
-        >
-          {summary || markdown}
-        </ReactMarkdown>
+      {/* Summaries */}
+      <div className="flex flex-col gap-3">
+        <SummaryCard />
+        <SummaryCard />
+        <SummaryCard />
       </div>
       {isGenerating && <RefreshCcw className="animate-spin self-center" />}
     </div>
