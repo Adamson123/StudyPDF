@@ -53,6 +53,7 @@ Stay tuned for more features!
 `;
 
   const generateSummary = async () => {
+    setSummary("")
     const pdfTexts = await getPDFTexts(pdfInfo.url);
     const splittedTexts = splitTexts(pdfTexts);
 
