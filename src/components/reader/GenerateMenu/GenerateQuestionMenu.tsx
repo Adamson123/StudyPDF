@@ -50,10 +50,8 @@ const GenerateQuestionMenu = ({
     numOfPages,
     getPrompt,
     type: "quiz",
-    userPrompt,
     amountOfData: amountOfQuestions,
     title,
-    questionType,
   });
 
   return (
@@ -63,6 +61,7 @@ const GenerateQuestionMenu = ({
           onSubmit={async (event) => {
             event.preventDefault();
             setError("");
+
             await generateQuestions();
           }}
           style={{
@@ -74,7 +73,7 @@ const GenerateQuestionMenu = ({
             <div>
               <h2 className="text-xl">Generate Questions</h2>
               <h3 className="text-xs text-gray-500">
-                Select the type of question
+                Create questions from your PDF content
               </h3>
             </div>
 

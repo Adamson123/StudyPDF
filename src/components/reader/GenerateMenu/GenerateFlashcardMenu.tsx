@@ -46,7 +46,6 @@ const GenerateFlashcardsMenu = ({
     numOfPages,
     getPrompt,
     type: "flashcard",
-    userPrompt,
     amountOfData: amountOfFlashcards,
     title,
   });

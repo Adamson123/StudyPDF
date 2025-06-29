@@ -1,5 +1,5 @@
 import Input from "@/components/ui/input";
-import { Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 const OtherCustomInput = ({
   setAmountOfData,
@@ -20,6 +20,9 @@ const OtherCustomInput = ({
   setUserPrompt: Dispatch<SetStateAction<string>>;
   type: "question" | "flashcard";
 }) => {
+  const getNumberInput = (e: ChangeEvent<HTMLInputElement>) =>
+    (e.target.value === "" ? "" : Number(e.target.value)) as any;
+
   return (
     <div className="flex flex-col gap-6">
       {/* Amount of questions and range */}
@@ -28,7 +31,8 @@ const OtherCustomInput = ({
           Amount of {type} (10 - 70):
         </label>
         <Input
-          onChange={(e) => setAmountOfData(Number(e.target.value))}
+          required
+          onChange={(e) => setAmountOfData(getNumberInput(e))}
           id="amountOfData"
           value={amountOfData}
           type="number"
@@ -44,21 +48,33 @@ const OtherCustomInput = ({
         <div className="flex w-full items-center gap-3">
           <Input
             type="number"
+            required
             min={1}
             max={numOfPages}
             value={range.from}
             onChange={(e) =>
-              setRange({ ...range, from: Number(e.target.value) })
+              setRange({
+                ...range,
+                from: getNumberInput(e),
+              })
             }
+            placeholder="Enter starting page"
             className="bg-border focus:outline-1 focus:outline-primary"
           />
           <span>-</span>
           <Input
             type="number"
-            min={numOfPages > range.from + 1 ? range.from + 1 : numOfPages}
+            required
+            min={range.from}
             max={numOfPages}
             value={range.to}
-            onChange={(e) => setRange({ ...range, to: Number(e.target.value) })}
+            onChange={(e) =>
+              setRange({
+                ...range,
+                to: getNumberInput(e),
+              })
+            }
+            placeholder="Enter ending page"
             className="bg-border focus:outline-1 focus:outline-primary"
           />
         </div>

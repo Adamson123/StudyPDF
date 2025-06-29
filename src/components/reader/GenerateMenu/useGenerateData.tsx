@@ -15,19 +15,15 @@ import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 function useGenerateData<T>({
   numOfPages,
   type,
-  userPrompt,
   getPrompt,
   amountOfData,
   title,
-  questionType,
 }: {
   getPrompt: (amountOfDataToGenerate: number) => string;
   numOfPages: number;
   type: "quiz" | "flashcard";
-  userPrompt: string;
   amountOfData: number;
   title: string;
-  questionType: string;
 }) {
   const [range, setRange] = useState({ from: 1, to: numOfPages });
   const { pdfInfo } = useContext(ViewerContext);
@@ -60,77 +56,8 @@ function useGenerateData<T>({
     return amountOfDataToGenerate;
   };
 
-  // const generateDataWithOpenAI = useCallback(
-  //   async (
-  //     text: string,
-  //     index: number,
-  //     chunks: string[],
-  //     generatedData: T[],
-  //   ) => {
-  //     const amountOfDataToGenerate = getAmountOfDataToGenerate(
-  //       chunks,
-  //       index,
-  //       generatedData,
-  //     );
-
-  //     const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
-  //     const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
-
-  //     const headers = {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${apiKey}`,
-  //     };
-
-  //     const body = {
-  //       messages: [
-  //         {
-  //           role: "user",
-  //           content: getPrompt(amountOfDataToGenerate),
-  //         },
-  //         { role: "user", content: text },
-  //       ],
-  //       max_tokens: 4096,
-  //       temperature: 0.8,
-  //       top_p: 1,
-  //       model: "gpt-4o",
-  //     };
-
-  //     try {
-  //       const res = await fetch(url, {
-  //         method: "POST",
-  //         headers,
-  //         body: JSON.stringify(body),
-  //       });
-
-  //       const data = await res.json();
-  //       const output = data.choices?.[0]?.message?.content || "error";
-
-  //       if (output === "error") return { error: "Error generating data" };
-
-  //       let trimmedOutput = [];
-  //       try {
-  //         trimmedOutput = JSON.parse(
-  //           output.replace("```json", "").replace("```", "").trim(),
-  //         );
-  //         console.log(`✅ Chunk ${index + 1} saved.`);
-  //         return trimmedOutput;
-  //       } catch (error) {
-  //         console.error(`❌ Error parsing JSON for chunk ${index + 1}:`, error);
-  //         console.error("Raw output:", output);
-  //         return { error: "Error generating data😥" };
-  //       }
-  //     } catch (err) {
-  //       console.error(`❌ Error on chunk ${index + 1}:`, err);
-  //       return { error: "Error generating data😥" };
-  //     }
-  //   },
-
-  //   [amountOfData, userPrompt, data.length, questionType],
-  // );
-
   const handleSaveAndRedirect = useCallback(
     async (data: T[]) => {
-      console.log("Saving with data", data);
       const id = uuidv4();
 
       if (!data.length) return; // No data to save
@@ -182,9 +109,9 @@ function useGenerateData<T>({
 
     if (error) {
       if (response.length) {
-        setError("An Error occured while generating data");
+        setError(`An Error occured while generating ${type}`);
       } else {
-        setError("Error generating data");
+        setError(`Error generating ${type}`);
       }
       return;
     }

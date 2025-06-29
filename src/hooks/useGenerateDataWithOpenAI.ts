@@ -2,8 +2,6 @@ import { env } from "@/env";
 import { useCallback, useState } from "react";
 
 export default function useGenerateDataWithOpenAI() {
-  const [isGenerating, setIsGenerating] = useState(false);
-
   const delay = async () => {
     console.log("Sleeping for 5 seconds to avoid rate limits...");
     await new Promise((r) => setTimeout(r, 5000));
@@ -16,12 +14,11 @@ export default function useGenerateDataWithOpenAI() {
       text,
       prompt,
       expect,
-      updateIsGenerating,
     }: {
       text: string;
       prompt: string;
       expect: "stringResponse" | "objectResponse";
-      updateIsGenerating?: false;
+
       arrayLength: number;
       index: number;
     }) => {
@@ -51,7 +48,6 @@ export default function useGenerateDataWithOpenAI() {
       };
 
       try {
-        setIsGenerating(true);
         const res = await fetch(url, {
           method: "POST",
           headers,
@@ -63,7 +59,6 @@ export default function useGenerateDataWithOpenAI() {
           console.error(`❌ Error on chunk :`, data);
           return { error: "Error generating data😥" };
         }
-        if (updateIsGenerating) setIsGenerating(false);
 
         const output = data.choices?.[0]?.message?.content;
 
@@ -97,5 +92,5 @@ export default function useGenerateDataWithOpenAI() {
     [],
   );
 
-  return { generateDataWithOpenAI, isGenerating, setIsGenerating };
+  return { generateDataWithOpenAI };
 }

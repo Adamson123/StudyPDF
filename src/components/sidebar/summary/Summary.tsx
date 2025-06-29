@@ -1,22 +1,23 @@
 import "@/styles/markdown.css";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import { Button } from "../../ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
 import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 import { getPDFTexts, splitTexts } from "@/utils/pdfTextUtils";
-import { useContext, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { ViewerContext } from "../../reader/viewer/Viewer";
-import { cn } from "@/lib/utils";
 import SummaryCard from "./SummaryCard";
+import GenerateSummary from "./GenerateSummary";
 
-const Summary = () => {
+const Summary = ({
+  setOpenGenerateSummary,
+}: {
+  setOpenGenerateSummary: Dispatch<SetStateAction<boolean>>;
+}) => {
   const [summary, setSummary] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
   const { pdfInfo } = useContext(ViewerContext);
-  const { generateDataWithOpenAI, isGenerating, setIsGenerating } =
-    useGenerateDataWithOpenAI();
+  const { generateDataWithOpenAI } = useGenerateDataWithOpenAI();
 
   const markdown = `
 
@@ -53,7 +54,8 @@ Stay tuned for more features!
 `;
 
   const generateSummary = async () => {
-    setSummary("")
+    setSummary("");
+    setIsGenerating(true);
     const pdfTexts = await getPDFTexts(pdfInfo.url);
     const splittedTexts = splitTexts(pdfTexts);
 
@@ -119,20 +121,29 @@ ${text}
   };
 
   return (
-    <div className="flex flex-col gap-3 px-6 pb-5">
-      <div className="self-center rounded-lg bg-primary/55 p-1">
-        <Button onClick={generateSummary} className="p-5">
-          Create a Summary
-          <Plus />
-        </Button>
-      </div>
+    <div className="flex flex-col items-center gap-3 px-6">
+      {/* Create Summary */}
+
       {/* Summaries */}
       <div className="flex flex-col gap-3">
         <SummaryCard />
         <SummaryCard />
         <SummaryCard />
+        <SummaryCard />
       </div>
-      {isGenerating && <RefreshCcw className="animate-spin self-center" />}
+      {isGenerating ? (
+        <RefreshCcw className="animate-spin self-center" />
+      ) : (
+        <div className="self-center rounded-lg bg-primary/30 p-[4px]">
+          <Button
+            onClick={() => setOpenGenerateSummary((prev) => !prev)}
+            className="p-4"
+          >
+            Create a Summary
+            <Plus />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
