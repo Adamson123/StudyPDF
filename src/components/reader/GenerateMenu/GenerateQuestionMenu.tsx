@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   getQuestionGeneralPrompt,
   questionPrompts,
-} from "@/data/static-data/questionPrompts";
+} from "@/data/prompts/questionPrompts";
 import GeneratingCover from "./GeneratingCover";
 import XButton from "@/components/ui/XButton";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";

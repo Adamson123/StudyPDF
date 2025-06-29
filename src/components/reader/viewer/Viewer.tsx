@@ -20,13 +20,19 @@ import Popup from "@/components/ui/Popup";
 import { deleteFlashcardById } from "@/lib/flashcardStorage";
 import { deleteQuizById } from "@/lib/quizStorage";
 import useRender from "./useRender";
+import { PDFDocumentProxy } from "pdfjs-dist";
 
 export const ViewerContext = createContext<{
-  pdfInfo: PdfInfoTypes;
+  pdfData: PdfDataTypes;
   setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
   dataToDelete: DataToDeleteTypes;
 }>({
-  pdfInfo: { name: "", url: "" },
+  pdfData: {
+    name: "",
+    url: "",
+    pdfDocument: {} as PDFDocumentProxy,
+    numOfPages: 0,
+  },
   dataToDelete: {
     id: "",
     type: "",
@@ -39,7 +45,9 @@ export type CommentType = { text: string; class: string };
 const Viewer = () => {
   const pdfsContainer = useRef<HTMLDivElement>(null);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(
+    window.innerWidth > 1600 ? true : false,
+  );
   const constant = window.innerWidth < 640 ? -0.01 : 0.1;
   const [scale, setScale] = useState(
     1 - (1 / window.innerWidth) * 100 + constant,
@@ -58,7 +66,7 @@ const Viewer = () => {
     id: "",
     type: "",
   });
-  const { renderPDFsOnView, loadingPDF, pdfPages } = useRender({
+  const { renderPDFsOnView, loadingPDF, pdfPages, pdfData } = useRender({
     pdfInfo,
     pdfsContainer,
     scale,
@@ -114,7 +122,13 @@ const Viewer = () => {
   };
 
   return (
-    <ViewerContext.Provider value={{ pdfInfo, setDataToDelete, dataToDelete }}>
+    <ViewerContext.Provider
+      value={{
+        setDataToDelete,
+        dataToDelete,
+        pdfData: pdfData as PdfDataTypes,
+      }}
+    >
       <main className="flex-co tems-center flex min-h-screen justify-center p-3 pt-6">
         <Header
           setShowSidebar={setShowSidebar}

@@ -1,6 +1,6 @@
 "use server";
 
-import { questionPrompts } from "@/data/static-data/questionPrompts";
+import { questionPrompts } from "@/data/prompts/questionPrompts";
 import { env } from "@/env";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 

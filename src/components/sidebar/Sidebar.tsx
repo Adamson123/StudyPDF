@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FlashcardList from "./FlashcardList";
 import QuizList from "./QuizList";
 import GenerateSummary from "./summary/GenerateSummary";
 import Summary from "./summary/Summary";
+import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
 
 const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
   const [openGenerateSummary, setOpenGenerateSummary] = useState(false);
+  //TODO:Remove this state
+  const [summary, setSummary] = useState({ title: "", content: "" });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [summaries, setSummaries] = useState<SummaryTypes[]>([]);
+
+  //Get Summaries from localStorage
+  useEffect(() => {
+    const storedSummaries = getAllSummariesFromStorage();
+    if (storedSummaries) {
+      setSummaries(storedSummaries);
+    }
+  }, []);
 
   return (
     <section
@@ -19,11 +32,23 @@ const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
           <QuizList />
           <FlashcardList />
         </div>
-        <Summary setOpenGenerateSummary={setOpenGenerateSummary} />
+        <Summary
+          isGenerating={isGenerating}
+          setOpenGenerateSummary={setOpenGenerateSummary}
+          summaries={summaries}
+          setSummaries={setSummaries}
+        />
       </div>
 
       {openGenerateSummary && (
-        <GenerateSummary setOpenGenerateSummary={setOpenGenerateSummary} />
+        <GenerateSummary
+          setIsGenerating={setIsGenerating}
+          setSummary={setSummary}
+          summary={summary}
+          setOpenGenerateSummary={setOpenGenerateSummary}
+          setSummaries={setSummaries}
+          isGenerating={isGenerating}
+        />
       )}
     </section>
   );

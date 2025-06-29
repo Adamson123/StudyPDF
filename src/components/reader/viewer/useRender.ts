@@ -21,6 +21,7 @@ function useRender({
 }) {
   const [pdfPages, setPdfPages] = useState<PDFPage[]>([]);
   const [loadingPDF, setLoadingPDF] = useState(false);
+  const [pdfData, setPdfData] = useState<PdfDataTypes>();
 
   const renderPDFsOnView = async (currentPdfPages: PDFPage[]) => {
     const pdfsContainerElement = pdfsContainer.current;
@@ -119,8 +120,13 @@ function useRender({
 
   useEffect(() => {
     (async () => {
+      if (pdfData?.pdfDocument) {
+        pdfData.pdfDocument.destroy(); // Clean up previous PDF document if it exists
+      }
+
       const pdfDocument = await getPDFDocument(pdfInfo.url);
 
+      setPdfData({ ...pdfInfo, pdfDocument, numOfPages: pdfDocument.numPages });
       const pdfPages: PDFPage[] = [];
       for (let index = 1; index <= pdfDocument.numPages; index++) {
         const pdfPage = new PDFPage(
@@ -166,6 +172,7 @@ function useRender({
     renderPDFsOnView,
     loadingPDF,
     pdfPages,
+    pdfData,
   };
 }
 

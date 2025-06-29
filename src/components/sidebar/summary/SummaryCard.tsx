@@ -1,52 +1,39 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, Trash2 } from "lucide-react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { cn } from "@/lib/utils";
+import { deleteSummaryById } from "@/lib/summaryStorage";
 
-const SummaryCard = () => {
+const SummaryCard = ({
+  summary,
+  setSummaries,
+}: {
+  summary: SummaryTypes;
+  setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
+}) => {
   const [expand, setExpand] = useState(false);
 
-  const markdown = `
-
-> **Note:** This space will be used for PDF summaries and key points in the future. 
-
-### Welcome to StudyPDF 🚀
-
-StudyPDF helps you learn smarter from your PDFs by generating quizzes, flashcards, and summaries using AI.
-
-##### Features
-- Fast PDF rendering ⚡
-- Easy to use 🧠
-- Beautiful interface 💅
-- Generate quizzes and flashcards from your PDFs
-- Persistent storage for your study materials
-
-##### Future Roadmap
-- PDF summarization and key points extraction for exam prep
-- Chat with your PDF using AI
-- Search for text within your PDF
-- Draw boxes on a PDF to capture and extract specific parts
-- Choose between Gemini, OpenAI, or your own custom AI API
-- Use a database (not just local storage) for quizzes and flashcards
-- Ongoing bug fixes and improvements
-
-##### Team
-
-| Name | Role        |
-|------|-------------|
-| Adam | Lead Dev    |
-| You  | Contributor |
-
-Stay tuned for more features!
-`;
+  const deleteSummary = () => {
+    deleteSummaryById(summary.id);
+    setSummaries((prev) => prev.filter((data) => data.id !== summary.id));
+  };
   return (
     <div>
-      <h3 className="p-2 text-lg font-semibold">GST104 Pg 1-3 Summary</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="p-2 text-lg font-semibold">{summary.title}</h3>
+        <div className="flex items-center justify-end gap-3">
+          <ChevronDown
+            onClick={() => setExpand(!expand)}
+            className={cn("cursor-pointer", expand ? "rotate-180" : "rotate-0")}
+          />
+          <Trash2 onClick={deleteSummary} className="cursor-pointer" />
+        </div>
+      </div>
       <div
         className={cn(
-          `markdown relative flex flex-col gap-2 overflow-hidden rounded-md bg-gray-900 p-4`,
+          `markdown p relative flex flex-col gap-2 overflow-hidden rounded-md bg-gray-900 p-4`,
           expand ? "max-h-max" : "max-h-64",
         )}
       >
@@ -54,16 +41,20 @@ Stay tuned for more features!
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeHighlight]}
         >
-          {markdown}
+          {summary.content}
         </ReactMarkdown>
         {!expand && (
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
         )}
         <button
           onClick={() => setExpand(!expand)}
-          className="absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-1 text-sm"
+          className={cn(
+            "flex items-center gap-1 self-center rounded-md bg-white p-2 px-3 text-sm text-black",
+            !expand && "absolute bottom-3",
+          )}
         >
-          Expand <ChevronDown />
+          {expand ? "Collapse" : "Expand"}
+          <ChevronDown className={cn(expand ? "rotate-180" : "rotate-0")} />
         </button>
       </div>
     </div>

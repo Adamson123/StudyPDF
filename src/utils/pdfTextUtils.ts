@@ -1,8 +1,3 @@
-import {
-  createPDFPage,
-  getPDFDocument,
-} from "../components/reader/viewer/utils";
-
 export const splitTexts = (pdfString: string[], chunkSize = 30000) => {
   const chunks: string[] = [];
   let chunk = "";
@@ -16,26 +11,6 @@ export const splitTexts = (pdfString: string[], chunkSize = 30000) => {
   }
   if (chunk) chunks.push(chunk);
   return chunks;
-};
-
-export const getPDFTexts = async (
-  pdfURL: string,
-  range?: { from: number; to: number },
-) => {
-  const pdfDocument = await getPDFDocument(pdfURL);
-  const defaultRange = range || { from: 1, to: pdfDocument.numPages };
-  const pdfPromises: Promise<string>[] = [];
-  for (let index = defaultRange.from - 1; index < defaultRange.to; index++) {
-    const renderer = async () => {
-      const pdfPage = await createPDFPage(pdfDocument, index + 1);
-      const text = await pdfPage.getTextContent();
-      return text.items.map((item: any) => item.str).join("\n");
-    };
-    pdfPromises.push(renderer());
-  }
-
-  const pdfTexts = await Promise.all(pdfPromises);
-  return pdfTexts;
 };
 
 export const splitChunks = (chunks: string[], amountOfQuestions: number) => {

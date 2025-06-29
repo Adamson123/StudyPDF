@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import {
   flashcardPrompt,
   getFlashcardGeneralPrompt,
-} from "@/data/static-data/flashcardPrompt";
+} from "@/data/prompts/flashcardPrompt";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import XButton from "@/components/ui/XButton";
 import Input from "@/components/ui/input";

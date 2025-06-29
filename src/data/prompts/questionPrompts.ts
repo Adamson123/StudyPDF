@@ -1,4 +1,4 @@
-import { questionsMock } from "./questionMock";
+import { questionsMock } from "../static-data/questionMock";
 
 // export const getQuestionGeneralPrompt = (amountOfQuestionsEach: number) => `
 // - fillInAnswer questions must only contain one gap and one correct answer.

@@ -23,7 +23,7 @@ export const Message = ({
   }, [message]);
   return (
     <div
-      className={`pointer-events-none fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-background p-3 px-5 text-xs transition-all duration-75 ${message.text ? "opacity-100" : "opacity-0"}`}
+      className={`pointer-events-none fixed left-1/2 top-1/2 z-[200] -translate-x-1/2 -translate-y-1/2 rounded bg-background p-3 px-5 text-xs transition-all duration-75 ${message.text ? "opacity-100" : "opacity-0"}`}
     >
       {message.text}
     </div>

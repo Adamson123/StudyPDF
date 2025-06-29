@@ -3,14 +3,10 @@ import { ViewerContext } from "../viewer/Viewer";
 import { useRouter } from "next/navigation";
 import { saveQuiz } from "@/lib/quizStorage";
 import { v4 as uuidv4 } from "uuid";
-import {
-  getPDFTexts,
-  splitChunks,
-  splitTexts,
-} from "../../../utils/pdfTextUtils";
+import { splitChunks, splitTexts } from "../../../utils/pdfTextUtils";
 import { saveFlashcard } from "@/lib/flashcardStorage";
-import { env } from "@/env";
 import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
+import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 
 function useGenerateData<T>({
   numOfPages,
@@ -25,13 +21,16 @@ function useGenerateData<T>({
   amountOfData: number;
   title: string;
 }) {
-  const [range, setRange] = useState({ from: 1, to: numOfPages });
-  const { pdfInfo } = useContext(ViewerContext);
+  const [range, setRange] = useState({ from: 1, to: Math.min(numOfPages, 17) });
+  const { pdfData } = useContext(ViewerContext);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [data, setData] = useState<T[]>([]);
   const [error, setError] = useState("");
   const router = useRouter();
   const { generateDataWithOpenAI } = useGenerateDataWithOpenAI();
+  const { getPDFTexts } = useGetPDFTexts();
+  const [lastPDfBeforeErrorIndex, setLastPDfBeforeErrorIndex] =
+    useState<number>(0);
 
   const getAmountOfDataToGenerate = (
     chunks: string[],
@@ -71,17 +70,17 @@ function useGenerateData<T>({
         router.push(`/flashcard/${id}`);
       }
     },
-    [pdfInfo.name, numOfPages, router, title],
+    [pdfData.name, numOfPages, router, title],
   );
 
   const generateData = useCallback(async () => {
     setIsGenerating(true);
-    let response: T[] = [];
-    const pdfTexts = await getPDFTexts(pdfInfo.url, range); // Get texts from PDF
+    let response: T[] = data.length ? data : [];
+    const pdfTexts = await getPDFTexts(range); // Get texts from PDF
     const chunks = splitChunks(splitTexts(pdfTexts), amountOfData); // Break chunks if needed
     let error = "";
 
-    for (let index = 0; index < chunks.length; index++) {
+    for (let index = lastPDfBeforeErrorIndex; index < chunks.length; index++) {
       const text = chunks[index] as string;
       console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
 
@@ -98,16 +97,21 @@ function useGenerateData<T>({
         index,
       });
 
+      //if no error occurred and data is generated, append to response
       if (!data.error && data.length) {
         // Skip if no data generated
         response = response.length ? [...response, ...data] : data;
         setData(response);
       }
 
-      if (data.error) error = "error";
+      // If an error occurred, set the last index before the error
+      if (data.error) {
+        setLastPDfBeforeErrorIndex(index);
+        error = "error";
+      }
     }
 
-    if (error) {
+    if (error && response.length < amountOfData) {
       if (response.length) {
         setError(`An Error occured while generating ${type}`);
       } else {
@@ -116,14 +120,15 @@ function useGenerateData<T>({
       return;
     }
 
-    console.log(response);
     await handleSaveAndRedirect(response);
   }, [
     amountOfData,
     generateDataWithOpenAI,
     handleSaveAndRedirect,
-    pdfInfo.url,
+    pdfData.url,
     range,
+    data,
+    lastPDfBeforeErrorIndex,
   ]);
 
   const handleTryAgain = useCallback(async () => {

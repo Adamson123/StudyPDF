@@ -21,10 +21,20 @@ interface FlashcardTypes {
   back: string;
   level: string;
 }
-interface PdfInfoTypes {
+
+interface SummaryTypes {
+  title: string;
+  content: string;
+  isCompleted: boolean;
+  id: string;
+}
+interface PdfDataTypes {
   name: string;
   url: string;
+  pdfDocument: PDFDocumentProxy;
+  numOfPages: number;
 }
+
 interface DataToDeleteTypes {
   id: string;
   type: "flashcard" | "quiz" | "";

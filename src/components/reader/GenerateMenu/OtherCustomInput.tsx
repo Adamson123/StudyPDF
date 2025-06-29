@@ -1,4 +1,5 @@
 import Input from "@/components/ui/input";
+import { getNumberInput } from "@/utils";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 const OtherCustomInput = ({
@@ -20,9 +21,6 @@ const OtherCustomInput = ({
   setUserPrompt: Dispatch<SetStateAction<string>>;
   type: "question" | "flashcard";
 }) => {
-  const getNumberInput = (e: ChangeEvent<HTMLInputElement>) =>
-    (e.target.value === "" ? "" : Number(e.target.value)) as any;
-
   return (
     <div className="flex flex-col gap-6">
       {/* Amount of questions and range */}
