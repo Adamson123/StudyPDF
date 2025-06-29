@@ -23,7 +23,7 @@ const SummaryCard = ({
     <div>
       <div className="flex items-center justify-between">
         <h3 className="p-2 text-lg font-semibold">{summary.title}</h3>
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-4">
           <ChevronDown
             onClick={() => setExpand(!expand)}
             className={cn("cursor-pointer", expand ? "rotate-180" : "rotate-0")}

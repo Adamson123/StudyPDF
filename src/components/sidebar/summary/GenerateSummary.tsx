@@ -5,6 +5,7 @@ import { getSummaryPrompt } from "@/data/prompts/summaryPrompts";
 import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 import { saveSummary } from "@/lib/summaryStorage";
+import { cn } from "@/lib/utils";
 import { getNumberInput } from "@/utils";
 import { splitTexts } from "@/utils/pdfTextUtils";
 import { Stars } from "lucide-react";
@@ -149,7 +150,11 @@ const GenerateSummary = ({
       </div>
       <Button
         type="submit"
-        className="flex w-full max-w-96 items-center self-center"
+        className={cn(
+          "flex w-full max-w-96 items-center self-center text-white",
+          isGenerating && "cursor-not-allowed bg-gray-600",
+        )}
+        disabled={isGenerating}
       >
         {isGenerating ? "Generating..." : "Generate Summary"}
         <Stars className="ml-2" />

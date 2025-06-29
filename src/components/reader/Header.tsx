@@ -72,7 +72,7 @@ const Header = ({
   numOfPages: number;
   pdfsContainer: RefObject<HTMLDivElement>;
   setSelectionBoxMode: Dispatch<SetStateAction<boolean>>;
-  setPdfInfo: Dispatch<SetStateAction<PdfInfoTypes>>;
+  setPdfInfo: Dispatch<SetStateAction<{ url: string; name: string }>>;
   setMessage: Dispatch<SetStateAction<MessageType>>;
   renderPDFsOnView: (pdfPages: PDFPage[]) => Promise<void>;
   pdfPages: PDFPage[];
@@ -105,6 +105,7 @@ const Header = ({
     const debouncedFunc = debouncedHandler(
       () => renderPDFsOnView(pdfPages),
       scrollTimeoutId,
+      200,
     );
 
     debouncedFunc();
