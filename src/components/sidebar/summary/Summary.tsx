@@ -31,7 +31,7 @@ const Summary = ({
             />
           ))
         ) : (
-          <div className="flex w-full items-center justify-center rounded-lg bg-secondary p-4 text-sm text-secondary-foreground">
+          <div className="w-full text-center  rounded-lg bg-secondary p-4 text-sm text-secondary-foreground">
             No summaries available. Click the button to create one.
           </div>
         )}
