@@ -26,7 +26,7 @@ const SummaryCard = ({
     <div>
       <div
         onClick={() => setExpand(!expand)}
-        className="flex cursor-pointer items-center justify-between"
+        className="flex cursor-pointer max-w-full items-center justify-between"
       >
         <h3 className="p-2 text-lg font-semibold">{summary.title}</h3>
         <div className="flex items-center justify-end gap-4">
