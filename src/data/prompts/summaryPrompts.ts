@@ -36,6 +36,7 @@ Include **as many bullet points as possible** for:
 - Processes, stages, steps
 - Acronyms and what they mean
 - People or orgs associated with major inventions, events, or discoveries
+- Real-world or descriptive sentences that illustrate or reinforce a definition
 
 ✅ *Bold* or _italicize_ the most important **terms, variables, and numbers**  
 ❌ DO NOT use double parentheses like \`(( x ))\` — they're invalid.  
@@ -72,45 +73,47 @@ For every fact or formula, convert into as many simple Q&A as possible:
 ⚠️ **ALL math formulas must appear on a new line using block LaTeX only. No inline LaTeX. EVER.**
 
 ✅ Always use this format:
+
 \`\`\`markdown
 $$
 a^2 + b^2 = c^2
 $$
 \`\`\`
 
-✅ Use for:
-- Variables with subscripts:
-  \`\`\`markdown
-  $$
-  x_1,\ y_2,\ A_Y
-  $$
-  \`\`\`
+✅ Examples:
+
+- Subscripts:
+\`\`\`markdown
+$$
+x_1,\ y_2,\ A_Y
+$$
+\`\`\`
 
 - Fractions:
-  \`\`\`markdown
-  $$
-  \\frac{y_2 - y_1}{x_2 - x_1}
-  $$
-  \`\`\`
+\`\`\`markdown
+$$
+\\frac{y_2 - y_1}{x_2 - x_1}
+$$
+\`\`\`
 
 - Vectors:
-  \`\`\`markdown
-  $$
-  \\mathbf{v} = ai + bj
-  $$
-  \`\`\`
+\`\`\`markdown
+$$
+\\mathbf{v} = ai + bj
+$$
+\`\`\`
 
 - Square roots and powers:
-  \`\`\`markdown
-  $$
-  |r| = \\sqrt{a^2 + b^2 + c^2}
-  $$
-  \`\`\`
+\`\`\`markdown
+$$
+|r| = \\sqrt{a^2 + b^2 + c^2}
+$$
+\`\`\`
 
-❌ DO NOT format math using inline LaTeX like \`\\( x = 5 \\)\`  
-❌ DO NOT use regular parentheses for math like \`(x = 5)\`
+❌ DO NOT use \`\x = 5 \\`  
+❌ DO NOT use \`(x = 5)\`
 
-✅ Example – Proper math rendering:
+✅ Correct Example:
 \`\`\`markdown
 $$
 (x - h)^2 + (y - k)^2 = r^2
@@ -129,23 +132,24 @@ $$
 ---
 
 ### 📌 5. You Should Be Able To:
-End each topic with a list of questions the student should be able to answer:
+End each topic with a checklist of things the student should be able to do:
+
 - Define important terms
 - Compare differences
 - List types, steps, components
 - Recall dates, people, formulas
 - Explain short processes
-- Solve math/numerical problems
+- Solve math/numerical problems (if applicable)
 
 ---
 
-✅ Markdown output must be well-formatted  
-✅ Use simple, beginner-level English  
-✅ NO fill-in-the-blank, NO open-ended or opinion questions  
-✅ DO NOT skip small points — extract everything  
-✅ Stay within each topic — no mixing or reordering  
-✅ **ALL math MUST render correctly** using new-line LaTeX blocks only  
-✅ Think like a WAEC/JAMB/UTME examiner 💣
+✅ Markdown output must be clean and readable  
+✅ Use simple, beginner-friendly English  
+✅ NO fill-in-the-blanks, NO open-ended or opinion-based questions  
+✅ DO NOT skip any small detail — extract all  
+✅ Stay inside each topic’s scope — no jumping around  
+✅ **ALL math MUST be rendered using block-style LaTeX only**  
+✅ Think like an exam-setter: “How can I turn this into a test question?”
 
 ---
 
