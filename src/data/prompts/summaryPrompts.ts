@@ -36,12 +36,12 @@ Include **as many bullet points as possible** for:
 - Processes, stages, steps
 - Acronyms and what they mean
 - People or orgs associated with major inventions, events, or discoveries
-- Real-world or descriptive sentences that illustrate or reinforce a definition
 
 ✅ *Bold* or _italicize_ the most important **terms, variables, and numbers**  
-❌ DO NOT use double parentheses like \`(( x ))\` — they're invalid.  
-❌ DO NOT format math like \`( r = ai + bj )\` — it will not render.  
-✅ DO format **ALL math and variables using LaTeX in new lines** (see next section).
+❌ DO NOT use any LaTeX syntax like \`$$\`, \`\\frac{}\`, or \`a^2\`  
+❌ DO NOT use Markdown code blocks to wrap math  
+✅ ONLY use **real math symbols** like:  
+π, √, ∑, ∫, ×, ÷, ≠, ≤, ≥, ∞, ≈, Δ, ∆, ∂, θ, α, β, etc.
 
 ---
 
@@ -67,77 +67,36 @@ For every fact or formula, convert into as many simple Q&A as possible:
 
 ### ⚙️ 4. Formulas To Know (if present):
 - Add a **“Formulas To Know”** section.
-- List **every math equation** in the text.
+- List **every math equation** in the text using only symbols, no LaTeX.
 
-#### 🔣 Math Formatting Rules (STRICT NEW LINE MODE):
-⚠️ **ALL math formulas must appear on a new line using block LaTeX only. No inline LaTeX. EVER.**  
-❌ DO NOT use inline LaTeX like \`\\( x = 5 \\)\`  
-❌ DO NOT use regular parentheses like \`(x = 5)\`  
-✅ ALWAYS begin any LaTeX/math expression on its own new line — directly beneath the sentence it's linked to.
+#### 🔣 Math Formatting Rules (REAL SYMBOLS ONLY):
+✅ Use plain symbols like this:
 
-✅ Example format:
-\`\`\`markdown
-$$
-a^2 + b^2 = c^2
-$$
-\`\`\`
+- Area of circle: A = πr²  
+- Slope: m = (y₂ − y₁) ÷ (x₂ − x₁)  
+- Vector: **v** = ai + bj  
+- Magnitude: |r| = √(a² + b² + c²)  
+- Pythagoras: a² + b² = c²  
+- Force: F = ma  
+- Average: 𝑥̄ = (x₁ + x₂ + x₃) ÷ n
 
-✅ More cases:
-- Subscripts:
-  \`\`\`markdown
-  $$
-  x_1,\ y_2,\ A_Y
-  $$
-  \`\`\`
-
-- Fractions:
-\`\`\`markdown
-$$
-\\frac{y_2 - y_1}{x_2 - x_1}
-$$
-\`\`\`
-
-- Vectors:
-\`\`\`markdown
-$$
-\\mathbf{v} = ai + bj
-$$
-\`\`\`
-
-- Roots & powers:
-  \`\`\`markdown
-  $$
-  |r| = \\sqrt{a^2 + b^2 + c^2}
-  $$
-  \`\`\`
-
-✅ Example – Proper math rendering:
-\`\`\`markdown
-$$
-(x - h)^2 + (y - k)^2 = r^2
-$$
-$$
-m = \\frac{y_2 - y_1}{x_2 - x_1}
-$$
-$$
-\\mathbf{r} = ai + bj + ck
-$$
-$$
-|PQ| = \\sqrt{5^2 + 2^2 + 4^2}
-$$
-\`\`\`
+❌ DO NOT use:
+- \`$$ ... $$\`  
+- \`\\frac{}\`  
+- \`\\sqrt{}\`  
+- Markdown math blocks  
+✅ ONLY use: symbols like \`√\`, \`²\`, \`₁\`, \`θ\`, \`÷\`, etc.
 
 ---
 
 ### 📌 5. You Should Be Able To:
-End each topic with a checklist of things the student should be able to do:
-
+End each topic with a list of questions the student should be able to answer:
 - Define important terms
 - Compare differences
 - List types, steps, components
 - Recall dates, people, formulas
 - Explain short processes
-- Solve math/numerical problems (if applicable)
+- Solve math/numerical problems
 
 ---
 
@@ -146,29 +105,9 @@ End each topic with a checklist of things the student should be able to do:
 ✅ NO fill-in-the-blank, NO open-ended or opinion questions  
 ✅ DO NOT skip small points — extract everything  
 ✅ Stay within each topic — no mixing or reordering  
-✅ **ALL math MUST render correctly** using block LaTeX  
-
----
-
-### 🧠 FINAL WARNING: How to Write LaTeX and How NOT To
-
-🚫 **WRONG:**
-- Don’t write math like \`\\( x = 2 + 3 \\)\` ← no inline
-- Don’t say: “The formula is (a = b + c)” ← invalid syntax
-- Don’t mix math into a sentence or a bullet like this: “Newton’s law is \`F = ma\`” ← BAD
-
-✅ **CORRECT:**
-Explain, then drop the math like a boss — on its own line:
-
-“The total resistance is calculated using the formula below:”
-
-\`\`\`markdown
-$$
-R = R_1 + R_2 + R_3
-$$
-\`\`\`
-
-Always keep math **below the sentence**, on its own line, in the block format shown above.
+✅ **ALL math MUST use real, readable symbols** (like π, ×, √, ≥)  
+✅ NO LaTeX, NO dollar signs, NO math block code fences  
+✅ Send math as natural symbols everyone can read 👌
 
 ---
 

@@ -1,4 +1,4 @@
-import { MathJax, MathJaxContext } from "better-react-mathjax";
+//import { MathJax, MathJaxContext } from "better-react-mathjax";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ChevronDown, Trash2 } from "lucide-react";
@@ -24,18 +24,18 @@ const SummaryCard = ({
     ? summary.content
     : summary.content.substring(0, 1000);
 
-  const mathjaxConfig = {
-    tex: {
-      inlineMath: [["\\(", "\\)"]],
-      displayMath: [["$$", "$$"]],
-    },
-  };
+  // const mathjaxConfig = {
+  //   tex: {
+  //     inlineMath: [["\\(", "\\)"]],
+  //     displayMath: [["$$", "$$"]],
+  //   },
+  // };
 
   return (
     <div>
       <div
         onClick={() => setExpand(!expand)}
-        className="flex cursor-pointer max-w-full items-center justify-between"
+        className="flex max-w-full cursor-pointer items-center justify-between"
       >
         <h3 className="p-2 text-lg font-semibold">{summary.title}</h3>
         <div className="flex items-center justify-end gap-4">
@@ -58,13 +58,14 @@ const SummaryCard = ({
           expand ? "max-h-max" : "max-h-64",
         )}
       >
-        <MathJaxContext config={mathjaxConfig}>
+        {/* <MathJaxContext config={mathjaxConfig}>
           <MathJax dynamic inline>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {visibleContent}
-            </ReactMarkdown>
+           
           </MathJax>
-        </MathJaxContext>
+        </MathJaxContext> */}
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {visibleContent}
+        </ReactMarkdown>
 
         {!expand && (
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black to-transparent" />
