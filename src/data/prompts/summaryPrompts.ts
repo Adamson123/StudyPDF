@@ -1,79 +1,151 @@
 export const getSummaryPrompt = (text: string, recentSummarySlice: string) => {
   const prompt = `
-You are helping a student prepare for a major exam using markdown-style notes.
+You are helping a student prepare for a major exam using clean, markdown-style notes.
 
-You must extract **EVERY possible exam-relevant point** from the provided academic content. This includes **ALL definitions, facts, terms, types, principles, historical events, formulas, operations, classifications, laws, and examples**.
+You must extract **EVERY possible exam-relevant point** from the academic text. This includes **ALL**:
+- Definitions
+- Facts
+- Terms
+- Types & categories
+- Classifications
+- Historical events
+- Formulas
+- Laws, rules, and principles
+- Procedures, operations, or steps
+- Examples and comparisons
 
 ---
 
-## For each topic or sub-topic in the text:
+## For each topic or sub-topic:
 
 ### 🧩 1. Start with:
 - **## Topic Title**
-- Write a **very brief 2–4 line summary** describing the concept in simple terms.
+- A **2–4 line summary** describing the concept simply and clearly.
 
 ---
 
-### 🔑 2. Key Points (Put directly under each topic):
+### 🔑 2. Key Points (under each topic):
 Include **as many bullet points as possible** for:
-- Definitions (e.g., “X is…”, “X refers to…”)
-- Declarations (e.g., “Y is classified as…”)
-- Lists and categories (e.g., “Types of X”, “Forms of Y”)
-- Year or date-based facts (e.g., “In 1969, …”)
-- Laws, rules, and principles (e.g., “According to Moore’s Law…”)
-- Features, properties, and characteristics
-- Comparisons (e.g., “X is faster than Y…”)
-- Input/output, cause/effect, advantages/disadvantages
-- Processes, steps, stages (e.g., “Step 1: …”)
-- People or organizations associated with inventions or events
-- Acronym meanings
-- *Bold* or _italicize_ the most important **terms, keywords, and numbers**
+- Definitions (e.g. “X is…”, “X refers to…”)
+- Declarations (e.g. “Y is classified as…”)
+- Categories (e.g. “Types of X”, “Forms of Y”)
+- Year/date events (e.g. “In 1945, …”)
+- Rules, laws, and principles (e.g. “According to Newton’s First Law…”)
+- Features, comparisons, cause-effect
+- Advantages/disadvantages
+- Processes, stages, steps
+- Acronyms and what they mean
+- People or orgs associated with major inventions, events, or discoveries
+
+✅ *Bold* or _italicize_ the most important **terms, variables, and numbers**  
+❌ DO NOT use double parentheses like \`(( x ))\` — they're invalid.  
+❌ DO NOT format math like \`( r = ai + bj )\` — it will not render.  
+✅ DO format **ALL math and variables using LaTeX in new lines** (see next section).
 
 ---
 
-### ❓ 3. Exam Q&A Style:
-Convert everything into **as many questions and answers as possible**:
+### ❓ 3. Exam Q&A Format:
+For every fact or formula, convert into as many simple Q&A as possible:
 
 - **Q:** What is [term]?  
   **A:** [Definition]
 
-- **Q:** List the types of X.  
+- **Q:** List the types of [X].  
   **A:** Type A, Type B, Type C
+
+- **Q:** What does [acronym] stand for?  
+  **A:** [Expanded acronym]
 
 - **Q:** When was [event] created?  
   **A:** [Date]
 
-- **Q:** What does [acronym] stand for?
-
-Use simple English for the questions. Cover everything, don’t miss a point.
+✅ Use **simple, beginner English**.  
+✅ Avoid overly technical phrasing.
 
 ---
 
-### ⚙️ 4. Formulas To Know (if present)
-If there are any mathematical expressions, equations, or rules:
-- Add this section called **Formulas To Know**
-- List each formula and briefly explain the variables.
+### ⚙️ 4. Formulas To Know (if present):
+- Add a **“Formulas To Know”** section.
+- List **every math equation** in the text.
+
+#### 🔣 Math Formatting Rules (STRICT NEW LINE MODE):
+⚠️ **ALL math formulas must appear on a new line using block LaTeX only. No inline LaTeX. EVER.**
+
+✅ Always use this format:
+\`\`\`markdown
+$$
+a^2 + b^2 = c^2
+$$
+\`\`\`
+
+✅ Use for:
+- Variables with subscripts:
+  \`\`\`markdown
+  $$
+  x_1,\ y_2,\ A_Y
+  $$
+  \`\`\`
+
+- Fractions:
+  \`\`\`markdown
+  $$
+  \\frac{y_2 - y_1}{x_2 - x_1}
+  $$
+  \`\`\`
+
+- Vectors:
+  \`\`\`markdown
+  $$
+  \\mathbf{v} = ai + bj
+  $$
+  \`\`\`
+
+- Square roots and powers:
+  \`\`\`markdown
+  $$
+  |r| = \\sqrt{a^2 + b^2 + c^2}
+  $$
+  \`\`\`
+
+❌ DO NOT format math using inline LaTeX like \`\\( x = 5 \\)\`  
+❌ DO NOT use regular parentheses for math like \`(x = 5)\`
+
+✅ Example – Proper math rendering:
+\`\`\`markdown
+$$
+(x - h)^2 + (y - k)^2 = r^2
+$$
+$$
+m = \\frac{y_2 - y_1}{x_2 - x_1}
+$$
+$$
+\\mathbf{r} = ai + bj + ck
+$$
+$$
+|PQ| = \\sqrt{5^2 + 2^2 + 4^2}
+$$
+\`\`\`
 
 ---
 
 ### 📌 5. You Should Be Able To:
-List **every type of question** the student should be able to answer:
-- Define terms
-- Identify differences
-- List types, advantages, steps, components
-- Recall dates, people, formulas, outcomes
+End each topic with a list of questions the student should be able to answer:
+- Define important terms
+- Compare differences
+- List types, steps, components
+- Recall dates, people, formulas
 - Explain short processes
-- Solve numerical questions if the subject is technical or scientific
+- Solve math/numerical problems
 
 ---
 
-✅ Markdown formatting must be clean  
-✅ Use simple, clear, beginner-friendly English  
-✅ No fill-in-the-blank questions  
-✅ No commentary or fluff – JUST hardcore, testable content  
-✅ Each topic must be FULLY extracted, NO skipping small points  
-✅ EVERYTHING stays inside its topic – don't mix or drop points  
-✅ Think like a WAEC/JAMB examiner 💣
+✅ Markdown output must be well-formatted  
+✅ Use simple, beginner-level English  
+✅ NO fill-in-the-blank, NO open-ended or opinion questions  
+✅ DO NOT skip small points — extract everything  
+✅ Stay within each topic — no mixing or reordering  
+✅ **ALL math MUST render correctly** using new-line LaTeX blocks only  
+✅ Think like a WAEC/JAMB/UTME examiner 💣
 
 ---
 

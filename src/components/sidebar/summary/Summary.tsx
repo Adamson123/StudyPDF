@@ -17,7 +17,7 @@ const Summary = ({
   setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
 }) => {
   return (
-    <div className="flex flex-col items-center gap-3 px-6">
+    <div className="flex flex-col items-center gap-3 px-2">
       {/* Create Summary */}
 
       {/* Summaries */}
@@ -31,7 +31,7 @@ const Summary = ({
             />
           ))
         ) : (
-          <div className="w-full text-center  rounded-lg bg-secondary p-4 text-sm text-secondary-foreground">
+          <div className="w-full rounded-lg bg-secondary p-4 text-center text-sm text-secondary-foreground">
             No summaries available. Click the button to create one.
           </div>
         )}
