@@ -25,7 +25,7 @@ const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
       style={{
         scrollbarColor: "hsl(var(--border)) transparent",
       }}
-      className={`fixed bottom-0 left-0 top-0 z-40 max-w-full bg-background pt-16 shadow-[4px_0px_3px_rgba(0,0,0,0.3)] transition-all md:max-w-[600px] ${showSidebar ? "translate-x-0" : "-translate-x-full"}`}
+      className={`fixed bottom-0 left-0 top-0 z-40 max-w-full bg-background pt-16 shadow-[4px_0px_3px_rgba(0,0,0,0.3)] transition-all w-full max-w-screen md:max-w-[600px] ${showSidebar ? "translate-x-0" : "-translate-x-full"}`}
     >
       <div className="flex max-h-screen flex-col gap-5 overflow-x-auto overflow-y-auto pb-28">
         <div className="flex flex-col pb-2">
