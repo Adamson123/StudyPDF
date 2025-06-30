@@ -36,6 +36,7 @@ Include **as many bullet points as possible** for:
 - Processes, stages, steps
 - Acronyms and what they mean
 - People or orgs associated with major inventions, events, or discoveries
+- Real-world or descriptive sentences that illustrate or reinforce a definition
 
 ✅ *Bold* or _italicize_ the most important **terms, variables, and numbers**  
 ❌ DO NOT use double parentheses like \`(( x ))\` — they're invalid.  
@@ -90,18 +91,18 @@ $$
   \`\`\`
 
 - Fractions:
-  \`\`\`markdown
-  $$
-  \\frac{y_2 - y_1}{x_2 - x_1}
-  $$
-  \`\`\`
+\`\`\`markdown
+$$
+\\frac{y_2 - y_1}{x_2 - x_1}
+$$
+\`\`\`
 
 - Vectors:
-  \`\`\`markdown
-  $$
-  \\mathbf{v} = ai + bj
-  $$
-  \`\`\`
+\`\`\`markdown
+$$
+\\mathbf{v} = ai + bj
+$$
+\`\`\`
 
 - Roots & powers:
   \`\`\`markdown
@@ -129,13 +130,14 @@ $$
 ---
 
 ### 📌 5. You Should Be Able To:
-End each topic with a list of questions the student should be able to answer:
+End each topic with a checklist of things the student should be able to do:
+
 - Define important terms
 - Compare differences
 - List types, steps, components
 - Recall dates, people, formulas
 - Explain short processes
-- Solve math/numerical problems
+- Solve math/numerical problems (if applicable)
 
 ---
 
