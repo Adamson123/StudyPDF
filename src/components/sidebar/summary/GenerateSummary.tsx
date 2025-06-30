@@ -10,6 +10,7 @@ import { getNumberInput } from "@/utils";
 import { splitTexts } from "@/utils/pdfTextUtils";
 import { Stars } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
+import { v4 as uuid } from "uuid";
 
 const GenerateSummary = ({
   setOpenGenerateSummary,
@@ -42,7 +43,7 @@ const GenerateSummary = ({
       to: range.to,
     });
     const splittedTexts = splitTexts(pdfTexts);
-    const id = crypto.randomUUID();
+    const id = uuid();
     for (let index = 0; index < splittedTexts.length; index++) {
       const text = splittedTexts[index] as string;
       const recentSummarySlice = summary.content.slice(-1000);

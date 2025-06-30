@@ -31,3 +31,7 @@ td {
 .markdown p {
   font-size: 13px;
 }
+
+.katex-html {
+  font-size: 14px;
+}

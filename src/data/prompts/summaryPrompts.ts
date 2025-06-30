@@ -69,17 +69,20 @@ For every fact or formula, convert into as many simple Q&A as possible:
 - List **every math equation** in the text.
 
 #### 🔣 Math Formatting Rules (STRICT NEW LINE MODE):
-⚠️ **ALL math formulas must appear on a new line using block LaTeX only. No inline LaTeX. EVER.**
+⚠️ **ALL math formulas must appear on a new line using block LaTeX only. No inline LaTeX. EVER.**  
+❌ DO NOT use inline LaTeX like \`\\( x = 5 \\)\`  
+❌ DO NOT use regular parentheses like \`(x = 5)\`  
+✅ ALWAYS begin any LaTeX/math expression on its own new line — directly beneath the sentence it's linked to.
 
-✅ Always use this format:
+✅ Example format:
 \`\`\`markdown
 $$
 a^2 + b^2 = c^2
 $$
 \`\`\`
 
-✅ Use for:
-- Variables with subscripts:
+✅ More cases:
+- Subscripts:
   \`\`\`markdown
   $$
   x_1,\ y_2,\ A_Y
@@ -100,15 +103,12 @@ $$
   $$
   \`\`\`
 
-- Square roots and powers:
+- Roots & powers:
   \`\`\`markdown
   $$
   |r| = \\sqrt{a^2 + b^2 + c^2}
   $$
   \`\`\`
-
-❌ DO NOT format math using inline LaTeX like \`\\( x = 5 \\)\`  
-❌ DO NOT use regular parentheses for math like \`(x = 5)\`
 
 ✅ Example – Proper math rendering:
 \`\`\`markdown
@@ -144,8 +144,29 @@ End each topic with a list of questions the student should be able to answer:
 ✅ NO fill-in-the-blank, NO open-ended or opinion questions  
 ✅ DO NOT skip small points — extract everything  
 ✅ Stay within each topic — no mixing or reordering  
-✅ **ALL math MUST render correctly** using new-line LaTeX blocks only  
-✅ Think like a WAEC/JAMB/UTME examiner 💣
+✅ **ALL math MUST render correctly** using block LaTeX  
+
+---
+
+### 🧠 FINAL WARNING: How to Write LaTeX and How NOT To
+
+🚫 **WRONG:**
+- Don’t write math like \`\\( x = 2 + 3 \\)\` ← no inline
+- Don’t say: “The formula is (a = b + c)” ← invalid syntax
+- Don’t mix math into a sentence or a bullet like this: “Newton’s law is \`F = ma\`” ← BAD
+
+✅ **CORRECT:**
+Explain, then drop the math like a boss — on its own line:
+
+“The total resistance is calculated using the formula below:”
+
+\`\`\`markdown
+$$
+R = R_1 + R_2 + R_3
+$$
+\`\`\`
+
+Always keep math **below the sentence**, on its own line, in the block format shown above.
 
 ---
 
@@ -161,6 +182,5 @@ ${recentSummarySlice}
 ${text}
 \`\`\`
   `;
-
   return prompt;
 };
