@@ -58,6 +58,18 @@ const FillAnswerCard = ({
 
   const getAnswerInputIndex = (i: number) => (i + 1) / 2 - 1;
 
+  const splittedQuestion = question.split(/_{5,}/g);
+  let count = 0;
+  question.split(/_{5,}/g).forEach((q, i) => {
+    if (i % 2 === 0) {
+      // const word = splittedQuestion[i + 1] as string;
+      // splittedQuestion[i + 1] = answer[count] as string;
+      // splittedQuestion[i + 2] = word;
+      const ans = answer[count] as string;
+      splittedQuestion.splice(i + 1, 0, ans);
+    }
+  });
+
   return (
     <div className="flex max-w-[600px] snap-center flex-col items-start gap-5 rounded-md border border-gray-border p-5">
       <div className="flex items-center gap-1 rounded-md bg-primary/30 p-2 text-sm">
@@ -67,7 +79,7 @@ const FillAnswerCard = ({
 
       {/* Question */}
       <div className="w-full flex-grow text-xs font-semibold leading-[23px]">
-        {question.split(/\*\*(.*?)\*\*/).map((part, i) =>
+        {splittedQuestion.map((part, i) =>
           i % 2 === 0 ? (
             <span key={i} className="font-semibold">
               {part}
@@ -79,7 +91,7 @@ const FillAnswerCard = ({
                 ref={(el) => {
                   answerInputs.current[getAnswerInputIndex(i)] = el;
                 }}
-                className={`"bg-gray-400/15" inline h-7 w-auto ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)] === answer[getAnswerInputIndex(i)] ? "bg-green-500/40" : "bg-red-500/40")}`}
+                className={`inline h-7 w-auto bg-gray-400/15 ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)] === answer[getAnswerInputIndex(i)] ? "bg-green-500/40" : "bg-red-500/40")}`}
               />{" "}
               &nbsp;
             </span>
@@ -92,7 +104,7 @@ const FillAnswerCard = ({
         <div className="flex w-full flex-col gap-2">
           <div className="text-md underline">Answer</div>
           <div className="w-full flex-grow text-xs font-semibold leading-[23px]">
-            {question.split(/\*\*(.*?)\*\*/).map((part, i) =>
+            {splittedQuestion.map((part, i) =>
               i % 2 === 0 ? (
                 <span key={i} className="font-semibold">
                   {part}

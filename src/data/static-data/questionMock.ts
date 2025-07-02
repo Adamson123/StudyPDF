@@ -9,7 +9,6 @@ export const questionsMock: (MultiChoiceQuestionTypes | FillAnswerTypes)[] = [
     type: "multiChoice",
     isCorrect: false,
   },
-
   {
     question: "What is the largest planet in our solar system?",
     options: ["Earth", "Mars", "Jupiter", "Saturn"],
@@ -46,7 +45,7 @@ export const questionsMock: (MultiChoiceQuestionTypes | FillAnswerTypes)[] = [
     isCorrect: false,
   },
   {
-    question: "The gggg **conical** flask is a laboratory equipment.",
+    question: "The gggg _____ flask is a laboratory equipment.",
     choosenAnswer: [],
     answer: ["conical"],
     explanation:
@@ -65,8 +64,8 @@ export const questionsMock: (MultiChoiceQuestionTypes | FillAnswerTypes)[] = [
     isCorrect: false,
   },
   {
-    question: "The **conical** flask is a **laboratory** equipment.",
-    answer: ["conical", "laboratory"],
+    question: "The conical flask is a _____ equipment.",
+    answer: ["laboratory"],
     choosenAnswer: [],
     explanation:
       "Conical flasks are used in laboratories for mixing and heating liquids.",
