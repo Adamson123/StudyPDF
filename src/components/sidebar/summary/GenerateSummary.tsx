@@ -34,8 +34,11 @@ const GenerateSummary = ({
   } = useGetPDFTexts();
   const [name, setName] = useState("");
   const [range, setRange] = useState({ from: 1, to: Math.min(numOfPages, 15) });
+  const [userPrompt, setUserPrompt] = useState("");
 
   const generateSummary = async () => {
+    //Close
+    setOpenGenerateSummary(false);
     setSummary({ title: "", content: "" });
     setIsGenerating(true);
     const pdfTexts = await getPDFTexts({
@@ -47,7 +50,9 @@ const GenerateSummary = ({
     for (let index = 0; index < splittedTexts.length; index++) {
       const text = splittedTexts[index] as string;
       const recentSummarySlice = summary.content.slice(-1000);
-      const prompt = getSummaryPrompt(text, recentSummarySlice);
+      const prompt =
+        getSummaryPrompt(text, recentSummarySlice) +
+        `\nUser Prompt: ${userPrompt}`;
       const response = await generateDataWithOpenAI({
         text,
         prompt,
@@ -57,7 +62,7 @@ const GenerateSummary = ({
       });
 
       if (response.error) {
-        alert("Error");
+        alert("Error generating summary");
         break;
       }
 
@@ -65,6 +70,7 @@ const GenerateSummary = ({
       //   content: summary + response.replace("```markdown", ""),
       //   title: summary.title,
       // });
+
       setSummaries((prev) => {
         const newSummary = {
           title: name,
@@ -83,7 +89,6 @@ const GenerateSummary = ({
       return [...prev];
     });
     setIsGenerating(false);
-    setOpenGenerateSummary(false);
   };
 
   return (
@@ -110,6 +115,7 @@ const GenerateSummary = ({
           value={name}
           placeholder="Enter summary name"
           required
+          className="bg-border"
         />
       </div>
       {/* TODO: Use Range of pages as label instead */}
@@ -129,6 +135,7 @@ const GenerateSummary = ({
               })
             }
             placeholder="Enter starting page"
+            className="bg-border"
           />
         </div>
         <div className="w-full">
@@ -146,20 +153,36 @@ const GenerateSummary = ({
               })
             }
             placeholder="Enter ending page"
+            className="bg-border"
           />
         </div>
       </div>
-      <Button
-        type="submit"
-        className={cn(
-          "flex w-full max-w-96 items-center self-center text-white",
-          isGenerating && "cursor-not-allowed bg-gray-600",
-        )}
-        disabled={isGenerating}
-      >
-        {isGenerating ? "Generating..." : "Generate Summary"}
-        <Stars className="ml-2" />
-      </Button>
+
+      {/* User Prompt */}
+      <div className="flex w-full flex-col gap-2">
+        <label htmlFor="userPrompt" className="flex justify-between text-sm">
+          <span>Custom Prompt (Optional):</span>{" "}
+          <span className="text-gray-500">{userPrompt.length}/550</span>
+        </label>
+        <textarea
+          id="userPrompt"
+          value={userPrompt}
+          onChange={(e) => setUserPrompt(e.target.value)}
+          className="h-40 resize-none rounded bg-border p-3 text-xs ring-primary focus:outline-none focus:ring-1"
+          placeholder="Enter your custom prompt here..."
+        />
+        <Button
+          type="submit"
+          className={cn(
+            "flex w-full max-w-96 items-center self-center text-white",
+            isGenerating && "cursor-not-allowed bg-gray-600",
+          )}
+          disabled={isGenerating}
+        >
+          {isGenerating ? "Generating..." : "Generate Summary"}
+          <Stars className="ml-2" />
+        </Button>
+      </div>
     </form>
   );
 };
