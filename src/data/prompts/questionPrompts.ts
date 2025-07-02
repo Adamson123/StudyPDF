@@ -49,7 +49,7 @@ ${type === "multiChoice" && multiChoiceGneneralPrompt}
   • DO NOT skip steps or assume final answer.
   • DO NOT round unless clearly told. Use exact decimals or fractions.
   • Always show correct **units** (e.g., m/s², N, kg).
-  • Final answer must match **exactly** one of the \`options\`.
+  • Final answer must be the answer included in the \`options\` and updated as answer in the \`answer\` field at the object you are generating.
   • Answer must also match explanation (no contradiction allowed).
   • Format equations clearly, e.g., \`(a^2 + b^2) = c^2\`.
 
@@ -65,7 +65,6 @@ const getAnswerLetter = (options, correctAnswer) =>
 All options must be relevant and make logical sense. No silly or unrelated distractors. No repetition. No fluff. Just clean, sharp question objects. 🔥💯
 `;
 };
-
 
 export const questionPrompts: { [key: string]: string } = {
   mixed: `
