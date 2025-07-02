@@ -1,27 +1,5 @@
 import { questionsMock } from "../static-data/questionMock";
 
-// export const getQuestionGeneralPrompt = (amountOfQuestionsEach: number) => `
-// - fillInAnswer questions must only contain one gap and one correct answer.
-// - I will be using JSON.parse in JavaScript to parse the output, so the response must be a valid JSON array of objects.
-// - At least 75% of the questions should be calculations when the topic involves Maths or Physics. The remaining 25% can be conceptual/theoretical.
-// - Include questions about sentence types like Declarative, Complex, Simple, Active Voice, and Passive Voice.
-// - Strictly return only a JSON array of ${amountOfQuestionsEach} questions. Do NOT include explanations, markdown, or any introductory or closing text.
-// - Each question object must include: question, options (array of 4 strings), answer (letter A-D), choosenAnswer (empty string or array), explanation, type (multiChoice or fillAnswer), and isCorrect (false).
-// - For multiple-choice questions, use difficulty-based answer randomization:
-//   • If the question is **Easy**, place the correct answer randomly in **Option A or B**.
-//   • If the question is **Medium**, place it randomly in **Option B or C**.
-//   • If the question is **Hard**, place it randomly in **Option C or D**.
-// - Assign difficulty levels based on how complex or calculative the question is. You may optionally include a "difficulty" field to clarify.
-// - Avoid repetition of correct answer positions throughout the question set. Spread answers across A, B, C, and D as much as possible.
-// - All options should be relevant and logical distractors. No silly or unrelated choices.
-// - Make sure you are asking questions that are relevant to the text provided only. The questions should be based strictly on the texts only.
-// - ⚠️ After randomizing the position of the correct answer, make sure the \`answer\` field is updated to reflect the **correct letter (A-D)** based on its new position in the \`options\` array.
-// - Use this exact function to determine the correct answer field:
-//   const getAnswerLetter = (options, correctAnswer) => ['A','B','C','D'][options.findIndex(o => o === correctAnswer)];
-// - Make sure the \`answer\` value relates with the \`explanation\` field value.
-
-// `;
-
 const multiChoiceGneneralPrompt = `
 - Each question object must include:
   • \`question\` (string),
@@ -64,12 +42,30 @@ export const getQuestionGeneralPrompt = (
 
 ${type === "multiChoice" && multiChoiceGneneralPrompt}
 
+📐🚨 MATH & PHYSICS QUESTION RULES (Strict):
+- For **all calculation questions** in Maths or Physics topics:
+  • SHOW full step-by-step calculation in the \`explanation\` field.
+  • Use proper formulas and plug in values clearly.
+  • DO NOT skip steps or assume final answer.
+  • DO NOT round unless clearly told. Use exact decimals or fractions.
+  • Always show correct **units** (e.g., m/s², N, kg).
+  • Final answer must match **exactly** one of the \`options\`.
+  • Answer must also match explanation (no contradiction allowed).
+  • Format equations clearly, e.g., \`(a^2 + b^2) = c^2\`.
+
+✅ Use this to ensure answer field matches option:
+\`\`\`ts
+const getAnswerLetter = (options, correctAnswer) =>
+  ['A','B','C','D'][options.findIndex(o => o === correctAnswer)];
+\`\`\`
+
 ⚠️ The \`answer\` field **must match** the correct option in the \`options\` array.
 ⚠️ The \`explanation\` must always support the correct answer. No contradictions.
 
 All options must be relevant and make logical sense. No silly or unrelated distractors. No repetition. No fluff. Just clean, sharp question objects. 🔥💯
 `;
 };
+
 
 export const questionPrompts: { [key: string]: string } = {
   mixed: `
