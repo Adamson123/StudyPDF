@@ -9,4 +9,5 @@ TODO: Place expand where it won't disturb user
 TODO: Preview of what is being generated
 TODO: Switch uuid to crypto.randomUUID()
 TODO: Pop up message to confirm summary deletion
+TODO: Join generate questions from  pdf and summary into one component
 -->

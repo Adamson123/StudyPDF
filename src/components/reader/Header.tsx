@@ -24,13 +24,16 @@ import GenerateQuestionMenu from "./GenerateMenu/GenerateQuestionMenu";
 import GenerateFlashcardMenu from "./GenerateMenu/GenerateFlashcardMenu";
 import PDFPage from "./viewer/pdfPage";
 import debouncedHandler from "@/utils/debounceHandler";
+import GenerateSummaryQuestionMenu from "./GenerateMenu/GenerateSummaryQuestionMenu";
 
 const GenerateMenu = ({
   setOpenQuestionMenu,
   setOpenFlashCardMenu,
+  setOpenSummaryMenu,
 }: {
   setOpenQuestionMenu: Dispatch<SetStateAction<boolean>>;
   setOpenFlashCardMenu: Dispatch<SetStateAction<boolean>>;
+  setOpenSummaryMenu: Dispatch<SetStateAction<boolean>>;
 }) => {
   return (
     <div className="absolute right-0 top-10 z-[100] flex flex-col text-nowrap rounded-md border border-gray-border bg-background text-sm shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
@@ -40,6 +43,14 @@ const GenerateMenu = ({
       >
         <FileQuestion />
         Generate questions
+      </div>
+      {/* TODO: Remove in the future */}
+      <div
+        onClick={() => setOpenSummaryMenu(true)}
+        className="flex cursor-pointer items-center gap-2 p-3 hover:bg-gray-100/10"
+      >
+        <File />
+        Generate questions (experimental)
       </div>
       <div
         onClick={() => setOpenFlashCardMenu(true)}
@@ -79,9 +90,11 @@ const Header = ({
 }) => {
   const [pageNum, setPageNum] = useState("1");
   const [onPageNumInput, setOnPageNumInput] = useState(false);
+  const [openGenerationMenu, setOpenGenerationMenu] = useState(false);
+  //TODO: put into one state object
   const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
   const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
-  const [openGenerationMenu, setOpenGenerationMenu] = useState(false);
+  const [openSummaryMenu, setOpenSummaryMenu] = useState(false);
 
   const handlePageNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOnPageNumInput(true);
@@ -272,6 +285,7 @@ const Header = ({
             <GenerateMenu
               setOpenQuestionMenu={setOpenQuestionMenu}
               setOpenFlashCardMenu={setOpenFlashCardMenu}
+              setOpenSummaryMenu={setOpenSummaryMenu}
             />
           )}
         </div>
@@ -283,6 +297,9 @@ const Header = ({
           setOpenQuestionMenu={setOpenQuestionMenu}
           numOfPages={numOfPages}
         />
+      )}
+      {openSummaryMenu && (
+        <GenerateSummaryQuestionMenu setOpenSummaryMenu={setOpenSummaryMenu} />
       )}
       {openFlashCardMenu && (
         <GenerateFlashcardMenu

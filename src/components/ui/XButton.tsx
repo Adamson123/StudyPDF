@@ -5,6 +5,7 @@ const XButton = (props: HTMLAttributes<HTMLButtonElement>) => {
   const { ...otherProps } = props;
   return (
     <button
+      type="button"
       {...otherProps}
       className="rounded-full border border-gray-border p-2 hover:bg-gray-100/10"
     >

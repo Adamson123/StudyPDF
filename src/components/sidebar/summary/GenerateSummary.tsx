@@ -157,32 +157,6 @@ const GenerateSummary = ({
           />
         </div>
       </div>
-
-      {/* User Prompt */}
-      <div className="flex w-full flex-col gap-2">
-        <label htmlFor="userPrompt" className="flex justify-between text-sm">
-          <span>Custom Prompt (Optional):</span>{" "}
-          <span className="text-gray-500">{userPrompt.length}/550</span>
-        </label>
-        <textarea
-          id="userPrompt"
-          value={userPrompt}
-          onChange={(e) => setUserPrompt(e.target.value)}
-          className="h-40 resize-none rounded bg-border p-3 text-xs ring-primary focus:outline-none focus:ring-1"
-          placeholder="Enter your custom prompt here..."
-        />
-        <Button
-          type="submit"
-          className={cn(
-            "flex w-full max-w-96 items-center self-center text-white",
-            isGenerating && "cursor-not-allowed bg-gray-600",
-          )}
-          disabled={isGenerating}
-        >
-          {isGenerating ? "Generating..." : "Generate Summary"}
-          <Stars className="ml-2" />
-        </Button>
-      </div>
     </form>
   );
 };

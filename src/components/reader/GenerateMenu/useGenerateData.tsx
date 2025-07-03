@@ -14,10 +14,12 @@ function useGenerateData<T>({
   getPrompt,
   amountOfData,
   title,
+  selectedSummaries = [],
 }: {
   getPrompt: (amountOfDataToGenerate: number) => string;
   numOfPages: number;
-  type: "quiz" | "flashcard";
+  type: "quiz" | "flashcard" | "summaryQuestion";
+  selectedSummaries?: string[];
   amountOfData: number;
   title: string;
 }) {
@@ -62,7 +64,7 @@ function useGenerateData<T>({
       if (!data.length) return; // No data to save
 
       setRange({ from: 1, to: numOfPages });
-      if (type === "quiz") {
+      if (type === "quiz" || type === "summaryQuestion") {
         saveQuiz({ id, title, questionsToSave: data as any });
         router.push(`/quiz/${id}`);
       } else {
@@ -70,14 +72,22 @@ function useGenerateData<T>({
         router.push(`/flashcard/${id}`);
       }
     },
-    [pdfData.name, numOfPages, router, title],
+    [type !== "summaryQuestion" && pdfData?.name, numOfPages, router, title],
   );
 
   const generateData = useCallback(async () => {
     setIsGenerating(true);
     let response: T[] = data.length ? data : [];
     const pdfTexts = await getPDFTexts(range); // Get texts from PDF
-    const chunks = splitChunks(splitTexts(pdfTexts), amountOfData); // Break chunks if needed
+    //TODO: IMprove Here
+    let chunks: string[] = [];
+
+    if (type === "summaryQuestion") {
+      chunks = selectedSummaries;
+    } else {
+      splitChunks(splitTexts(pdfTexts), amountOfData); // Break chunks if needed
+    }
+
     let error = "";
 
     for (let index = lastPDfBeforeErrorIndex; index < chunks.length; index++) {
@@ -125,7 +135,7 @@ function useGenerateData<T>({
     amountOfData,
     generateDataWithOpenAI,
     handleSaveAndRedirect,
-    pdfData.url,
+    pdfData?.url,
     range,
     data,
     lastPDfBeforeErrorIndex,

@@ -73,9 +73,24 @@ export default function useGenerateDataWithOpenAI() {
         let trimmedOutput = [];
         try {
           const cleanedOutput = output
-            .replace(/^[\s\S]*?```json/, "")
-            .replace(/```$/, "")
-            .trim();
+            .replace(/^.*?Raw output:\s*/s, "") // Remove "Raw output:" and everything before it
+            .replace(/```(?:json)?/g, "") // Remove all ``` or ```json
+            .replace(/^\s*\/\/.*$/gm, "") // Remove JS-style comments like `// something`
+            .replace(/^\s*\*\*?.*?\*\*?\s*$/gm, "") // Remove Markdown bold/italic lines
+            .replace(/^\s*[\*\-+]\s.*$/gm, "") // Remove Markdown bullet points
+            .replace(/^\s*\n/gm, "") // Remove blank lines
+            .trim(); // Final cleanup of whitespace
+
+          let parsed;
+          try {
+            parsed = JSON.parse(cleanedOutput);
+          } catch (err) {
+            console.error("💥 Failed to parse cleaned output:", cleanedOutput);
+            throw err;
+          }
+
+          console.log("✅ Parsed successfully:", parsed);
+
           trimmedOutput = JSON.parse(cleanedOutput);
           console.log(`✅ Chunk  saved.`);
           return trimmedOutput;
