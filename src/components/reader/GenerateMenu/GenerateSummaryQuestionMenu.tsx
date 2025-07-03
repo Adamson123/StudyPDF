@@ -120,23 +120,28 @@ const GenerateSummaryQuestionMenu = ({
           <div className="space-y-1 text-sm">
             <label htmlFor="summary">Select Summary</label>
             <div className="relative overflow-hidden">
-              <div className="pointer-events-none absolute bottom-0 w-full text-nowrap rounded bg-border p-2 text-[10px]">
+              {/* <div className="pointer-events-none absolute w-full text-nowrap rounded bg-border p-2 text-[10px]">
                 Selected {selectedSummaries.size} summaries (Tap to
                 select/deselect)
-              </div>
+              </div> */}
               {/* TODO:Fix selection box */}
               <select
                 id="summary"
                 className="w-full rounded bg-border p-2 text-sm outline-none"
-                onChange={(e) =>
-                  selectOrDeselectSummary(Number(e.target.value))
-                }
+                // onChange={(e) =>
+                //   selectOrDeselectSummary(Number(e.target.value))
+                // }
+                multiple
               >
                 {summaries.length ? (
                   summaries.map((summary: any, idx: number) => (
-                    <option key={idx} value={idx}>
+                    <option
+                      onClick={() => selectOrDeselectSummary(idx)}
+                      key={idx}
+                      value={idx}
+                    >
                       {summary.title || `Summary ${idx + 1}}`}&nbsp;&nbsp;
-                      {selectedSummaries.has(idx) && "✔"}
+                      {selectedSummaries.has(idx) && "✔️"}
                     </option>
                   ))
                 ) : (
@@ -144,6 +149,21 @@ const GenerateSummaryQuestionMenu = ({
                 )}
               </select>
             </div>
+          </div>
+
+          {/* Amount of Questions */}
+          <div className="space-y-1 text-sm">
+            <label htmlFor="amountOfQuestions">Amount of Questions</label>
+            <Input
+              type="number"
+              id="amountOfQuestions"
+              value={amountOfQuestions}
+              onChange={(e) => setAmountOfQuestions(Number(e.target.value))}
+              min={1}
+              max={100}
+              className="bg-border focus:outline-1 focus:outline-primary"
+              required
+            />
           </div>
           {/* Options */}
           <div className="flex flex-col gap-3">
