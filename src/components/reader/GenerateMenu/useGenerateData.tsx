@@ -87,11 +87,14 @@ function useGenerateData<T>({
     } else {
       splitChunks(splitTexts(pdfTexts), amountOfData); // Break chunks if needed
     }
+    console.log({ chunks });
 
     let error = "";
 
     for (let index = lastPDfBeforeErrorIndex; index < chunks.length; index++) {
       const text = chunks[index] as string;
+      console.log({ text });
+
       console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
 
       const amountOfDataToGenerate = getAmountOfDataToGenerate(
@@ -139,6 +142,7 @@ function useGenerateData<T>({
     range,
     data,
     lastPDfBeforeErrorIndex,
+    selectedSummaries,
   ]);
 
   const handleTryAgain = useCallback(async () => {

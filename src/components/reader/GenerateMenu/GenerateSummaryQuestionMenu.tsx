@@ -85,9 +85,13 @@ const GenerateSummaryQuestionMenu = ({
         <form
           onSubmit={async (event) => {
             event.preventDefault();
+            if (!selectedSummaries.size) {
+              return alert(
+                "Please select at least one summary to generate questions from.",
+              );
+            }
             setError("");
             console.log(selectedSummaries.size);
-
             await generateQuestions();
           }}
           style={{

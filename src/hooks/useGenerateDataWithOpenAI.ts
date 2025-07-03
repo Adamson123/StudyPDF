@@ -1,4 +1,6 @@
 import { env } from "@/env";
+import parseAIJsonResponse from "@/utils/parseAIJsonResponse";
+import { parse } from "path";
 import { useCallback, useState } from "react";
 
 export default function useGenerateDataWithOpenAI() {
@@ -70,28 +72,26 @@ export default function useGenerateDataWithOpenAI() {
         }
 
         // Return valid object if expect is objectRes
-        let trimmedOutput = [];
+        // let trimmedOutput = [];
         try {
-          const cleanedOutput = output
-            .replace(/^.*?Raw output:\s*/s, "") // Remove "Raw output:" and everything before it
-            .replace(/```(?:json)?/g, "") // Remove all ``` or ```json
-            .replace(/^\s*\/\/.*$/gm, "") // Remove JS-style comments like `// something`
-            .replace(/^\s*\*\*?.*?\*\*?\s*$/gm, "") // Remove Markdown bold/italic lines
-            .replace(/^\s*[\*\-+]\s.*$/gm, "") // Remove Markdown bullet points
-            .replace(/^\s*\n/gm, "") // Remove blank lines
-            .trim(); // Final cleanup of whitespace
+          // const cleanedOutput = output
+          //   .replace(/^.*?Raw output:\s*/s, "") // Remove "Raw output:" and everything before it
+          //   .replace(/```(?:json)?/g, "") // Remove all ``` or ```json
+          //   .replace(/^\s*\/\/.*$/gm, "") // Remove JS-style comments like `// something`
+          //   .replace(/^\s*\*\*?.*?\*\*?\s*$/gm, "") // Remove Markdown bold/italic lines
+          //   .replace(/^\s*[\*\-+]\s.*$/gm, "") // Remove Markdown bullet points
+          //   .replace(/^\s*\n/gm, "") // Remove blank lines
+          //   .trim(); // Final cleanup of whitespace
 
-          let parsed;
-          try {
-            parsed = JSON.parse(cleanedOutput);
-          } catch (err) {
-            console.error("💥 Failed to parse cleaned output:", cleanedOutput);
-            throw err;
-          }
+          // let parsed;
+          // try {
+          //   parsed = JSON.parse(cleanedOutput);
+          // } catch (err) {
+          //   console.error("💥 Failed to parse cleaned output:", cleanedOutput);
+          //   throw err;
+          // }
 
-          console.log("✅ Parsed successfully:", parsed);
-
-          trimmedOutput = JSON.parse(cleanedOutput);
+          const trimmedOutput = parseAIJsonResponse(output);
           console.log(`✅ Chunk  saved.`);
           return trimmedOutput;
         } catch (error) {
