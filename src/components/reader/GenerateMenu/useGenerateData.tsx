@@ -85,7 +85,7 @@ function useGenerateData<T>({
     if (type === "summaryQuestion") {
       chunks = selectedSummaries;
     } else {
-      splitChunks(splitTexts(pdfTexts), amountOfData); // Break chunks if needed
+      chunks = splitChunks(splitTexts(pdfTexts), amountOfData); // Break chunks if needed
     }
     console.log({ chunks });
 
