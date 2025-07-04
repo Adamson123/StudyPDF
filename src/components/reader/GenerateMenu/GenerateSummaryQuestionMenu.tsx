@@ -141,7 +141,7 @@ const GenerateSummaryQuestionMenu = ({
                 {summaries.length ? (
                   summaries.map((summary: any, idx: number) => (
                     <option
-                      onClick={() => selectOrDeselectSummary(idx)}
+                      // onClick={() => selectOrDeselectSummary(idx)}
                       key={idx}
                       value={idx}
                     >
