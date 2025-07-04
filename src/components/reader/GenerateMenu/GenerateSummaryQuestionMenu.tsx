@@ -86,10 +86,11 @@ const GenerateSummaryQuestionMenu = ({
           onSubmit={async (event) => {
             event.preventDefault();
             if (!selectedSummaries.size) {
-              return alert(
+              alert(
                 "Please select at least one summary to generate questions from. " +
                   selectedSummaries.size,
               );
+              return;
             }
             setError("");
             console.log(selectedSummaries.size);
@@ -130,29 +131,26 @@ const GenerateSummaryQuestionMenu = ({
                 select/deselect)
               </div> */}
               {/* TODO:Fix selection box */}
-              <select
-                id="summary"
-                className="w-full rounded bg-border p-2 text-sm outline-none"
-                onChange={(e) =>
-                  selectOrDeselectSummary(Number(e.target.value))
-                }
-                multiple
-              >
+
+              <div className="flex max-h-40 flex-col gap-2 overflow-y-auto">
                 {summaries.length ? (
                   summaries.map((summary: any, idx: number) => (
-                    <option
-                      // onClick={() => selectOrDeselectSummary(idx)}
+                    <label
                       key={idx}
-                      value={idx}
+                      className="flex cursor-pointer items-center gap-2"
                     >
-                      {summary.title || `Summary ${idx + 1}}`}&nbsp;&nbsp;
-                      {selectedSummaries.has(idx) && "✔️"}
-                    </option>
+                      <input
+                        type="checkbox"
+                        checked={selectedSummaries.has(idx)}
+                        onChange={() => selectOrDeselectSummary(idx)}
+                      />
+                      <span>{summary.title || `Summary ${idx + 1}`}</span>
+                    </label>
                   ))
                 ) : (
-                  <option value={0}>No summaries found</option>
+                  <span>No summaries found</span>
                 )}
-              </select>
+              </div>
             </div>
           </div>
 
