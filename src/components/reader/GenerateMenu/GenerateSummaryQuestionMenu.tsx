@@ -87,7 +87,8 @@ const GenerateSummaryQuestionMenu = ({
             event.preventDefault();
             if (!selectedSummaries.size) {
               return alert(
-                "Please select at least one summary to generate questions from.",
+                "Please select at least one summary to generate questions from. " +
+                  selectedSummaries.size,
               );
             }
             setError("");
@@ -132,9 +133,9 @@ const GenerateSummaryQuestionMenu = ({
               <select
                 id="summary"
                 className="w-full rounded bg-border p-2 text-sm outline-none"
-                // onChange={(e) =>
-                //   selectOrDeselectSummary(Number(e.target.value))
-                // }
+                onChange={(e) =>
+                  selectOrDeselectSummary(Number(e.target.value))
+                }
                 multiple
               >
                 {summaries.length ? (
