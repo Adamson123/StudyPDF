@@ -10,4 +10,5 @@ TODO: Preview of what is being generated
 TODO: Switch uuid to crypto.randomUUID()
 TODO: Pop up message to confirm summary deletion
 TODO: Join generate questions from  pdf and summary into one component
+TODO: Use react toast in the future
 -->

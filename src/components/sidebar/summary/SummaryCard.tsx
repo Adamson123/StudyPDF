@@ -1,10 +1,11 @@
 //import { MathJax, MathJaxContext } from "better-react-mathjax";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ChevronDown, Trash2 } from "lucide-react";
+import { ChevronDown, Copy, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { cn } from "@/lib/utils";
 import { deleteSummaryById } from "@/lib/summaryStorage";
+import copy from "@/utils/copy";
 
 const SummaryCard = ({
   summary,
@@ -41,6 +42,12 @@ const SummaryCard = ({
         <div className="flex items-center justify-end gap-4">
           <ChevronDown
             className={cn("cursor-pointer", expand ? "rotate-180" : "rotate-0")}
+          />
+          <Copy
+            onClick={(e) => {
+              e.stopPropagation();
+              copy(summary.content);
+            }}
           />
           <Trash2
             onClick={(e) => {

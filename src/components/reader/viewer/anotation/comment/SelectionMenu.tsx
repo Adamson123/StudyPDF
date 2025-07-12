@@ -14,22 +14,14 @@ import {
 } from "react";
 import { MessageType } from "./Message";
 import { generateClass } from "../../utils";
+import copy from "@/utils/copy";
 
-export const copyToClipboard = () => {
+const copyToClipboard = () => {
   const selection = window.getSelection() as Selection;
   if (selection?.rangeCount === 0) return;
   const range = selection.getRangeAt(0);
   const text = range.toString();
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      //TODO: will pop up a message after copying
-      console.log("Text copied to clipboard: ", text);
-    })
-    .catch((err) => {
-      console.error("Error copying text: ", err);
-      document.execCommand("copy");
-    });
+  copy(text);
 };
 
 const SelectionMenu = ({
