@@ -59,7 +59,7 @@ const GenerateFlashcardsMenu = ({
             setError("");
             await generateFlashcards();
           }}
-          className="flex max-h-screen w-full max-w-[500px] flex-col gap-6 overflow-y-auto rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]"
+          className="flex max-h-screen w-full max-w-[600px] flex-col gap-6 overflow-y-auto rounded-md border border-gray-border bg-background p-7 shadow-[0px_4px_3px_rgba(0,0,0,0.3)]"
         >
           {/* Header */}
           <div className="flex items-center justify-between gap-3">

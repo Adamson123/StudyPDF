@@ -37,5 +37,19 @@ interface PdfDataTypes {
 
 interface DataToDeleteTypes {
   id: string;
-  type: "flashcard" | "quiz" | "";
+  type: "flashcard" | "quiz" | "summary" | "";
 }
+
+type StoredQuiz = {
+  id: string;
+  title: string;
+  questions: (MultiChoiceQuestionTypes | FillAnswerTypes)[];
+  // Add any other metadata you store per quiz, e.g., title, lastPlayed
+};
+
+type StoredFlashcard = {
+  id: string;
+  title: string;
+  cards: FlashcardTypes[]; // Replace with your flashcard types
+  // Add any other metadata you store per flashcard set, e.g., description, lastReviewed
+};

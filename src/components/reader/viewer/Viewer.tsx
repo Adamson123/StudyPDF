@@ -1,31 +1,21 @@
 "use client";
 
 import "pdfjs-dist/web/pdf_viewer.css";
-import {
-  createContext,
-  Dispatch,
-  SetStateAction,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useRef, useState } from "react";
 import SelectionMenu from "./anotation/comment/SelectionMenu";
-import Header from "../Header";
+import Header from "../header/Header";
 import Sidebar from "../../sidebar/Sidebar";
 import { Loader2 } from "lucide-react";
 import AddComment from "./anotation/comment/AddComment";
 import Comment from "./anotation/comment/Comment";
 import { Message } from "./anotation/comment/Message";
-import HighlightMenu from "./anotation/comment/HighlightMenu";
-import Popup from "@/components/ui/Popup";
-import { deleteFlashcardById } from "@/lib/flashcardStorage";
-import { deleteQuizById } from "@/lib/quizStorage";
 import useRender from "./useRender";
 import { PDFDocumentProxy } from "pdfjs-dist";
 
 export const ViewerContext = createContext<{
   pdfData: PdfDataTypes;
-  setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
-  dataToDelete: DataToDeleteTypes;
+  //  setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
+  // dataToDelete: DataToDeleteTypes;
 }>({
   pdfData: {
     name: "",
@@ -33,11 +23,11 @@ export const ViewerContext = createContext<{
     pdfDocument: {} as PDFDocumentProxy,
     numOfPages: 0,
   },
-  dataToDelete: {
-    id: "",
-    type: "",
-  },
-  setDataToDelete: () => {},
+  // dataToDelete: {
+  //   id: "",
+  //   type: "",
+  // },
+  // setDataToDelete: () => {},
 });
 
 export type CommentType = { text: string; class: string };
@@ -52,8 +42,8 @@ const Viewer = () => {
   const [scale, setScale] = useState(
     1 - (1 / window.innerWidth) * 100 + constant,
   );
-  const [selectionClass, setSelectionClass] = useState("");
-  const [comment, setComment] = useState<CommentType>({ text: "", class: "" });
+  // const [selectionClass, setSelectionClass] = useState("");
+  // const [comment, setComment] = useState<CommentType>({ text: "", class: "" });
   const [message, setMessage] = useState({ text: "", autoTaminate: false });
   const [highlightClass, setHighlightClass] = useState("");
   //TODO:  Add selection box mode
@@ -62,10 +52,7 @@ const Viewer = () => {
     url: window.location.origin + "/Split.pdf",
     name: "pdf-name",
   });
-  const [dataToDelete, setDataToDelete] = useState<DataToDeleteTypes>({
-    id: "",
-    type: "",
-  });
+
   const { renderPDFsOnView, loadingPDF, pdfPages, pdfData } = useRender({
     pdfInfo,
     pdfsContainer,
@@ -97,7 +84,7 @@ const Viewer = () => {
   };
 
   const openAddComment = (id: string) => {
-    setSelectionClass(id);
+    // setSelectionClass(id);
     //setShowAddComment(true);
     commentInputRef.current?.focus();
   };
@@ -124,12 +111,12 @@ const Viewer = () => {
   return (
     <ViewerContext.Provider
       value={{
-        setDataToDelete,
-        dataToDelete,
+        // setDataToDelete,
+        // dataToDelete,
         pdfData: pdfData as PdfDataTypes,
       }}
     >
-      <main className="flex-co tems-center flex min-h-screen justify-center p-3 pt-6">
+      <main className="flex min-h-screen justify-center p-3 pt-6">
         <Header
           setShowSidebar={setShowSidebar}
           showSidebar={showSidebar}
@@ -193,27 +180,6 @@ const Viewer = () => {
         /> */}
 
         <Message message={message} setMessage={setMessage} />
-        {dataToDelete.id && (
-          <Popup
-            message="Are you sure you want to delete this quiz"
-            cancelBtnFunc={() => setDataToDelete({ id: "", type: "" })}
-            executeBtnLabel="Delete"
-            executeBtnFunc={() => {
-              switch (dataToDelete.type) {
-                case "quiz":
-                  deleteQuizById(dataToDelete.id);
-                  break;
-                case "flashcard":
-                  deleteFlashcardById(dataToDelete.id);
-                  break;
-                default:
-                  deleteQuizById("quiz");
-                  break;
-              }
-              setDataToDelete({ id: "", type: "" });
-            }}
-          />
-        )}
       </main>
     </ViewerContext.Provider>
   );

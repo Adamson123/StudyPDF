@@ -1,36 +1,35 @@
-//import { MathJax, MathJaxContext } from "better-react-mathjax";
 import ReactMarkdown from "react-markdown";
+import { MathJax, MathJaxContext } from "better-react-mathjax";
 import remarkGfm from "remark-gfm";
 import { ChevronDown, Copy, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { cn } from "@/lib/utils";
-import { deleteSummaryById } from "@/lib/summaryStorage";
 import copy from "@/utils/copy";
 
 const SummaryCard = ({
   summary,
-  setSummaries,
+  setDataToDelete,
 }: {
   summary: SummaryTypes;
-  setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
+  setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
 }) => {
   const [expand, setExpand] = useState(false);
 
-  const deleteSummary = () => {
-    deleteSummaryById(summary.id);
-    setSummaries((prev) => prev.filter((data) => data.id !== summary.id));
-  };
+  // const deleteSummary = () => {
+  //   deleteSummaryById(summary.id);
+  //   setSummaries((prev) => prev.filter((data) => data.id !== summary.id));
+  // };
 
   const visibleContent = expand
     ? summary.content
     : summary.content.substring(0, 1000);
 
-  // const mathjaxConfig = {
-  //   tex: {
-  //     inlineMath: [["\\(", "\\)"]],
-  //     displayMath: [["$$", "$$"]],
-  //   },
-  // };
+  const mathjaxConfig = {
+    tex: {
+      inlineMath: [["\\(", "\\)"]],
+      displayMath: [["$$", "$$"]],
+    },
+  };
 
   return (
     <div>
@@ -52,7 +51,7 @@ const SummaryCard = ({
           <Trash2
             onClick={(e) => {
               e.stopPropagation();
-              deleteSummary();
+              setDataToDelete({ id: summary.id, type: "summary" });
             }}
             className="cursor-pointer"
           />
@@ -61,18 +60,17 @@ const SummaryCard = ({
 
       <div
         className={cn(
-          `markdown relative flex max-w-fit flex-col gap-2 overflow-hidden rounded-md bg-gray-900 p-4`,
+          `markdown relative flex w-[450px] flex-col gap-2 overflow-hidden overflow-x-auto rounded-md bg-gray-900 p-5 md:w-[550px]`,
           expand ? "max-h-max" : "max-h-64",
         )}
       >
-        {/* <MathJaxContext config={mathjaxConfig}>
+        <MathJaxContext config={mathjaxConfig}>
           <MathJax dynamic inline>
-           
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {visibleContent}
+            </ReactMarkdown>
           </MathJax>
-        </MathJaxContext> */}
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {visibleContent}
-        </ReactMarkdown>
+        </MathJaxContext>
 
         {!expand && (
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black to-transparent" />

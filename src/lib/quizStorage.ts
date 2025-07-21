@@ -1,12 +1,5 @@
 const LOCAL_STORAGE_KEY = "AllQuizzes"; // Or your existing key, e.g., "questions"
 
-type StoredQuiz = {
-  id: string;
-  title: string;
-  questions: (MultiChoiceQuestionTypes | FillAnswerTypes)[];
-  // Add any other metadata you store per quiz, e.g., title, lastPlayed
-};
-
 type AllStoredQuizzes = StoredQuiz[];
 
 /**

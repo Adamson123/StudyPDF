@@ -1,18 +1,18 @@
-import { getAllQuizzesFromStorage } from "@/lib/quizStorage";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useContext, useMemo, useState } from "react";
-import { ViewerContext } from "../reader/viewer/Viewer";
+import { Dispatch, SetStateAction, useState } from "react";
 
-const QuizList = () => {
+const QuizList = ({
+  setDataToDelete,
+  dataToDelete,
+  quizzes,
+}: {
+  setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
+  dataToDelete: DataToDeleteTypes;
+  quizzes: StoredQuiz[];
+}) => {
   const [openDropDown, setOpenDropDown] = useState(false);
-  const { setDataToDelete, dataToDelete } = useContext(ViewerContext);
   const router = useRouter();
-  const quizzes = useMemo(() => {
-    console.log("rendered in  quizzes");
-
-    return getAllQuizzesFromStorage();
-  }, [dataToDelete.type === "quiz" ? dataToDelete.id : ""]);
 
   return (
     <div className="flex flex-col gap-1">

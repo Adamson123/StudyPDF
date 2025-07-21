@@ -1,7 +1,6 @@
 import { env } from "@/env";
 import parseAIJsonResponse from "@/utils/parseAIJsonResponse";
-import { parse } from "path";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 export default function useGenerateDataWithOpenAI() {
   const delay = async () => {
@@ -24,9 +23,11 @@ export default function useGenerateDataWithOpenAI() {
       arrayLength: number;
       index: number;
     }) => {
-      if (index > 0 || index < arrayLength - 1) {
+      if (index > 0) {
         await delay(); // Delay to avoid rate limits
       }
+      console.log({ index, length1: arrayLength - 1 });
+
       const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
       const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
 

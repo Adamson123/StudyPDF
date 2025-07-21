@@ -1,12 +1,5 @@
 const LOCAL_STORAGE_KEY = "AllFlashcards"; // Or your existing key, e.g., "flashcards"
 
-type StoredFlashcard = {
-  id: string;
-  title: string;
-  cards: FlashcardTypes[]; // Replace with your flashcard types
-  // Add any other metadata you store per flashcard set, e.g., description, lastReviewed
-};
-
 type AllStoredFlashcards = StoredFlashcard[];
 
 /**

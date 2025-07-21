@@ -1,19 +1,18 @@
-import { getAllFlashcardsFromStorage } from "@/lib/flashcardStorage";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useContext, useMemo, useState } from "react";
-import { ViewerContext } from "../reader/viewer/Viewer";
+import { Dispatch, SetStateAction, useState } from "react";
 
-const FlashcardList = () => {
+const FlashcardList = ({
+  setDataToDelete,
+  dataToDelete,
+  flashcards,
+}: {
+  setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
+  dataToDelete: DataToDeleteTypes;
+  flashcards: StoredFlashcard[];
+}) => {
   const [openDropDown, setOpenDropDown] = useState(false);
   const router = useRouter();
-  const { setDataToDelete, dataToDelete } = useContext(ViewerContext);
-
-  const flashcards = useMemo(() => {
-    console.log("rendered flashcards haha");
-
-    return getAllFlashcardsFromStorage();
-  }, [dataToDelete.type === "flashcard" ? dataToDelete.id : ""]);
 
   return (
     <div className="flex -translate-y-1 flex-col gap-1">

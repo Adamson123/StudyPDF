@@ -9,12 +9,12 @@ const Summary = ({
   setOpenGenerateSummary,
   isGenerating,
   summaries,
-  setSummaries,
+  setDataToDelete,
 }: {
   setOpenGenerateSummary: Dispatch<SetStateAction<boolean>>;
   isGenerating: boolean;
   summaries: SummaryTypes[];
-  setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
+  setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
 }) => {
   return (
     <div className="flex flex-col items-center gap-3 px-2">
@@ -27,7 +27,7 @@ const Summary = ({
             <SummaryCard
               key={index}
               summary={summary}
-              setSummaries={setSummaries}
+              setDataToDelete={setDataToDelete}
             />
           ))
         ) : (
