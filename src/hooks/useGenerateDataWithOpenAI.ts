@@ -2,15 +2,25 @@ import { env } from "@/env";
 import parseAIJsonResponse from "@/utils/parseAIJsonResponse";
 import { useCallback } from "react";
 
+/**
+ * @returns An object containing the function to generate data with OpenAI.
+ */
 export default function useGenerateDataWithOpenAI() {
   const delay = async () => {
     console.log("Sleeping for 5 seconds to avoid rate limits...");
     await new Promise((r) => setTimeout(r, 5000));
   };
 
+  /**
+   * @param index - The index of the current chunk being processed. Used to apply a delay between requests to avoid rate limits.
+   * @param text - The text content to be processed by the AI model.
+   * @param prompt - The prompt to be sent to the AI model, guiding it on how to process the text.
+   * @param expect - Specifies the expected type of response from the AI model, either a string or an object.
+   * @returns The generated data or an error object if the generation fails.
+   */
   const generateDataWithOpenAI = useCallback(
     async ({
-      arrayLength,
+      //  arrayLength,
       index,
       text,
       prompt,
@@ -19,14 +29,10 @@ export default function useGenerateDataWithOpenAI() {
       text: string;
       prompt: string;
       expect: "stringResponse" | "objectResponse";
-
       arrayLength: number;
       index: number;
     }) => {
-      if (index > 0) {
-        await delay(); // Delay to avoid rate limits
-      }
-      console.log({ index, length1: arrayLength - 1 });
+      if (index > 0) await delay(); // Delay to avoid rate limits
 
       const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
       const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
@@ -58,13 +64,13 @@ export default function useGenerateDataWithOpenAI() {
         });
 
         const data = await res.json();
+
         if (!res.ok) {
           console.error(`❌ Error on chunk :`, data);
           return { error: "Error generating data😥" };
         }
 
         const output = data.choices?.[0]?.message?.content;
-
         if (!output) return { error: "Error generating data" };
 
         // Return raw string if expect is stringRes
@@ -72,26 +78,8 @@ export default function useGenerateDataWithOpenAI() {
           return output;
         }
 
-        // Return valid object if expect is objectRes
-        // let trimmedOutput = [];
+        // Return valid object if expect is objectResponse
         try {
-          // const cleanedOutput = output
-          //   .replace(/^.*?Raw output:\s*/s, "") // Remove "Raw output:" and everything before it
-          //   .replace(/```(?:json)?/g, "") // Remove all ``` or ```json
-          //   .replace(/^\s*\/\/.*$/gm, "") // Remove JS-style comments like `// something`
-          //   .replace(/^\s*\*\*?.*?\*\*?\s*$/gm, "") // Remove Markdown bold/italic lines
-          //   .replace(/^\s*[\*\-+]\s.*$/gm, "") // Remove Markdown bullet points
-          //   .replace(/^\s*\n/gm, "") // Remove blank lines
-          //   .trim(); // Final cleanup of whitespace
-
-          // let parsed;
-          // try {
-          //   parsed = JSON.parse(cleanedOutput);
-          // } catch (err) {
-          //   console.error("💥 Failed to parse cleaned output:", cleanedOutput);
-          //   throw err;
-          // }
-
           const trimmedOutput = parseAIJsonResponse(output);
           console.log(`✅ Chunk  saved.`);
           return trimmedOutput;

@@ -67,10 +67,12 @@ const GenerateSummary = ({
         alert("Error generating summary");
         break;
       }
+
       setSummaries((prev) => {
         let newSummary = {} as SummaryTypes;
         const existingSummary = prev.find((s) => s.id === id);
         let summaries = [] as SummaryTypes[];
+
         if (existingSummary) {
           existingSummary.content += `\n\n${response.replace("```markdown", "").trim()}`;
           newSummary = existingSummary;
@@ -84,8 +86,8 @@ const GenerateSummary = ({
           };
           summaries = prev.length ? [...prev, newSummary] : [newSummary];
         }
-        saveSummary(newSummary);
 
+        saveSummary(newSummary);
         return summaries;
       });
     }
@@ -94,6 +96,7 @@ const GenerateSummary = ({
       (prev[prev.length - 1] as SummaryTypes).isCompleted = true;
       return [...prev];
     });
+
     setIsGenerating(false);
   };
 

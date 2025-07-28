@@ -15,11 +15,6 @@ const SummaryCard = ({
 }) => {
   const [expand, setExpand] = useState(false);
 
-  // const deleteSummary = () => {
-  //   deleteSummaryById(summary.id);
-  //   setSummaries((prev) => prev.filter((data) => data.id !== summary.id));
-  // };
-
   const visibleContent = expand
     ? summary.content
     : summary.content.substring(0, 1000);
@@ -30,9 +25,9 @@ const SummaryCard = ({
       displayMath: [["$$", "$$"]],
     },
   };
-
+  //BUG texts longer than screen
   return (
-    <div>
+    <div className="px-3">
       <div
         onClick={() => setExpand(!expand)}
         className="flex max-w-full cursor-pointer items-center justify-between"
@@ -60,7 +55,7 @@ const SummaryCard = ({
 
       <div
         className={cn(
-          `markdown relative flex w-[450px] flex-col gap-2 overflow-hidden overflow-x-auto rounded-md bg-gray-900 p-5 md:w-[550px]`,
+          `markdown relative flex w-full flex-col gap-2 overflow-hidden overflow-x-auto rounded-md bg-gray-900 p-5`,
           expand ? "max-h-max" : "max-h-64",
         )}
       >
@@ -75,6 +70,7 @@ const SummaryCard = ({
         {!expand && (
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         )}
+
         <button
           onClick={() => setExpand(!expand)}
           className={cn(

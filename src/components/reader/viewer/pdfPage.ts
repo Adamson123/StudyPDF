@@ -137,8 +137,9 @@ class PDFPage {
     if (!this.pdfDocument) return;
     try {
       this.scale = newScale;
-      await this.load();
-      await this.render();
+      console.log("updated scale");
+      //  await this.load();
+      //  await this.render();
     } catch (error) {
       console.error("Error updating scale:", error);
     }

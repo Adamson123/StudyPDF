@@ -1,14 +1,10 @@
 import {
-  MessageSquareText,
   Search,
   Minus,
   Plus,
   PanelLeftDashed,
   ChevronsRight,
   Stars,
-  File,
-  FileQuestion,
-  LucideFileStack,
   LucideFileInput,
 } from "lucide-react";
 import {
@@ -24,9 +20,23 @@ import GenerateQuestionMenu from "../generateWithAiMenus/GenerateQuestionMenu";
 import GenerateFlashcardMenu from "../generateWithAiMenus/GenerateFlashcardMenu";
 import PDFPage from "../viewer/pdfPage";
 import debouncedHandler from "@/utils/debounceHandler";
-import GenerateSummaryQuestionMenu from "../generateWithAiMenus/GenerateSummaryQuestionMenu";
 import GenerateMenu from "./GenerateMenu";
 
+/**
+ * @param setShowSidebar - Function to toggle the visibility of the sidebar.
+ * @param showSidebar - Boolean indicating whether the sidebar is currently shown.
+ * @param incrementScale - Function to increase the scale of the PDF viewer.
+ * @param decrementScale - Function to decrease the scale of the PDF viewer.
+ * @param numOfPages - Total number of pages in the PDF document.
+ * @param pdfsContainer - Ref to the container holding the PDF pages.
+ * @param setSelectionBoxMode - Function to toggle the selection box mode.
+ * @param setPdfInfo - Function to set the PDF information (URL and name).
+ * @param setMessage - Function to set messages for the user interface.
+ * @param renderPDFsOnView - Function to render the PDF pages on view.
+ * @param pdfPages - Array of PDFPage objects representing the pages of the PDF document.
+ * @param param0 - Object containing various state setters and values for the header component.
+ * @returns JSX.Element
+ */
 const Header = ({
   setShowSidebar,
   showSidebar,
@@ -58,7 +68,6 @@ const Header = ({
   //TODO: put into one state object
   const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
   const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
-  const [openSummaryMenu, setOpenSummaryMenu] = useState(false);
 
   const handlePageNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOnPageNumInput(true);
@@ -90,6 +99,26 @@ const Header = ({
   };
 
   useEffect(() => {
+    /**
+     * Updates the current page number based on the user's scroll position.
+     *
+     * This function calculates which PDF page is currently in view by checking the
+     * position of each page relative to the viewport. If multiple pages are partially
+     * visible, it determines the page with the larger visible portion and sets it as
+     * the current page. The function also triggers rendering of PDFs in view and updates
+     * the page number state.
+     *
+     * @async
+     * @returns {Promise<void>} Resolves when the page number is updated and PDFs in view are rendered.
+     *
+     * @remarks
+     * - If `onPageNumInput` is true, the function exits early without performing any updates.
+     * - The function assumes that each page is represented by an element with the class `pdfContainer`.
+     * - The `pdfsContainer` ref must point to a valid HTMLDivElement containing the PDF pages.
+     *
+     * @see renderPDFsOnView
+     * @see setPageNum
+     */
     const updatePageNumOnScroll = async () => {
       if (onPageNumInput) return;
       const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
@@ -215,18 +244,6 @@ const Header = ({
       </div>
       {/* Right section */}
       <div className="flex items-center gap-[15px]">
-        {/* <div className="relative">
-          <Square className="h-5 w-5" />
-          <Hash className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2" />
-        </div> */}
-        {/* <SquareDashed
-          onClick={() => setSelectionBoxMode((prev) => !prev)}
-          className="h-[18px] w-[18px]"
-        /> */}
-
-        {/* <Star className="h-[18px] w-[18px]" /> */}
-        {/* <MessageSquareText className="h-[17px] w-[17px]" /> */}
-
         <div className="relative flex h-[17px] w-[17px] cursor-pointer items-center justify-center">
           <LucideFileInput className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
           <Input
@@ -249,7 +266,6 @@ const Header = ({
             <GenerateMenu
               setOpenQuestionMenu={setOpenQuestionMenu}
               setOpenFlashCardMenu={setOpenFlashCardMenu}
-              setOpenSummaryMenu={setOpenSummaryMenu}
             />
           )}
         </div>
@@ -261,9 +277,6 @@ const Header = ({
           setOpenQuestionMenu={setOpenQuestionMenu}
           numOfPages={numOfPages}
         />
-      )}
-      {openSummaryMenu && (
-        <GenerateSummaryQuestionMenu setOpenSummaryMenu={setOpenSummaryMenu} />
       )}
       {openFlashCardMenu && (
         <GenerateFlashcardMenu

@@ -8,17 +8,31 @@ import { saveFlashcard } from "@/lib/flashcardStorage";
 import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 
+/**
+ *
+ * @param numOfPages - The total number of pages in the PDF document.
+ * @param type - The type of data to generate, can be "quiz", "flashcard", or "summaryQuestion".
+ * @param questionFrom - The source of the questions, can be "summary" or "pdf".
+ * @param getPrompt - A function that returns a prompt string based on the amount of data to generate.
+ * @param amountOfData - The total amount of data to generate.
+ * @param title - The title for the generated data, used when saving the quiz or flashcard.
+ * @param selectedSummaries - An optional array of summaries to use when generating questions from summary.
+ * @returns An object containing functions and state related to data generation, including error handling, data saving, and UI state management.
+ */
+
 function useGenerateData<T>({
   numOfPages,
   type,
   getPrompt,
-  amountOfData,
+  amountOfData: totalAmountOfData,
   title,
   selectedSummaries = [],
+  questionFrom = "pdf",
 }: {
   getPrompt: (amountOfDataToGenerate: number) => string;
   numOfPages: number;
-  type: "quiz" | "flashcard" | "summaryQuestion";
+  type: "quiz" | "flashcards";
+  questionFrom?: "summary" | "pdf";
   selectedSummaries?: string[];
   amountOfData: number;
   title: string;
@@ -34,18 +48,21 @@ function useGenerateData<T>({
   const [lastPDfBeforeErrorIndex, setLastPDfBeforeErrorIndex] =
     useState<number>(0);
 
-  const getAmountOfDataToGenerate = (
+  const getAmountOfDataOnEachReq = (
     chunks: string[],
     index: number,
     generatedData: T[],
   ) => {
-    let amountOfDataToGenerate = !index
-      ? Math.floor(amountOfData / chunks.length) +
-        (amountOfData % chunks.length)
-      : Math.floor(amountOfData / chunks.length);
+    /*
+     * Calculate the amount of data to generate for each chunk based on the total amount of data and the number of chunks.
+     * If it is the last chunk, it will take the remaining data to reach the total amount.
+     * This ensures that we are not exceeding or below the total amount of data.
+     */
+
+    let amountOfDataToGenerate = Math.floor(totalAmountOfData / chunks.length);
 
     if (index === chunks.length - 1) {
-      const remainingData = amountOfData - generatedData.length;
+      const remainingData = totalAmountOfData - generatedData.length;
       amountOfDataToGenerate = remainingData;
     }
 
@@ -57,6 +74,7 @@ function useGenerateData<T>({
     return amountOfDataToGenerate;
   };
 
+  // Function to handle saving data and redirecting to the quiz or flashcard page
   const handleSaveAndRedirect = useCallback(
     async (data: T[]) => {
       const id = uuidv4();
@@ -64,7 +82,7 @@ function useGenerateData<T>({
       if (!data.length) return; // No data to save
 
       setRange({ from: 1, to: numOfPages });
-      if (type === "quiz" || type === "summaryQuestion") {
+      if (type === "quiz" || questionFrom === "summary") {
         saveQuiz({ id, title, questionsToSave: data as any });
         router.push(`/quiz/${id}`);
       } else {
@@ -72,7 +90,7 @@ function useGenerateData<T>({
         router.push(`/flashcard/${id}`);
       }
     },
-    [type !== "summaryQuestion" && pdfData?.name, numOfPages, router, title],
+    [type, questionFrom, pdfData?.name, numOfPages, router, title],
   );
 
   const generateData = useCallback(async () => {
@@ -82,22 +100,18 @@ function useGenerateData<T>({
     //TODO: IMprove Here
     let chunks: string[] = [];
 
-    if (type === "summaryQuestion") {
+    if (questionFrom === "summary") {
       chunks = selectedSummaries;
     } else {
-      chunks = splitChunks(splitTexts(pdfTexts), amountOfData); // Break chunks if needed
+      chunks = splitChunks(splitTexts(pdfTexts), totalAmountOfData); // Break chunks if needed
     }
-    console.log({ chunks });
 
     let error = "";
 
     for (let index = lastPDfBeforeErrorIndex; index < chunks.length; index++) {
-      const text = chunks[index] as string;
-      console.log({ text });
-
       console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
-
-      const amountOfDataToGenerate = getAmountOfDataToGenerate(
+      const text = chunks[index] as string;
+      const amountOfDataToGenerate = getAmountOfDataOnEachReq(
         chunks,
         index,
         response,
@@ -121,10 +135,12 @@ function useGenerateData<T>({
       if (data.error) {
         setLastPDfBeforeErrorIndex(index);
         error = "error";
+        break;
       }
     }
 
-    if (error && response.length < amountOfData) {
+    // If the response is empty and an error occurred, set the error message
+    if (error && response.length < totalAmountOfData) {
       if (response.length) {
         setError(`An Error occured while generating ${type}`);
       } else {
@@ -133,9 +149,10 @@ function useGenerateData<T>({
       return;
     }
 
+    // If we have generated enough data, reset the last index before error
     await handleSaveAndRedirect(response);
   }, [
-    amountOfData,
+    totalAmountOfData,
     generateDataWithOpenAI,
     handleSaveAndRedirect,
     pdfData?.url,

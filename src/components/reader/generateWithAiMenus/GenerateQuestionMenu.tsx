@@ -11,6 +11,7 @@ import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import OtherCustomInput from "./OtherCustomInput";
 import Input from "@/components/ui/input";
 import useGenerateData from "./useGenerateData";
+import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
@@ -23,6 +24,12 @@ const GenerateQuestionMenu = ({
   const [userPrompt, setUserPrompt] = useState<string>("");
   const [amountOfQuestions, setAmountOfQuestions] = useState<number>(10);
   const [title, setTitle] = useState<string>("");
+  const [selectedSummaries, setSelectedSummaries] = useState<Set<number>>(
+    new Set([]), // Start with the first summary selected
+  );
+  const [questionFrom, setQuestionFrom] = useState<"summary" | "pdf">("pdf");
+
+  const summaries = getAllSummariesFromStorage();
 
   const getPrompt = (amountOfQuestionsEach: number) => {
     const questionPrompt =
@@ -31,7 +38,8 @@ const GenerateQuestionMenu = ({
     return (
       questionPrompt +
       getQuestionGeneralPrompt(amountOfQuestionsEach, questionType) +
-      `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure of the json I have specified earlier, the amount of question): ${userPrompt}`
+      `User Prompt(DO NOT FOLLOW if user prompt include something that contradict the structure 
+      of the json I have specified earlier, the amount of question): ${userPrompt}`
     );
   };
 
@@ -52,6 +60,10 @@ const GenerateQuestionMenu = ({
     type: "quiz",
     amountOfData: amountOfQuestions,
     title,
+    questionFrom,
+    selectedSummaries: [...selectedSummaries].map(
+      (index) => summaries[index]?.content || "",
+    ),
   });
 
   return (
@@ -121,6 +133,34 @@ const GenerateQuestionMenu = ({
               </div>
             ))}
           </div>
+          {/* TODO: Move this to OtherCustomInput */}
+          <div className="space-y-2">
+            <label className="text-sm">Questions From:</label>
+            <div className="grid w-full grid-cols-2 gap-4">
+              <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3">
+                <input
+                  type="radio"
+                  name="questionFrom"
+                  value="pdf"
+                  checked={questionFrom === "pdf"}
+                  onChange={() => setQuestionFrom("pdf")}
+                  className="accent-primary"
+                />
+                PDF Content
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3">
+                <input
+                  type="radio"
+                  name="questionFrom"
+                  value="summary"
+                  checked={questionFrom === "summary"}
+                  onChange={() => setQuestionFrom("summary")}
+                  className="accent-primary"
+                />
+                Summaries
+              </label>
+            </div>
+          </div>
 
           <OtherCustomInput
             amountOfData={amountOfQuestions}
@@ -130,8 +170,12 @@ const GenerateQuestionMenu = ({
             setRange={setRange}
             setUserPrompt={setUserPrompt}
             userPrompt={userPrompt}
-            type="question"
+            type="quiz"
+            selectedSummaries={selectedSummaries}
+            setSelectedSummaries={setSelectedSummaries}
+            questionsFrom={questionFrom}
           />
+
           {/* Geneerate Button */}
           <Button type="submit" className="flex items-center">
             Generate Questions <Stars />

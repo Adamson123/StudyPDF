@@ -45,7 +45,7 @@ const GenerateFlashcardsMenu = ({
   } = useGenerateData({
     numOfPages,
     getPrompt,
-    type: "flashcard",
+    type: "flashcards",
     amountOfData: amountOfFlashcards,
     title,
   });
@@ -93,7 +93,7 @@ const GenerateFlashcardsMenu = ({
             setRange={setRange}
             setUserPrompt={setUserPrompt}
             userPrompt={userPrompt}
-            type="flashcard"
+            type="flashcards"
           />
           {/* Generate Button */}
           <Button type="submit" className="flex items-center">

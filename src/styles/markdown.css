@@ -9,6 +9,17 @@ td {
   border-radius: 3px;
 }
 
+.markdown pre,
+.markdown code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+.markdown table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+}
+
 .markdown ul {
   list-style-type: circle;
   padding-left: 2rem;
