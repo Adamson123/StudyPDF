@@ -1,9 +1,7 @@
 import Input from "@/components/ui/input";
 import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
 import { getNumberInput } from "@/utils";
-import { Dispatch, SetStateAction } from "react";
-
-const summaries = getAllSummariesFromStorage();
+import { Dispatch, SetStateAction, useMemo } from "react";
 
 /**
  * OtherCustomInput component for handling user input for data generation.
@@ -46,6 +44,8 @@ const OtherCustomInput = ({
   type: "quiz" | "flashcards";
   questionsFrom?: "summary" | "pdf";
 }) => {
+  const summaries = useMemo(() => getAllSummariesFromStorage(), []);
+
   const selectOrDeselectSummary = (index: number) => {
     const newSelectedSummaries = new Set(selectedSummaries);
     if (newSelectedSummaries.has(index)) {

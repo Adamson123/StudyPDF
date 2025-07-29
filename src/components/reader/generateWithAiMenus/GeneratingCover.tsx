@@ -46,7 +46,7 @@ const GeneratingCover = ({
         {dataLength}/{amountOfData}
       </p>
       {/*  */}
-      {error && (
+      {error ? (
         <div className="flex flex-col items-center gap-2 text-sm">
           {/* <p className="text-red-500">{error}</p>{" "} */}
           <div className="flex gap-5">
@@ -74,6 +74,10 @@ const GeneratingCover = ({
             ""
           )}
         </div>
+      ) : (
+        <Button onClick={handleCancel} className="bg-red-600 hover:bg-red-500">
+          Cancel
+        </Button>
       )}
     </div>
   );

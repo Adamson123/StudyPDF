@@ -10,7 +10,7 @@ import OtherCustomInput from "./OtherCustomInput";
 import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
 import GeneratingCover from "./GeneratingCover";
-import useGenerateData from "./useGenerateData";
+import useGenerateData from "@/hooks/useGenerateData";
 
 const GenerateFlashcardsMenu = ({
   setOpenFlashCardMenu,

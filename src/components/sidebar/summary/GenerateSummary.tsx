@@ -8,7 +8,7 @@ import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 import { saveSummary } from "@/lib/summaryStorage";
 import { cn } from "@/lib/utils";
 import { getNumberInput } from "@/utils";
-import { splitTexts } from "@/utils/pdfTextUtils";
+import { splitTextsToChunk } from "@/utils/pdfTextUtils";
 import { Stars } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { v4 as uuid } from "uuid";
@@ -47,7 +47,7 @@ const GenerateSummary = ({
       from: range.from,
       to: range.to,
     });
-    const splittedTexts = splitTexts(pdfTexts);
+    const splittedTexts = splitTextsToChunk(pdfTexts);
     const id = uuid();
     for (let index = 0; index < splittedTexts.length; index++) {
       const text = splittedTexts[index] as string;

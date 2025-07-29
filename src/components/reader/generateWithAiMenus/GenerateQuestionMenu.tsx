@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   getQuestionGeneralPrompt,
   questionPrompts,
@@ -10,8 +10,8 @@ import XButton from "@/components/ui/XButton";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import OtherCustomInput from "./OtherCustomInput";
 import Input from "@/components/ui/input";
-import useGenerateData from "./useGenerateData";
 import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
+import useGenerateData from "@/hooks/useGenerateData";
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
@@ -29,7 +29,7 @@ const GenerateQuestionMenu = ({
   );
   const [questionFrom, setQuestionFrom] = useState<"summary" | "pdf">("pdf");
 
-  const summaries = getAllSummariesFromStorage();
+  const summaries = useMemo(() => getAllSummariesFromStorage(), []);
 
   const getPrompt = (amountOfQuestionsEach: number) => {
     const questionPrompt =

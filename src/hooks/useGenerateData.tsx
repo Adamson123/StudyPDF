@@ -1,12 +1,13 @@
 import { useCallback, useContext, useState } from "react";
-import { ViewerContext } from "../viewer/Viewer";
 import { useRouter } from "next/navigation";
 import { saveQuiz } from "@/lib/quizStorage";
 import { v4 as uuidv4 } from "uuid";
-import { splitChunks, splitTexts } from "../../../utils/pdfTextUtils";
 import { saveFlashcard } from "@/lib/flashcardStorage";
 import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
+import { ViewerContext } from "@/components/reader/viewer/Viewer";
+import { splitChunks, splitTextsToChunk } from "@/utils/pdfTextUtils";
+import { is } from "node_modules/cypress/types/bluebird";
 
 /**
  *
@@ -43,10 +44,15 @@ function useGenerateData<T>({
   const [data, setData] = useState<T[]>([]);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { generateDataWithOpenAI } = useGenerateDataWithOpenAI();
+  const {
+    generateDataWithOpenAI,
+    cancelDataGenerationWithOpenAI,
+    setController,
+  } = useGenerateDataWithOpenAI();
   const { getPDFTexts } = useGetPDFTexts();
   const [lastPDfBeforeErrorIndex, setLastPDfBeforeErrorIndex] =
     useState<number>(0);
+  const [isAborted, setIsAborted] = useState(false);
 
   const getAmountOfDataOnEachReq = (
     chunks: string[],
@@ -94,6 +100,7 @@ function useGenerateData<T>({
   );
 
   const generateData = useCallback(async () => {
+    setIsAborted(false);
     setIsGenerating(true);
     let response: T[] = data.length ? data : [];
     const pdfTexts = await getPDFTexts(range); // Get texts from PDF
@@ -103,7 +110,7 @@ function useGenerateData<T>({
     if (questionFrom === "summary") {
       chunks = selectedSummaries;
     } else {
-      chunks = splitChunks(splitTexts(pdfTexts), totalAmountOfData); // Break chunks if needed
+      chunks = splitChunks(splitTextsToChunk(pdfTexts), totalAmountOfData); // Break chunks if needed
     }
 
     let error = "";
@@ -137,6 +144,10 @@ function useGenerateData<T>({
         error = "error";
         break;
       }
+
+      if (isAborted) {
+        break;
+      }
     }
 
     // If the response is empty and an error occurred, set the error message
@@ -149,6 +160,9 @@ function useGenerateData<T>({
       return;
     }
 
+    setController(null); // Clear the controller after generation
+    if (isAborted) return;
+
     // If we have generated enough data, reset the last index before error
     await handleSaveAndRedirect(response);
   }, [
@@ -160,6 +174,7 @@ function useGenerateData<T>({
     data,
     lastPDfBeforeErrorIndex,
     selectedSummaries,
+    isAborted,
   ]);
 
   const handleTryAgain = useCallback(async () => {
@@ -177,7 +192,9 @@ function useGenerateData<T>({
     setError("");
     setIsGenerating(false);
     setData([]);
-  }, []);
+    cancelDataGenerationWithOpenAI();
+    setIsAborted(true); // Set aborted state to true
+  }, [cancelDataGenerationWithOpenAI]);
 
   return {
     handleTryAgain,

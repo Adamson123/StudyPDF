@@ -1,4 +1,4 @@
-export const splitTexts = (pdfString: string[], chunkSize = 30000) => {
+export const splitTextsToChunk = (pdfString: string[], chunkSize = 30000) => {
   const chunks: string[] = [];
   let chunk = "";
 

@@ -1,11 +1,13 @@
 import { env } from "@/env";
 import parseAIJsonResponse from "@/utils/parseAIJsonResponse";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 /**
- * @returns An object containing the function to generate data with OpenAI.
+ * @returns An object containing the function to generate data with OpenAI and a function to cancel the data generation.
  */
 export default function useGenerateDataWithOpenAI() {
+  const [controller, setController] = useState<AbortController | null>(null);
+
   const delay = async () => {
     console.log("Sleeping for 5 seconds to avoid rate limits...");
     await new Promise((r) => setTimeout(r, 5000));
@@ -32,7 +34,11 @@ export default function useGenerateDataWithOpenAI() {
       arrayLength: number;
       index: number;
     }) => {
-      if (index > 0) await delay(); // Delay to avoid rate limits
+      if (index > 0) await delay(); // Delay to avoid rate
+
+      // ✅ NEW ABORT CONTROLLER PER CALL SET
+      const abortCtrl = new AbortController();
+      setController(abortCtrl);
 
       const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
       const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
@@ -61,6 +67,7 @@ export default function useGenerateDataWithOpenAI() {
           method: "POST",
           headers,
           body: JSON.stringify(body),
+          signal: abortCtrl.signal,
         });
 
         const data = await res.json();
@@ -96,5 +103,13 @@ export default function useGenerateDataWithOpenAI() {
     [],
   );
 
-  return { generateDataWithOpenAI };
+  const cancelDataGenerationWithOpenAI = () => {
+    controller?.abort("Data generation cancelled by user.");
+  };
+
+  return {
+    generateDataWithOpenAI,
+    cancelDataGenerationWithOpenAI,
+    setController,
+  };
 }
