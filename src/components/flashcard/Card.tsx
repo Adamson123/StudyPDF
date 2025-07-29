@@ -28,7 +28,6 @@ const Flashcard = ({
       return flashcards;
     });
   };
-  flashcard.level && console.log(flashcard, flashcardLevel);
 
   return (
     <div

@@ -100,7 +100,6 @@ function useGenerateData<T>({
   );
 
   const generateData = useCallback(async () => {
-    setIsAborted(false);
     setIsGenerating(true);
     let response: T[] = data.length ? data : [];
     const pdfTexts = await getPDFTexts(range); // Get texts from PDF
@@ -161,7 +160,10 @@ function useGenerateData<T>({
     }
 
     setController(null); // Clear the controller after generation
-    if (isAborted) return;
+    if (isAborted) {
+      setIsAborted(false);
+      return;
+    }
 
     // If we have generated enough data, reset the last index before error
     await handleSaveAndRedirect(response);
