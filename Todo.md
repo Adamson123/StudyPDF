@@ -10,6 +10,6 @@ COMPLETE: Preview of what is being generated
 COMPLETE: Pop up message to confirm summary deletion
 COMPLETE: Join generate questions from  pdf and summary into one component
 TODO: Use react toast in the future
-TODO: Show error when summary is not generated
-TODO:Cancel button on data generation
+COMPLETE: Show error when summary is not generated
+COMPLETE:Cancel button on data generation
 -->

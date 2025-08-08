@@ -1,17 +1,15 @@
 import { env } from "@/env";
+import { delay } from "@/utils";
 import parseAIJsonResponse from "@/utils/parseAIJsonResponse";
-import { useCallback, useState } from "react";
+import { is } from "node_modules/cypress/types/bluebird";
+import { useCallback, useRef, useState } from "react";
 
 /**
  * @returns An object containing the function to generate data with OpenAI and a function to cancel the data generation.
  */
 export default function useGenerateDataWithOpenAI() {
   const [controller, setController] = useState<AbortController | null>(null);
-
-  const delay = async () => {
-    console.log("Sleeping for 5 seconds to avoid rate limits...");
-    await new Promise((r) => setTimeout(r, 5000));
-  };
+  const isCancelled = useRef(false);
 
   /**
    * @param index - The index of the current chunk being processed. Used to apply a delay between requests to avoid rate limits.
@@ -34,7 +32,11 @@ export default function useGenerateDataWithOpenAI() {
       arrayLength: number;
       index: number;
     }) => {
-      if (index > 0) await delay(); // Delay to avoid rate
+      isCancelled.current = false; // Reset cancellation state for each call
+      if (index > 0) {
+        console.log("Sleeping for 5 seconds to avoid rate limits...");
+        await delay(); // Delay to avoid rate
+      }
 
       // ✅ NEW ABORT CONTROLLER PER CALL SET
       const abortCtrl = new AbortController();
@@ -88,7 +90,6 @@ export default function useGenerateDataWithOpenAI() {
         // Return valid object if expect is objectResponse
         try {
           const trimmedOutput = parseAIJsonResponse(output);
-          console.log(`✅ Chunk  saved.`);
           return trimmedOutput;
         } catch (error) {
           console.error(`❌ Error parsing JSON for chunk :`, error);
@@ -105,11 +106,13 @@ export default function useGenerateDataWithOpenAI() {
 
   const cancelDataGenerationWithOpenAI = () => {
     controller?.abort("Data generation cancelled by user.");
+    isCancelled.current = true;
   };
 
   return {
     generateDataWithOpenAI,
     cancelDataGenerationWithOpenAI,
     setController,
+    isCancelled,
   };
 }

@@ -3,14 +3,13 @@ import Input from "@/components/ui/input";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import XButton from "@/components/ui/XButton";
 import { getSummaryPrompt } from "@/data/prompts/summaryPrompts";
-import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 import { saveSummary } from "@/lib/summaryStorage";
 import { cn } from "@/lib/utils";
 import { getNumberInput } from "@/utils";
 import { splitTextsToChunk } from "@/utils/pdfTextUtils";
 import { Stars } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, RefObject, SetStateAction, useState } from "react";
 import { v4 as uuid } from "uuid";
 
 const GenerateSummary = ({
@@ -20,6 +19,9 @@ const GenerateSummary = ({
   setIsGenerating,
   setSummaries,
   isGenerating,
+  generateDataWithOpenAI,
+  setError,
+  isCancelled,
 }: {
   setOpenGenerateSummary: Dispatch<SetStateAction<boolean>>;
   setSummary: Dispatch<SetStateAction<{ title: string; content: string }>>;
@@ -27,8 +29,17 @@ const GenerateSummary = ({
   setIsGenerating: Dispatch<SetStateAction<boolean>>;
   setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
   isGenerating: boolean;
+  generateDataWithOpenAI: (param: {
+    text: string;
+    prompt: string;
+    expect: "stringResponse" | "objectResponse";
+    arrayLength: number;
+    index: number;
+  }) => Promise<any>;
+  setError: Dispatch<SetStateAction<string>>;
+  isCancelled: RefObject<boolean>;
 }) => {
-  const { generateDataWithOpenAI } = useGenerateDataWithOpenAI();
+  //  const { generateDataWithOpenAI } = useGenerateDataWithOpenAI();
   const {
     getPDFTexts,
     pdfData: { numOfPages },
@@ -38,23 +49,39 @@ const GenerateSummary = ({
   const [userPrompt, setUserPrompt] = useState("");
 
   const generateSummary = async () => {
+    //   await delay(30000);
     console.log("Generating summary with range:", range);
-    //Close
+
+    // Close the popup and reset the summary state
     setOpenGenerateSummary(false);
     setSummary({ title: "", content: "" });
     setIsGenerating(true);
+
+    // Fetch the PDF texts for the specified range
     const pdfTexts = await getPDFTexts({
       from: range.from,
       to: range.to,
     });
+
+    // Split the fetched texts into manageable chunks
     const splittedTexts = splitTextsToChunk(pdfTexts);
+
+    // Generate a unique ID for the summary
     const id = uuid();
+
+    // Iterate through each chunk of text and generate a summary
     for (let index = 0; index < splittedTexts.length; index++) {
       const text = splittedTexts[index] as string;
+
+      // Get the last 1000 characters of the current summary content
       const recentSummarySlice = summary.content.slice(-1000);
+
+      // Generate the prompt for OpenAI, including the user-provided prompt
       const prompt =
         getSummaryPrompt(text, recentSummarySlice) +
         `\nUser Prompt: ${userPrompt}`;
+
+      // Call the OpenAI API to generate the summary
       const response = await generateDataWithOpenAI({
         text,
         prompt,
@@ -63,40 +90,52 @@ const GenerateSummary = ({
         index,
       });
 
+      // Handle errors in the API response
       if (response.error) {
-        alert("Error generating summary");
+        //Only set error if not cancelled
+        // This prevents setting an error if the user cancels the operation
+        if (!isCancelled.current) {
+          console.log("ran on");
+          setError("Error generating summary");
+        }
         break;
       }
 
+      // Update the summaries state with the new summary content
       setSummaries((prev) => {
         let newSummary = {} as SummaryTypes;
         const existingSummary = prev.find((s) => s.id === id);
         let summaries = [] as SummaryTypes[];
 
         if (existingSummary) {
+          // Append the new content to the existing summary
           existingSummary.content += `\n\n${response.replace("```markdown", "").trim()}`;
           newSummary = existingSummary;
           summaries = prev.map((s) => (s.id === id ? newSummary : s));
         } else {
+          // Create a new summary entry
           newSummary = {
             title: name,
             content: response.replace("```markdown", "").trim(),
-            isCompleted: true,
+            isCompleted: false,
             id,
           };
           summaries = prev.length ? [...prev, newSummary] : [newSummary];
         }
 
+        // Save the summary to persistent storage
         saveSummary(newSummary);
         return summaries;
       });
     }
 
+    // Mark the last summary as completed
     setSummaries((prev) => {
       (prev[prev.length - 1] as SummaryTypes).isCompleted = true;
       return [...prev];
     });
 
+    // Reset the generating state
     setIsGenerating(false);
   };
 

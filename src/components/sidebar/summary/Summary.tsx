@@ -10,18 +10,21 @@ const Summary = ({
   isGenerating,
   summaries,
   setDataToDelete,
+  cancelSummaryGeneration,
+  error,
 }: {
   setOpenGenerateSummary: Dispatch<SetStateAction<boolean>>;
   isGenerating: boolean;
   summaries: SummaryTypes[];
   setDataToDelete: Dispatch<SetStateAction<DataToDeleteTypes>>;
+  cancelSummaryGeneration: () => void;
+  error: string;
 }) => {
   return (
-    <div className="flex flex-col items-center gap-3 px-2">
+    <div className="flex flex-col items-center gap-4 px-2">
       {/* Create Summary */}
-
       {/* Summaries */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-5">
         {summaries.length > 0 ? (
           summaries.map((summary, index) => (
             <SummaryCard
@@ -37,16 +40,28 @@ const Summary = ({
         )}
       </div>
       {isGenerating ? (
-        <RefreshCcw className="animate-spin self-center" />
-      ) : (
-        <div className="self-center rounded-lg bg-primary/30 p-[4px]">
-          <Button
-            onClick={() => setOpenGenerateSummary((prev) => !prev)}
-            className="p-4"
-          >
-            Create a Summary
-            <Plus />
+        <div className="flex flex-col items-center gap-2">
+          <RefreshCcw className="animate-spin" />
+          <Button onClick={cancelSummaryGeneration} className="w-full px-5">
+            Cancel Summary Generation
           </Button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-3 px-2">
+          {error && (
+            <span className="rounded-lg bg-primary/30 p-3 text-sm text-red-500">
+              {error}
+            </span>
+          )}
+          <div className="self-center rounded-lg bg-primary/30 p-[4px]">
+            <Button
+              onClick={() => setOpenGenerateSummary((prev) => !prev)}
+              className="p-4"
+            >
+              Create a Summary
+              <Plus />
+            </Button>
+          </div>
         </div>
       )}
     </div>

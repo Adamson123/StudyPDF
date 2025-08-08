@@ -14,8 +14,9 @@ import {
   getAllFlashcardsFromStorage,
 } from "@/lib/flashcardStorage";
 import { cn } from "@/lib/utils";
+import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
 
-const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
+const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
   const [openGenerateSummary, setOpenGenerateSummary] = useState(false);
   //TODO:Remove this state
   const [summary, setSummary] = useState({ title: "", content: "" });
@@ -23,7 +24,12 @@ const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
   const [quizzes, setQuizzes] = useState<StoredQuiz[]>([]);
   const [flashcards, setFlashcards] = useState<StoredFlashcard[]>([]);
   const [summaries, setSummaries] = useState<SummaryTypes[]>([]);
-
+  const {
+    generateDataWithOpenAI,
+    cancelDataGenerationWithOpenAI,
+    isCancelled,
+  } = useGenerateDataWithOpenAI();
+  const [error, setError] = useState("");
   const [dataToDelete, setDataToDelete] = useState<DataToDeleteTypes>({
     id: "",
     type: "",
@@ -48,6 +54,14 @@ const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
       setFlashcards(storedFlashcarfs);
     }
   }, []);
+
+  const cancelSummaryGeneration = () => {
+    cancelDataGenerationWithOpenAI();
+    setIsGenerating(false);
+    setOpenGenerateSummary(false);
+    setSummary({ title: "", content: "" });
+    setSummaries(getAllSummariesFromStorage());
+  };
 
   return (
     <section
@@ -78,6 +92,8 @@ const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
           setOpenGenerateSummary={setOpenGenerateSummary}
           summaries={summaries}
           setDataToDelete={setDataToDelete}
+          cancelSummaryGeneration={cancelSummaryGeneration}
+          error={error}
         />
       </div>
 
@@ -89,6 +105,9 @@ const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
           setOpenGenerateSummary={setOpenGenerateSummary}
           setSummaries={setSummaries}
           isGenerating={isGenerating}
+          generateDataWithOpenAI={generateDataWithOpenAI}
+          setError={setError}
+          isCancelled={isCancelled}
         />
       )}
       {dataToDelete.id && (
@@ -121,4 +140,4 @@ const LeftSection = ({ showSidebar }: { showSidebar: boolean }) => {
   );
 };
 
-export default LeftSection;
+export default Sidebar;
