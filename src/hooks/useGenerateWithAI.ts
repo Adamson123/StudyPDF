@@ -1,9 +1,5 @@
 import azureOpenAIClient from "@/api/azureOpenAIClient.service";
 import geminiClient from "@/api/geminiClient.service";
-import generateWithAzureOpenAI from "@/server/actions/generateWithAzureOpenAI";
-import generateWithGemini, {
-  cancelGeminiGeneration,
-} from "@/server/actions/generateWithGemini";
 import { delay } from "@/utils";
 import parseAIJsonResponse from "@/utils/parseAIJsonResponse";
 import { useCallback, useRef, useState } from "react";
@@ -69,8 +65,8 @@ export default function useGenerateWithAI() {
           { prompt, text, abortSignal: abortCtrl.signal },
           "azureOpenAI",
         );
-        const output = await aiFunc();
 
+        const output = await aiFunc();
         if (output.error) return { error: "Error generating data" };
 
         // Return raw string if expect is stringRes
@@ -97,7 +93,6 @@ export default function useGenerateWithAI() {
 
   const cancelDataGenerationWithOpenAI = () => {
     controller?.abort("Data generation cancelled by user.");
-    cancelGeminiGeneration();
     isCancelled.current = true;
   };
 
