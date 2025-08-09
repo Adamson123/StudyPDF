@@ -39,7 +39,7 @@ const GenerateSummary = ({
   setError: Dispatch<SetStateAction<string>>;
   isCancelled: RefObject<boolean>;
 }) => {
-  //  const { generateDataWithOpenAI } = useGenerateDataWithOpenAI();
+  //  const { generateDataWithOpenAI } = useGenerateWithAI();
   const {
     getPDFTexts,
     pdfData: { numOfPages },
@@ -49,13 +49,11 @@ const GenerateSummary = ({
   const [userPrompt, setUserPrompt] = useState("");
 
   const generateSummary = async () => {
-    //   await delay(30000);
-    console.log("Generating summary with range:", range);
-
     // Close the popup and reset the summary state
     setOpenGenerateSummary(false);
     setSummary({ title: "", content: "" });
     setIsGenerating(true);
+    setError("");
 
     // Fetch the PDF texts for the specified range
     const pdfTexts = await getPDFTexts({
@@ -92,10 +90,10 @@ const GenerateSummary = ({
 
       // Handle errors in the API response
       if (response.error) {
+        console.log("cancelled", isCancelled.current);
         //Only set error if not cancelled
         // This prevents setting an error if the user cancels the operation
         if (!isCancelled.current) {
-          console.log("ran on");
           setError("Error generating summary");
         }
         break;

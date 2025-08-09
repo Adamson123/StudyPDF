@@ -1,6 +1,6 @@
 import { questionsMock } from "../static-data/questionMock";
 
-const multiChoiceGneneralPrompt = `
+const multiChoiceAdditionalPrompt = `
 - Each question object must include:
   • \`question\` (string),
   • \`options\` (array of 4 strings),
@@ -31,8 +31,6 @@ export const getQuestionGeneralPrompt = (
   amountOfQuestionsEach: number,
   type: string,
 ) => {
-  console.log({ amountOfQuestionsEach, type });
-
   return `
 - fillInAnswer questions must only contain one gap and one correct answer.
 - The missing word must be marked using five underscores, like this: "The _____ rises in the east."
@@ -41,7 +39,7 @@ export const getQuestionGeneralPrompt = (
 - Include questions about sentence types like Declarative, Complex, Simple, Active Voice, and Passive Voice.
 - Strictly return only a JSON array of ${amountOfQuestionsEach} questions. Do NOT include explanations, markdown, or any introductory or closing text.
 
-${type === "multiChoice" && multiChoiceGneneralPrompt}
+${type === "multiChoice" && multiChoiceAdditionalPrompt}
 
 📐🚨 MATH & PHYSICS QUESTION RULES (Strict):
 - For **all calculation questions** in Maths or Physics topics:
@@ -64,6 +62,8 @@ const getAnswerLetter = (options, correctAnswer) =>
 ⚠️ The \`explanation\` must always support the correct answer. No contradictions.
 
 All options must be relevant and make logical sense. No silly or unrelated distractors. No repetition. No fluff. Just clean, sharp question objects. 🔥💯
+
+You must include explanation field
 `;
 };
 

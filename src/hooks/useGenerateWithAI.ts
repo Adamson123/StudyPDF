@@ -1,13 +1,36 @@
-import { env } from "@/env";
+import azureOpenAIClient from "@/api/azureOpenAIClient.service";
+import geminiClient from "@/api/geminiClient.service";
+import generateWithAzureOpenAI from "@/server/actions/generateWithAzureOpenAI";
+import generateWithGemini, {
+  cancelGeminiGeneration,
+} from "@/server/actions/generateWithGemini";
 import { delay } from "@/utils";
 import parseAIJsonResponse from "@/utils/parseAIJsonResponse";
-import { is } from "node_modules/cypress/types/bluebird";
 import { useCallback, useRef, useState } from "react";
+
+const getAIFunc = (
+  {
+    prompt,
+    text,
+    abortSignal,
+  }: { prompt: string; text: string; abortSignal: AbortSignal },
+  AI: "azureOpenAI" | "gemini" = "gemini",
+) => {
+  switch (AI) {
+    case "gemini":
+      console.log("Using Gemini AI for generation");
+      return async () => await geminiClient({ prompt, text, abortSignal });
+
+    case "azureOpenAI":
+      console.log("Using Azure OpenAI for generation");
+      return async () => await azureOpenAIClient({ prompt, text, abortSignal });
+  }
+};
 
 /**
  * @returns An object containing the function to generate data with OpenAI and a function to cancel the data generation.
  */
-export default function useGenerateDataWithOpenAI() {
+export default function useGenerateWithAI() {
   const [controller, setController] = useState<AbortController | null>(null);
   const isCancelled = useRef(false);
 
@@ -20,7 +43,6 @@ export default function useGenerateDataWithOpenAI() {
    */
   const generateDataWithOpenAI = useCallback(
     async ({
-      //  arrayLength,
       index,
       text,
       prompt,
@@ -42,45 +64,14 @@ export default function useGenerateDataWithOpenAI() {
       const abortCtrl = new AbortController();
       setController(abortCtrl);
 
-      const url = env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
-      const apiKey = env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY;
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      };
-
-      const body = {
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-          { role: "user", content: text },
-        ],
-        max_tokens: 4096,
-        temperature: 0.8,
-        top_p: 1,
-        model: "gpt-4o",
-      };
-
       try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-          signal: abortCtrl.signal,
-        });
+        const aiFunc = getAIFunc(
+          { prompt, text, abortSignal: abortCtrl.signal },
+          "azureOpenAI",
+        );
+        const output = await aiFunc();
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error(`❌ Error on chunk :`, data);
-          return { error: "Error generating data😥" };
-        }
-
-        const output = data.choices?.[0]?.message?.content;
-        if (!output) return { error: "Error generating data" };
+        if (output.error) return { error: "Error generating data" };
 
         // Return raw string if expect is stringRes
         if (expect === "stringResponse") {
@@ -106,6 +97,7 @@ export default function useGenerateDataWithOpenAI() {
 
   const cancelDataGenerationWithOpenAI = () => {
     controller?.abort("Data generation cancelled by user.");
+    cancelGeminiGeneration();
     isCancelled.current = true;
   };
 

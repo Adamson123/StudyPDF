@@ -56,7 +56,7 @@ const SummaryCard = ({
       <div
         className={cn(
           `markdown relative flex w-full flex-col gap-2 overflow-hidden overflow-x-auto rounded-md bg-gray-900 p-5`,
-          expand ? "max-h-max" : "max-h-64",
+          expand ? "max-h-max" : "h-64",
         )}
       >
         <MathJaxContext config={mathjaxConfig}>
@@ -68,7 +68,19 @@ const SummaryCard = ({
         </MathJaxContext>
 
         {!expand && (
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+          <div className="pointer-events-none absolute inset-0 h-64 bg-gradient-to-t from-black to-transparent">
+            {/* <div className="relative h-full w-full overflow-hidden">
+              <button
+                onClick={() => setExpand(!expand)}
+                className={cn(
+                  "absolute bottom-3 flex items-center gap-1 self-center rounded-md bg-white p-2 px-3 text-sm text-black",
+                )}
+              >
+                Expand
+                <ChevronDown className="rotate-0" />
+              </button>
+            </div> */}
+          </div>
         )}
 
         <button

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { saveQuiz } from "@/lib/quizStorage";
 import { v4 as uuidv4 } from "uuid";
 import { saveFlashcard } from "@/lib/flashcardStorage";
-import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
+import useGenerateWithAI from "@/hooks/useGenerateWithAI";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 import { ViewerContext } from "@/components/reader/viewer/Viewer";
 import { splitChunks, splitTextsToChunk } from "@/utils/pdfTextUtils";
@@ -48,7 +48,7 @@ function useGenerateData<T>({
     generateDataWithOpenAI,
     cancelDataGenerationWithOpenAI,
     setController,
-  } = useGenerateDataWithOpenAI();
+  } = useGenerateWithAI();
   const { getPDFTexts } = useGetPDFTexts();
   const [lastPDfBeforeErrorIndex, setLastPDfBeforeErrorIndex] =
     useState<number>(0);

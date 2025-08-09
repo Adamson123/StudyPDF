@@ -14,7 +14,7 @@ import {
   getAllFlashcardsFromStorage,
 } from "@/lib/flashcardStorage";
 import { cn } from "@/lib/utils";
-import useGenerateDataWithOpenAI from "@/hooks/useGenerateDataWithOpenAI";
+import useGenerateWithAI from "@/hooks/useGenerateWithAI";
 
 const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
   const [openGenerateSummary, setOpenGenerateSummary] = useState(false);
@@ -28,7 +28,7 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
     generateDataWithOpenAI,
     cancelDataGenerationWithOpenAI,
     isCancelled,
-  } = useGenerateDataWithOpenAI();
+  } = useGenerateWithAI();
   const [error, setError] = useState("");
   const [dataToDelete, setDataToDelete] = useState<DataToDeleteTypes>({
     id: "",
