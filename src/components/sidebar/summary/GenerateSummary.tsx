@@ -131,6 +131,7 @@ const GenerateSummary = ({
 
     // Mark the last summary as completed
     setSummaries((prev) => {
+      console.log({ prev });
       (prev[prev.length - 1] as SummaryTypes).isCompleted = true;
       return [...prev];
     });
