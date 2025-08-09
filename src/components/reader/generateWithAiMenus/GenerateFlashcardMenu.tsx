@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
 import GeneratingCover from "./GeneratingCover";
 import useGenerateData from "@/hooks/useGenerateData";
+import AIOptions from "@/components/AIOptions";
 
 const GenerateFlashcardsMenu = ({
   setOpenFlashCardMenu,
@@ -22,6 +23,7 @@ const GenerateFlashcardsMenu = ({
   const [amountOfFlashcards, setAmountOfFlashcards] = useState<number>(10);
   const [userPrompt, setUserPrompt] = useState("");
   const [title, setTitle] = useState("");
+  const [selectedAI, setSelectedAI] = useState<AvailableAIOptions>("gemini");
 
   const getPrompt = (amountOfFlashcardsEach: number) => {
     return (
@@ -31,23 +33,25 @@ const GenerateFlashcardsMenu = ({
     );
   };
 
+  // Destructure the necessary values and functions from the useGenerateData hook
   const {
-    isGenerating,
-    setError,
-    generateData: generateFlashcards,
-    range,
-    setRange,
-    error,
-    handleCancel,
-    handleContinue,
-    handleTryAgain,
-    data: flashcards,
+    isGenerating, // Indicates if the generation process is ongoing
+    setError, // Function to set an error message
+    generateData: generateFlashcards, // Function to generate flashcards
+    range, // Range of pages or data to consider
+    setRange, // Function to update the range
+    error, // Error message, if any
+    handleCancel, // Function to handle cancellation of the generation process
+    handleContinue, // Function to continue after generation
+    handleTryAgain, // Function to retry the generation process
+    data: flashcards, // Generated flashcards data
   } = useGenerateData({
-    numOfPages,
-    getPrompt,
-    type: "flashcards",
-    amountOfData: amountOfFlashcards,
-    title,
+    numOfPages, // Total number of pages in the PDF
+    getPrompt, // Function to generate the prompt for the AI
+    type: "flashcards", // Type of data to generate (flashcards in this case)
+    amountOfData: amountOfFlashcards, // Number of flashcards to generate
+    title, // Title of the flashcards
+    selectedAI, // AI model to use for generation
   });
 
   return (
@@ -95,6 +99,10 @@ const GenerateFlashcardsMenu = ({
             userPrompt={userPrompt}
             type="flashcards"
           />
+
+          {/* AI options to select from */}
+          <AIOptions setSelectedAI={setSelectedAI} />
+
           {/* Generate Button */}
           <Button type="submit" className="flex items-center">
             Generate Flashcards <Stars />

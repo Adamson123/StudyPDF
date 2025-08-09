@@ -10,14 +10,14 @@ const getAIFunc = (
     text,
     abortSignal,
   }: { prompt: string; text: string; abortSignal: AbortSignal },
-  AI: "azureOpenAI" | "gemini" = "gemini",
+  selectedAI: AvailableAIOptions,
 ) => {
-  switch (AI) {
+  switch (selectedAI) {
     case "gemini":
       console.log("Using Gemini AI for generation");
       return async () => await geminiClient({ prompt, text, abortSignal });
 
-    case "azureOpenAI":
+    case "azure-openai":
       console.log("Using Azure OpenAI for generation");
       return async () => await azureOpenAIClient({ prompt, text, abortSignal });
   }
@@ -35,20 +35,23 @@ export default function useGenerateWithAI() {
    * @param text - The text content to be processed by the AI model.
    * @param prompt - The prompt to be sent to the AI model, guiding it on how to process the text.
    * @param expect - Specifies the expected type of response from the AI model, either a string or an object.
+   * @param selectedAI - The AI model to be used for data generation, defaulting to "gemini".
    * @returns The generated data or an error object if the generation fails.
    */
-  const generateDataWithOpenAI = useCallback(
+  const generateDataWithAI = useCallback(
     async ({
       index,
       text,
       prompt,
       expect,
+      selectedAI = "gemini",
     }: {
       text: string;
       prompt: string;
       expect: "stringResponse" | "objectResponse";
       arrayLength: number;
       index: number;
+      selectedAI?: AvailableAIOptions;
     }) => {
       isCancelled.current = false; // Reset cancellation state for each call
       if (index > 0) {
@@ -63,7 +66,7 @@ export default function useGenerateWithAI() {
       try {
         const aiFunc = getAIFunc(
           { prompt, text, abortSignal: abortCtrl.signal },
-          "azureOpenAI",
+          selectedAI,
         );
 
         const output = await aiFunc();
@@ -91,14 +94,14 @@ export default function useGenerateWithAI() {
     [],
   );
 
-  const cancelDataGenerationWithOpenAI = () => {
+  const cancelDataGenerationWithAI = () => {
     controller?.abort("Data generation cancelled by user.");
     isCancelled.current = true;
   };
 
   return {
-    generateDataWithOpenAI,
-    cancelDataGenerationWithOpenAI,
+    generateDataWithAI,
+    cancelDataGenerationWithAI,
     setController,
     isCancelled,
   };

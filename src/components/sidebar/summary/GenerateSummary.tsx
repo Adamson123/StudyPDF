@@ -1,3 +1,4 @@
+import AIOptions from "@/components/AIOptions";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
@@ -19,7 +20,7 @@ const GenerateSummary = ({
   setIsGenerating,
   setSummaries,
   isGenerating,
-  generateDataWithOpenAI,
+  generateDataWithAI,
   setError,
   isCancelled,
 }: {
@@ -29,7 +30,7 @@ const GenerateSummary = ({
   setIsGenerating: Dispatch<SetStateAction<boolean>>;
   setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
   isGenerating: boolean;
-  generateDataWithOpenAI: (param: {
+  generateDataWithAI: (param: {
     text: string;
     prompt: string;
     expect: "stringResponse" | "objectResponse";
@@ -39,7 +40,7 @@ const GenerateSummary = ({
   setError: Dispatch<SetStateAction<string>>;
   isCancelled: RefObject<boolean>;
 }) => {
-  //  const { generateDataWithOpenAI } = useGenerateWithAI();
+  //  const { generateDataWithAI } = useGenerateWithAI();
   const {
     getPDFTexts,
     pdfData: { numOfPages },
@@ -47,6 +48,7 @@ const GenerateSummary = ({
   const [name, setName] = useState("");
   const [range, setRange] = useState({ from: 1, to: Math.min(numOfPages, 15) });
   const [userPrompt, setUserPrompt] = useState("");
+  const [selectedAI, setSelectedAI] = useState<AvailableAIOptions>("gemini");
 
   const generateSummary = async () => {
     // Close the popup and reset the summary state
@@ -80,7 +82,7 @@ const GenerateSummary = ({
         `\nUser Prompt: ${userPrompt}`;
 
       // Call the OpenAI API to generate the summary
-      const response = await generateDataWithOpenAI({
+      const response = await generateDataWithAI({
         text,
         prompt,
         expect: "stringResponse",
@@ -218,6 +220,10 @@ const GenerateSummary = ({
             className="h-40 resize-none rounded bg-border p-3 text-xs ring-primary focus:outline-none focus:ring-1"
             placeholder="Enter your custom prompt here..."
           />
+
+          {/* AI options to select from */}
+          <AIOptions setSelectedAI={setSelectedAI} />
+
           <Button
             type="submit"
             className={cn(

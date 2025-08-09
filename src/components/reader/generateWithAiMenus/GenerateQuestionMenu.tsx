@@ -12,6 +12,7 @@ import OtherCustomInput from "./OtherCustomInput";
 import Input from "@/components/ui/input";
 import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
 import useGenerateData from "@/hooks/useGenerateData";
+import AIOptions from "@/components/AIOptions";
 
 const GenerateQuestionMenu = ({
   setOpenQuestionMenu,
@@ -28,6 +29,7 @@ const GenerateQuestionMenu = ({
     new Set([]), // Start with the first summary selected
   );
   const [questionFrom, setQuestionFrom] = useState<"summary" | "pdf">("pdf");
+  const [selectedAI, setSelectedAI] = useState<AvailableAIOptions>("gemini");
 
   const summaries = useMemo(() => getAllSummariesFromStorage(), []);
 
@@ -43,27 +45,29 @@ const GenerateQuestionMenu = ({
     );
   };
 
+  // Destructure the necessary values and functions from the useGenerateData hook
   const {
-    isGenerating,
-    setError,
-    generateData: generateQuestions,
-    range,
-    setRange,
-    error,
-    handleCancel,
-    handleContinue,
-    handleTryAgain,
-    data: questions,
+    isGenerating, // Indicates if the generation process is ongoing
+    setError, // Function to set an error message
+    generateData: generateQuestions, // Function to generate questions
+    range, // Range of pages or data to consider
+    setRange, // Function to update the range
+    error, // Error message, if any
+    handleCancel, // Function to handle cancellation of the generation process
+    handleContinue, // Function to continue after generation
+    handleTryAgain, // Function to retry the generation process
+    data: questions, // Generated questions data
   } = useGenerateData({
-    numOfPages,
-    getPrompt,
-    type: "quiz",
-    amountOfData: amountOfQuestions,
-    title,
-    questionFrom,
+    numOfPages, // Total number of pages in the PDF
+    getPrompt, // Function to generate the prompt for the AI
+    type: "quiz", // Type of data to generate (quiz in this case)
+    amountOfData: amountOfQuestions, // Number of questions to generate
+    title, // Title of the quiz
+    questionFrom, // Source of the questions (PDF or summaries)
     selectedSummaries: [...selectedSummaries].map(
-      (index) => summaries[index]?.content || "",
+      (index) => summaries[index]?.content || "", // Map selected summaries to their content
     ),
+    selectedAI, // AI model to use for generation
   });
 
   return (
@@ -175,6 +179,8 @@ const GenerateQuestionMenu = ({
             setSelectedSummaries={setSelectedSummaries}
             questionsFrom={questionFrom}
           />
+          {/* AI options to select from */}
+          <AIOptions setSelectedAI={setSelectedAI} />
 
           {/* Geneerate Button */}
           <Button type="submit" className="flex items-center">

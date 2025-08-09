@@ -63,7 +63,9 @@ const getAnswerLetter = (options, correctAnswer) =>
 
 All options must be relevant and make logical sense. No silly or unrelated distractors. No repetition. No fluff. Just clean, sharp question objects. 🔥💯
 
+The questions must be surrounded by square brackets
 You must include explanation field
+Your response must be an array of questions with the form we want no matter , the array must not be empty and it must contain the amount of data we want
 `;
 };
 

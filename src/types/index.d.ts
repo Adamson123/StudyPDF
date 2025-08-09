@@ -53,3 +53,11 @@ type StoredFlashcard = {
   cards: FlashcardTypes[]; // Replace with your flashcard types
   // Add any other metadata you store per flashcard set, e.g., description, lastReviewed
 };
+
+type AvailableAIOptions = "gemini" | "azure-openai";
+
+type AIOption = {
+  value: AvailableAIOptions;
+  name: string;
+  image: string;
+};

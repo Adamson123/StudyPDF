@@ -24,11 +24,8 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
   const [quizzes, setQuizzes] = useState<StoredQuiz[]>([]);
   const [flashcards, setFlashcards] = useState<StoredFlashcard[]>([]);
   const [summaries, setSummaries] = useState<SummaryTypes[]>([]);
-  const {
-    generateDataWithOpenAI,
-    cancelDataGenerationWithOpenAI,
-    isCancelled,
-  } = useGenerateWithAI();
+  const { generateDataWithAI, cancelDataGenerationWithAI, isCancelled } =
+    useGenerateWithAI();
   const [error, setError] = useState("");
   const [dataToDelete, setDataToDelete] = useState<DataToDeleteTypes>({
     id: "",
@@ -56,7 +53,7 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
   }, []);
 
   const cancelSummaryGeneration = () => {
-    cancelDataGenerationWithOpenAI();
+    cancelDataGenerationWithAI();
     setIsGenerating(false);
     setOpenGenerateSummary(false);
     setSummary({ title: "", content: "" });
@@ -105,7 +102,7 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
           setOpenGenerateSummary={setOpenGenerateSummary}
           setSummaries={setSummaries}
           isGenerating={isGenerating}
-          generateDataWithOpenAI={generateDataWithOpenAI}
+          generateDataWithAI={generateDataWithAI}
           setError={setError}
           isCancelled={isCancelled}
         />
