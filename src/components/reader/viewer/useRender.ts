@@ -107,9 +107,9 @@ function useRender({
     for (const pageToCancel of pagesToCancel) {
       if (pageToCancel.isRendered) {
         // Double-check before canceling
-        console.log(`cancelling pdf ${pageToCancel.index}`);
+        //  console.log(`cancelling pdf ${pageToCancel.index}`);
         pageToCancel.cancel();
-        console.log(`cancelled pdf ${pageToCancel.index}`);
+        //  console.log(`cancelled pdf ${pageToCancel.index}`);
       }
     }
 
@@ -123,10 +123,10 @@ function useRender({
       const renderPromises = batch.map(async (p) => {
         if (!p.isRendered || isScaliing) {
           // Check again before rendering
-          console.log(`rendering ${p.index}`);
+          //  console.log(`rendering ${p.index}`);
           await p.load(); // Ensure the page is loaded
           await p.render(); // Render the page
-          console.log(`rendered ${p.index}`);
+          //   console.log(`rendered ${p.index}`);
         }
       });
       await Promise.all(renderPromises); // Wait for all pages in the batch to finish rendering

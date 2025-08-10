@@ -30,7 +30,7 @@ const parseAIJsonResponse = (response: string): any => {
 
   let parsed;
   try {
-    console.log("🧪 JSON slice:", jsonSlice);
+    //  console.log("🧪 JSON slice:", jsonSlice);
     parsed = JSON.parse(jsonSlice);
   } catch (err) {
     console.error("💥 Failed to parse JSON:", response);

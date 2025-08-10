@@ -1,17 +1,19 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveQuiz } from "@/lib/quizStorage";
 import { v4 as uuidv4 } from "uuid";
 import { saveFlashcard } from "@/lib/flashcardStorage";
 import useGenerateWithAI from "@/hooks/useGenerateWithAI";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
-import { ViewerContext } from "@/components/reader/viewer/Viewer";
-import { splitChunks, splitTextsToChunk } from "@/utils/pdfTextUtils";
+import {
+  splitChunksByQuestionLimit,
+  splitTextIntoChunksBySize,
+} from "@/utils/textChunkUtils";
 
 /**
  *
  * @param numOfPages - The total number of pages in the PDF document.
- * @param type - The type of data to generate, can be "quiz", "flashcard", or "summaryQuestion".
+ * @param type - The type of data to generate, can be "quiz", "flashcard"
  * @param questionFrom - The source of the questions, can be "summary" or "pdf".
  * @param getPrompt - A function that returns a prompt string based on the amount of data to generate.
  * @param amountOfData - The total amount of data to generate.
@@ -41,7 +43,6 @@ function useGenerateData<T>({
   selectedAI: AvailableAIOptions;
 }) {
   const [range, setRange] = useState({ from: 1, to: Math.min(numOfPages, 17) });
-  const { pdfData } = useContext(ViewerContext);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [data, setData] = useState<T[]>([]);
   const [error, setError] = useState("");
@@ -73,6 +74,13 @@ function useGenerateData<T>({
       const remainingData = totalAmountOfData - generatedData.length;
       amountOfDataToGenerate = remainingData;
     }
+    console.log({
+      index,
+      amountOfDataToGenerate,
+      totalAmountOfData,
+      chunkLength: chunks.length,
+      genLength: generatedData.length,
+    });
 
     console.log(
       `📝 Generating ${amountOfDataToGenerate} data for chunk ${
@@ -107,9 +115,12 @@ function useGenerateData<T>({
     let chunks: string[] = [];
 
     if (questionFrom === "summary") {
-      chunks = selectedSummaries;
+      chunks = splitChunksByQuestionLimit(selectedSummaries, totalAmountOfData);
     } else {
-      chunks = splitChunks(splitTextsToChunk(pdfTexts), totalAmountOfData); // Break chunks if needed
+      chunks = splitChunksByQuestionLimit(
+        splitTextIntoChunksBySize(pdfTexts),
+        totalAmountOfData,
+      ); // Break chunks if needed
     }
 
     let error = "";
@@ -117,6 +128,7 @@ function useGenerateData<T>({
     for (let index = lastPDfBeforeErrorIndex; index < chunks.length; index++) {
       console.log(`⏳ Sending chunk ${index + 1}/${chunks.length}`);
       const text = chunks[index] as string;
+
       const amountOfDataToGenerate = getAmountOfDataOnEachReq(
         chunks,
         index,
@@ -140,6 +152,7 @@ function useGenerateData<T>({
 
       // If an error occurred, set the last index before the error
       if (data.error) {
+        console.log("There wasan error");
         setLastPDfBeforeErrorIndex(index);
         error = "error";
         break;
@@ -147,6 +160,7 @@ function useGenerateData<T>({
 
       //if the generation was cancelld, break the loop
       if (isCancelled.current) {
+        console.log("There wasan error");
         break;
       }
     }
@@ -158,6 +172,8 @@ function useGenerateData<T>({
       } else {
         setError(`Error generating ${type}`);
       }
+      console.log("Should redirect to another page");
+
       return;
     }
 

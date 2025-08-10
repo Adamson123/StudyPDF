@@ -8,7 +8,7 @@ import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 import { saveSummary } from "@/lib/summaryStorage";
 import { cn } from "@/lib/utils";
 import { getNumberInput } from "@/utils";
-import { splitTextsToChunk } from "@/utils/pdfTextUtils";
+import { splitTextIntoChunksBySize } from "@/utils/textChunkUtils";
 import { Stars } from "lucide-react";
 import { Dispatch, RefObject, SetStateAction, useState } from "react";
 import { v4 as uuid } from "uuid";
@@ -64,7 +64,7 @@ const GenerateSummary = ({
     });
 
     // Split the fetched texts into manageable chunks
-    const splittedTexts = splitTextsToChunk(pdfTexts);
+    const splittedTexts = splitTextIntoChunksBySize(pdfTexts);
 
     // Generate a unique ID for the summary
     const id = uuid();
