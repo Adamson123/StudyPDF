@@ -22,6 +22,7 @@ import GenerateFlashcardMenu from "../generateWithAiMenus/GenerateFlashcardMenu"
 import PDFPage from "../viewer/pdfPage";
 import debouncedHandler from "@/utils/debounceHandler";
 import GenerateMenu from "./GenerateMenu";
+import throttle from "@/utils/throttle";
 
 /**
  * @param setShowSidebar - Function to toggle the visibility of the sidebar.
@@ -87,16 +88,6 @@ const Header = ({
         behavior: "smooth",
       });
     }
-
-    // let scrollTimeoutId: NodeJS.Timeout | any = null;
-
-    // const debouncedFunc = debouncedHandler(
-    //   () => renderPDFsOnView(pdfPages),
-    //   scrollTimeoutId,
-    //   200,
-    // );
-
-    // debouncedFunc();
   };
 
   useEffect(() => {
@@ -177,26 +168,18 @@ const Header = ({
 
     let scrollTimeoutId: NodeJS.Timeout | any = null;
 
-    const debouncedFunc = debouncedHandler(
-      updatePageNumOnScroll,
-      scrollTimeoutId,
-    );
+    // const debouncedFunc = debouncedHandler(
+    //   updatePageNumOnScroll,
+    //   scrollTimeoutId,
+    //   500,
+    // );
+    const throttleFunc = throttle(updatePageNumOnScroll, 20);
 
-    // const handleScrollEnd = async () => {
-    //   onPageNumInput.current = false; // Reset flag when scrolling stop
-
-    //   clearTimeout(scrollTimeoutId); // Clear any pending scroll timeout
-    //   updatePageNumOnScroll(); // Ensure final state is rendered
-    //   await renderPDFsOnView(pdfPages);
-    //   console.log("scroll end");
-    //   alert("scroll end"); // Debugging alert, can be removed later
-    // };
-
-    window.addEventListener("scroll", debouncedFunc);
-    //  window.addEventListener("scrollend", handleScrollEnd);
+    window.addEventListener("scroll", throttleFunc);
+    window.addEventListener("scrollend", throttleFunc);
     return () => {
-      window.removeEventListener("scroll", debouncedFunc);
-      // window.removeEventListener("scrollend", handleScrollEnd);
+      window.removeEventListener("scroll", throttleFunc);
+      window.removeEventListener("scrollend", throttleFunc);
     };
   }, [pdfPages]);
 
@@ -207,6 +190,7 @@ const Header = ({
     setPdfInfo({ url: fileURL, name: file.name });
     setMessage({ text: "Loading PDF...", autoTaminate: false });
     setPageNum("1");
+    window.scrollTo(0, 0);
   };
 
   return (
