@@ -171,8 +171,8 @@ const Header = ({
         }
       }
 
-      await renderPDFsOnView(pdfPages);
       setPageNum(currentPageNum.toString());
+      await renderPDFsOnView(pdfPages);
     };
 
     let scrollTimeoutId: NodeJS.Timeout | any = null;
