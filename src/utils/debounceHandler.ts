@@ -5,6 +5,7 @@ const debouncedHandler = (
 ) => {
   const debouncedFunc = () => {
     clearTimeout(scrollTimeoutId as NodeJS.Timeout);
+
     scrollTimeoutId = setTimeout(async () => {
       await func();
     }, DEBOUNCE_DELAY);

@@ -12,6 +12,7 @@ import {
   RefObject,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import Input from "../../ui/input";
@@ -63,14 +64,15 @@ const Header = ({
   pdfPages: PDFPage[];
 }) => {
   const [pageNum, setPageNum] = useState("1");
-  const [onPageNumInput, setOnPageNumInput] = useState(false);
+  // const onPageNumInput = useRef(false);
   const [openGenerationMenu, setOpenGenerationMenu] = useState(false);
   //TODO: put into one state object
   const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
   const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
 
   const handlePageNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOnPageNumInput(true);
+    //  setOnPageNumInput(true);
+    //   onPageNumInput.current = true;
     const value = e.target.value;
 
     if (Number(value) <= numOfPages) {
@@ -86,16 +88,15 @@ const Header = ({
       });
     }
 
-    let scrollTimeoutId: NodeJS.Timeout | any = null;
+    // let scrollTimeoutId: NodeJS.Timeout | any = null;
 
-    const debouncedFunc = debouncedHandler(
-      () => renderPDFsOnView(pdfPages),
-      scrollTimeoutId,
-      200,
-    );
+    // const debouncedFunc = debouncedHandler(
+    //   () => renderPDFsOnView(pdfPages),
+    //   scrollTimeoutId,
+    //   200,
+    // );
 
-    debouncedFunc();
-    //setPageNum(value);
+    // debouncedFunc();
   };
 
   useEffect(() => {
@@ -120,7 +121,7 @@ const Header = ({
      * @see setPageNum
      */
     const updatePageNumOnScroll = async () => {
-      if (onPageNumInput) return;
+      //   if (onPageNumInput.current) return;
       const pdfsContainerElement = pdfsContainer.current as HTMLDivElement;
       if (!pdfsContainerElement) return;
       const pages = pdfsContainerElement.querySelectorAll(".pdfContainer");
@@ -181,19 +182,23 @@ const Header = ({
       scrollTimeoutId,
     );
 
-    const handleScrollEnd = () => {
-      setOnPageNumInput(false); // Reset flag when scrolling stops
-      clearTimeout(scrollTimeoutId); // Clear any pending scroll timeout
-      updatePageNumOnScroll(); // Ensure final state is rendered
-    };
+    // const handleScrollEnd = async () => {
+    //   onPageNumInput.current = false; // Reset flag when scrolling stop
+
+    //   clearTimeout(scrollTimeoutId); // Clear any pending scroll timeout
+    //   updatePageNumOnScroll(); // Ensure final state is rendered
+    //   await renderPDFsOnView(pdfPages);
+    //   console.log("scroll end");
+    //   alert("scroll end"); // Debugging alert, can be removed later
+    // };
 
     window.addEventListener("scroll", debouncedFunc);
-    window.addEventListener("scrollend", handleScrollEnd);
+    //  window.addEventListener("scrollend", handleScrollEnd);
     return () => {
       window.removeEventListener("scroll", debouncedFunc);
-      window.removeEventListener("scrollend", handleScrollEnd);
+      // window.removeEventListener("scrollend", handleScrollEnd);
     };
-  }, [onPageNumInput, pdfPages]);
+  }, [pdfPages]);
 
   const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

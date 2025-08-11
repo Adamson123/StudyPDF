@@ -12,4 +12,5 @@ COMPLETE: Join generate questions from  pdf and summary into one component
 TODO: Use react toast in the future
 COMPLETE: Show error when summary is not generated
 COMPLETE:Cancel button on data generation
+TODO: Use model name in the future instead of model provider
 -->
