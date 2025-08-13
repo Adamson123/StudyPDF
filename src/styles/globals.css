@@ -163,3 +163,10 @@ progress::-moz-progress-bar {
     @apply bg-background text-foreground;
   }
 }
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  font-size: 16px !important;
+}

@@ -8,11 +8,12 @@ import {
   LucideFileInput,
 } from "lucide-react";
 import {
+  ChangeEvent,
   Dispatch,
+  KeyboardEvent,
   RefObject,
   SetStateAction,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import Input from "../../ui/input";
@@ -22,7 +23,6 @@ import GenerateFlashcardMenu from "../generateWithAiMenus/GenerateFlashcardMenu"
 import PDFPage from "../viewer/pdfPage";
 import debouncedHandler from "@/utils/debounceHandler";
 import GenerateMenu from "./GenerateMenu";
-import throttle from "@/utils/throttle";
 
 /**
  * @param setShowSidebar - Function to toggle the visibility of the sidebar.
@@ -65,21 +65,23 @@ const Header = ({
   pdfPages: PDFPage[];
 }) => {
   const [pageNum, setPageNum] = useState("1");
-  // const onPageNumInput = useRef(false);
   const [openGenerationMenu, setOpenGenerationMenu] = useState(false);
   //TODO: put into one state object
   const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
   const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
 
-  const handlePageNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //  setOnPageNumInput(true);
-    //   onPageNumInput.current = true;
+  const handlePageNumChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
     if (Number(value) <= numOfPages) {
       setPageNum(value);
+    }
+  };
+
+  const scrollToPageNum = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
       const page = pdfsContainer.current?.querySelector(
-        `#pdfContainer-${value}`,
+        `#pdfContainer-${pageNum}`,
       ) as HTMLDivElement;
       if (!page) return;
       // Scroll to the page
@@ -164,24 +166,30 @@ const Header = ({
 
       setPageNum(currentPageNum.toString());
       await renderPDFsOnView(pdfPages);
+      //   setStartPDFRenderer(true);
+
+      // clearTimeout(pdfRenderDelayId.current);
+
+      // pdfRenderDelayId.current = setTimeout(async () => {
+      //   await renderPDFsOnView(pdfPages);
+      //   setStartPDFRenderer(false);
+      // }, 300);
     };
 
     let scrollTimeoutId: NodeJS.Timeout | any = null;
+    const debouncedFunc = debouncedHandler(
+      updatePageNumOnScroll,
+      scrollTimeoutId,
+      500,
+    );
 
-    // const debouncedFunc = debouncedHandler(
-    //   updatePageNumOnScroll,
-    //   scrollTimeoutId,
-    //   500,
-    // );
-    const throttleFunc = throttle(updatePageNumOnScroll, 20);
-
-    window.addEventListener("scroll", throttleFunc);
-    window.addEventListener("scrollend", throttleFunc);
+    window.addEventListener("scroll", debouncedFunc);
+    //    window.addEventListener("scrollend", debouncedFunc);
     return () => {
-      window.removeEventListener("scroll", throttleFunc);
-      window.removeEventListener("scrollend", throttleFunc);
+      window.removeEventListener("scroll", debouncedFunc);
+      //  window.removeEventListener("scrollend", throttleFunc);
     };
-  }, [pdfPages]);
+  }, [pdfPages, pageNum]);
 
   const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -209,6 +217,7 @@ const Header = ({
             id="page-input"
             value={pageNum}
             onChange={handlePageNumChange}
+            onKeyDown={scrollToPageNum}
             type="number"
             className="h-8 w-10 bg-gray-100/5"
           />
