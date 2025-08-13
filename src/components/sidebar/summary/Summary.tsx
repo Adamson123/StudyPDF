@@ -21,7 +21,7 @@ const Summary = ({
   error: string;
 }) => {
   return (
-    <div className="flex flex-col items-center gap-4 px-2">
+    <div className="flex flex-col items-center gap-4 px-2 pb-10">
       {/* Create Summary */}
       {/* Summaries */}
       <div className="flex flex-col gap-5">

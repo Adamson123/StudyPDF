@@ -166,7 +166,6 @@ progress::-moz-progress-bar {
 
 input:focus,
 textarea:focus,
-select:focus,
-button:focus {
+select:focus {
   font-size: 16px !important;
 }
