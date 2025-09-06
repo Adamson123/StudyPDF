@@ -162,8 +162,11 @@ const Header = ({
         } else {
           currentPageNum = secondPage.index;
         }
+
+        
       }
 
+            setPageNum(currentPageNum.toString());
       
       //   setStartPDFRenderer(true);
 
@@ -173,10 +176,10 @@ const Header = ({
       //   await renderPDFsOnView(pdfPages);
       //   setStartPDFRenderer(false);
       // }, 300);
+      
     };
 
     const renderPDFs = async() =>{
-      setPageNum(currentPageNum.toString());
       await renderPDFsOnView(pdfPages);
     }
 
