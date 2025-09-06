@@ -164,8 +164,7 @@ const Header = ({
         }
       }
 
-      setPageNum(currentPageNum.toString());
-      await renderPDFsOnView(pdfPages);
+      
       //   setStartPDFRenderer(true);
 
       // clearTimeout(pdfRenderDelayId.current);
@@ -176,17 +175,30 @@ const Header = ({
       // }, 300);
     };
 
+    const renderPDFs = async() =>{
+      setPageNum(currentPageNum.toString());
+      await renderPDFsOnView(pdfPages);
+    }
+
     let scrollTimeoutId: NodeJS.Timeout | any = null;
-    const debouncedFunc = debouncedHandler(
-      updatePageNumOnScroll,
+    const renderPDFsOnDebounce = debouncedHandler(
+      renderPDFs,
       scrollTimeoutId,
       500,
     );
 
-    window.addEventListener("scroll", debouncedFunc);
+    const onScroll = () =>{
+      //TODO: update page num on debounce too
+       updatePageNumOnScroll()
+       renderPDFsOnDebounce()
+    }
+
+    
+
+    window.addEventListener("scroll", onScroll);
     //    window.addEventListener("scrollend", debouncedFunc);
     return () => {
-      window.removeEventListener("scroll", debouncedFunc);
+      window.removeEventListener("scroll", onScroll);
       //  window.removeEventListener("scrollend", throttleFunc);
     };
   }, [pdfPages, pageNum]);
