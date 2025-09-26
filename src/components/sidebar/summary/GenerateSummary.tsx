@@ -56,7 +56,6 @@ const GenerateSummary = ({
     const [selectedAI, setSelectedAI] = useState<AvailableAIOptions>("gemini");
 
     const generateSummary = async () => {
-        console.log({ selectedAI });
         // Close the popup and reset the summary state
         setOpenGenerateSummary(false);
         setSummary({ title: "", content: "" });
