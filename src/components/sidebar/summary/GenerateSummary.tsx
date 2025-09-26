@@ -31,13 +31,13 @@ const GenerateSummary = ({
     setIsGenerating: Dispatch<SetStateAction<boolean>>;
     setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
     isGenerating: boolean;
-    generateDataWithAI: (args: {
+    generateDataWithAI: (param: {
         text: string;
         prompt: string;
-        expect: string;
+        expect: "stringResponse" | "objectResponse";
         arrayLength: number;
         index: number;
-        selectedAI: AvailableAIOptions;
+        selectedAI?: AvailableAIOptions;
     }) => Promise<any>;
     setError: Dispatch<SetStateAction<string>>;
     isCancelled: RefObject<boolean>;
@@ -56,6 +56,7 @@ const GenerateSummary = ({
     const [selectedAI, setSelectedAI] = useState<AvailableAIOptions>("gemini");
 
     const generateSummary = async () => {
+        console.log({ selectedAI });
         // Close the popup and reset the summary state
         setOpenGenerateSummary(false);
         setSummary({ title: "", content: "" });
