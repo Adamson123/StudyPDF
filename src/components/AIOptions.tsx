@@ -56,7 +56,7 @@ const AIOptions = ({
       >
         {aiOptions.map((option, i) => (
           <li
-            className="flex cursor-pointer items-center gap-1 border-b border-gray-500 px-3 py-2 text-sm"
+            className=`flex cursor-pointer items-center gap-1 border-gray-500 px-3 py-2 text-sm ${i < aiOptions.length - 1 && "borber-b"}`
             key={i}
             onClick={() => onOptionChange(option)}
           >
