@@ -47,16 +47,24 @@ const AIOptions = ({
           />
         </div>
         <ChevronDown
-          className={`h-5 w-5 transition-transform duration-200 ${openOptions ? "rotate-180" : "rotate-0"}`}
+          className={`h-5 w-5 transition-transform duration-200 ${
+            openOptions ? "rotate-180" : "rotate-0"
+          }`}
         />
       </div>
 
       <ul
-        className={`absolute left-0 top-[42px] w-full bg-input transition-all duration-200 ${openOptions ? "max-h-24 overflow-y-auto" : "pointer-events-none max-h-0 overflow-hidden"}`}
+        className={`absolute left-0 top-[42px] w-full bg-input transition-all duration-200 ${
+          openOptions
+            ? "max-h-24 overflow-y-auto"
+            : "pointer-events-none max-h-0 overflow-hidden"
+        }`}
       >
         {aiOptions.map((option, i) => (
           <li
-            className=`flex cursor-pointer items-center gap-1 border-gray-500 px-3 py-2 text-sm ${i < aiOptions.length - 1 && "borber-b"}`
+            className={`flex cursor-pointer items-center gap-1 border-gray-500 px-3 py-2 text-sm ${
+              i < aiOptions.length - 1 ? "border-b" : ""
+            }`}
             key={i}
             onClick={() => onOptionChange(option)}
           >
