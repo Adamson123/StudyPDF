@@ -13,8 +13,12 @@ export type DataTransferSelectionType = {
 
 const DataTransferMenu = ({
     setOpenDataTransferSelection,
+    setOpenDataTransferMenu
 }: {
     setOpenDataTransferSelection: Dispatch<
+        SetStateAction<DataTransferSelectionType>
+    >;
+    setOpenDataTransferMenu: Dispatch<
         SetStateAction<DataTransferSelectionType>
     >;
 }) => {
@@ -70,7 +74,9 @@ const DataTransferMenu = ({
     };
 
     return (
-        <div className="absolute -right-[80px] top-8 z-10 flex flex-col items-start justify-center gap-3 rounded border border-gray-border bg-background p-3 text-sm shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
+        <div 
+            onClick={()=>setOpenDataTransferMenu(true)}
+            className="absolute -right-[80px] top-8 z-10 flex flex-col items-start justify-center gap-3 rounded border border-gray-border bg-background p-3 text-sm shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
             {/* Transfers */}
             {["Quizzes", "Flashcards", "Summaries"].map((item) => (
                 <div
