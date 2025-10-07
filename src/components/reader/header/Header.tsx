@@ -178,6 +178,7 @@ const Header = ({
 
                 {/* Data transfer */}
                 <div
+                    onBlur={() => setOpenDataTransferMenu(false)}
 onClick={() => setOpenDataTransferMenu(true)
                     }
                     tabIndex={0}
