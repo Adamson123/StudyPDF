@@ -191,6 +191,9 @@ const Header = ({
                             setOpenDataTransferSelection={
                                 setOpenDataTransferSelection
                             }
+                            setOpenDataTransferMenu={
+                                setOpenDataTransferMenu
+                            }
                         />
                     )}
                 </div>
