@@ -178,10 +178,7 @@ const Header = ({
 
                 {/* Data transfer */}
                 <div
-                    onBlur={() => setOpenDataTransferMenu(false)}
-                    onClick={() =>
-                        setOpenDataTransferMenu(!openDataTransferMenu)
-                    }
+
                     tabIndex={0}
                     className="relative cursor-pointer"
                 >
