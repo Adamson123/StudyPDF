@@ -19,7 +19,7 @@ const DataTransferMenu = ({
         SetStateAction<DataTransferSelectionType>
     >;
     setOpenDataTransferMenu: Dispatch<
-        SetStateAction<DataTransferSelectionType>
+        SetStateAction<boolean>
     >;
 }) => {
     const fileInputRef = useRef<HTMLInputElement & { dataType: string }>(null);
