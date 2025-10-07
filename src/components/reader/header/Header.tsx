@@ -6,6 +6,7 @@ import {
     ChevronsRight,
     Stars,
     LucideFileInput,
+    Upload,
 } from "lucide-react";
 import {
     ChangeEvent,
@@ -17,12 +18,17 @@ import {
     useState,
 } from "react";
 import Input from "../../ui/input";
-import { MessageType } from "../viewer/anotation/comment/Message";
-import GenerateQuestionMenu from "../generateWithAiMenus/GenerateQuestionMenu";
-import GenerateFlashcardMenu from "../generateWithAiMenus/GenerateFlashcardMenu";
+import { MessageType } from "../../ui/Message";
+import GenerateQuestionMenu from "../generateStudyMaterials/GenerateQuestionMenu";
+import GenerateFlashcardMenu from "../generateStudyMaterials/GenerateFlashcardMenu";
 import PDFPage from "../viewer/pdfPage";
 import debouncedHandler from "@/utils/debounceHandler";
-import GenerateMenu from "./GenerateMenu";
+import GenerateStudyMaterialsMenu from "../generateStudyMaterials/GenerateStudyMaterialsMenu";
+import useUpdateOnScroll from "./hooks/useUpdateOnScroll";
+import DataTransferMenu, {
+    DataTransferSelectionType,
+} from "../dataTransfer/DataTransferMenu";
+import DataTransferSelection from "../dataTransfer/DataTransferSelection";
 
 /**
  * @param setShowSidebar - Function to toggle the visibility of the sidebar.
@@ -65,10 +71,16 @@ const Header = ({
     pdfPages: PDFPage[];
 }) => {
     const [pageNum, setPageNum] = useState("1");
+    //TODO:Rename
     const [openGenerationMenu, setOpenGenerationMenu] = useState(false);
+
+    const [openDataTransferMenu, setOpenDataTransferMenu] = useState(false);
+
     //TODO: put into one state object
     const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
     const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
+    const [openDataTransferSelection, setOpenDataTransferSelection] =
+        useState<DataTransferSelectionType>(null);
 
     const handlePageNumChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -92,107 +104,14 @@ const Header = ({
         }
     };
 
-    useEffect(() => {
-        /**
-         * Updates the current page number based on the user's scroll position.
-         *
-         * This function calculates which PDF page is currently in view by checking the
-         * position of each page relative to the viewport. If multiple pages are partially
-         * visible, it determines the page with the larger visible portion and sets it as
-         * the current page.
-         *
-         * @async
-         * @returns {Promise<void>} Resolves when the page number is updated and PDFs in view are rendered.
-         *
-         * @remarks
-         * - If `onPageNumInput` is true, the function exits early without performing any updates.
-         * - The function assumes that each page is represented by an element with the class `pdfContainer`.
-         * - The `pdfsContainer` ref must point to a valid HTMLDivElement containing the PDF pages.
-         *
-         * @see renderPDFsOnView
-         * @see setPageNum
-         */
-        const updatePageNumOnScroll = async () => {
-            //   if (onPageNumInput.current) return;
-            const pdfsContainerElement =
-                pdfsContainer.current as HTMLDivElement;
-            if (!pdfsContainerElement) return;
-            const pages =
-                pdfsContainerElement.querySelectorAll(".pdfContainer");
-            if (!pages.length) return;
-
-            let currentPageNum = 1;
-
-            interface PagePos {
-                index: number;
-                top: number;
-                bottom: number;
-            }
-
-            const pagePos: PagePos[] = [];
-
-            for (let index = 0; index < pages.length; index++) {
-                const page = pages[index] as HTMLDivElement;
-                const rect = page.getBoundingClientRect();
-
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                    currentPageNum = index + 1;
-
-                    pagePos.push({
-                        index: currentPageNum,
-                        bottom: rect.bottom,
-                        top: rect.top,
-                    });
-
-                    //  break;
-                }
-                if (pagePos.length >= 2) {
-                    break;
-                }
-            }
-
-            if (pagePos.length > 1) {
-                const firstPage = pagePos[0] as PagePos;
-                const secondPage = pagePos[1] as PagePos;
-
-                const remainOfFirstInView = firstPage.bottom;
-                const remainOfSecondInView =
-                    window.innerHeight - secondPage.top;
-
-                if (remainOfFirstInView > remainOfSecondInView) {
-                    currentPageNum = firstPage.index;
-                } else {
-                    currentPageNum = secondPage.index;
-                }
-            }
-
-            setPageNum(currentPageNum.toString());
-        };
-
-        const renderPDFs = async () => {
-            await renderPDFsOnView(pdfPages);
-        };
-
-        let scrollTimeoutId: NodeJS.Timeout | any = null;
-        const renderPDFsOnDebounce = debouncedHandler(
-            renderPDFs,
-            scrollTimeoutId,
-            500,
-        );
-
-        const onScroll = () => {
-            //TODO: update page num on debounce too
-            updatePageNumOnScroll();
-            renderPDFsOnDebounce();
-        };
-
-        window.addEventListener("scroll", onScroll);
-        //    window.addEventListener("scrollend", debouncedFunc);
-        return () => {
-            window.removeEventListener("scroll", onScroll);
-            //  window.removeEventListener("scrollend", throttleFunc);
-        };
-    }, [pdfPages, pageNum]);
+    useUpdateOnScroll({
+        debouncedHandler,
+        pageNum,
+        pdfPages,
+        pdfsContainer,
+        renderPDFsOnView,
+        setPageNum,
+    });
 
     const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -245,8 +164,9 @@ const Header = ({
             </div>
             {/* Right section */}
             <div className="flex items-center gap-[15px]">
+                {/* Upload file */}
                 <div className="relative flex h-[17px] w-[17px] cursor-pointer items-center justify-center">
-                    <LucideFileInput className="pointer-events-none absolute inset-0 h-full w-full cursor-pointer" />
+                    <LucideFileInput className="pointer-events-none absolute inset-0 h-full w-full" />
                     <Input
                         onChange={handlePdfSelection}
                         type="file"
@@ -255,16 +175,36 @@ const Header = ({
                         id="pdf-file-input"
                     />
                 </div>
-                {/* generateMenu */}
+
+                {/* Data transfer */}
+                <div
+                    onBlur={() => setOpenDataTransferMenu(false)}
+                    onClick={() =>
+                        setOpenDataTransferMenu(!openDataTransferMenu)
+                    }
+                    tabIndex={0}
+                    className="relative cursor-pointer"
+                >
+                    <Upload className="h-[18px] w-[18px]" />
+                    {openDataTransferMenu && (
+                        <DataTransferMenu
+                            setOpenDataTransferSelection={
+                                setOpenDataTransferSelection
+                            }
+                        />
+                    )}
+                </div>
+
+                {/* Generate Study Materials Menu */}
                 <div
                     onBlur={() => setOpenGenerationMenu(false)}
                     onClick={() => setOpenGenerationMenu(!openGenerationMenu)}
                     tabIndex={0}
                     className="relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
                 >
-                    <Stars className="h-[18px] w-[18px] cursor-pointer" />
+                    <Stars className="h-[18px] w-[18px]" />
                     {openGenerationMenu && (
-                        <GenerateMenu
+                        <GenerateStudyMaterialsMenu
                             setOpenQuestionMenu={setOpenQuestionMenu}
                             setOpenFlashCardMenu={setOpenFlashCardMenu}
                         />
@@ -273,18 +213,32 @@ const Header = ({
 
                 <ChevronsRight className="h-6 w-6" />
             </div>
-            {openQuestionMenu && (
-                <GenerateQuestionMenu
-                    setOpenQuestionMenu={setOpenQuestionMenu}
-                    numOfPages={numOfPages}
-                />
-            )}
-            {openFlashCardMenu && (
-                <GenerateFlashcardMenu
-                    setOpenFlashCardMenu={setOpenFlashCardMenu}
-                    numOfPages={numOfPages}
-                />
-            )}
+            {/* Study Materials Generation */}
+            <>
+                {openQuestionMenu && (
+                    <GenerateQuestionMenu
+                        setOpenQuestionMenu={setOpenQuestionMenu}
+                        numOfPages={numOfPages}
+                    />
+                )}
+                {openFlashCardMenu && (
+                    <GenerateFlashcardMenu
+                        setOpenFlashCardMenu={setOpenFlashCardMenu}
+                        numOfPages={numOfPages}
+                    />
+                )}
+            </>
+            {/* Study Materials Data Transfer selection  */}
+            <>
+                {openDataTransferSelection && (
+                    <DataTransferSelection
+                        setOpenDataTransferSelection={
+                            setOpenDataTransferSelection
+                        }
+                        openDataTransferSelection={openDataTransferSelection}
+                    />
+                )}
+            </>
         </header>
     );
 };

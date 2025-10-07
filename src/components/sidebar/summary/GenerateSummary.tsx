@@ -4,7 +4,6 @@ import Input from "@/components/ui/input";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import XButton from "@/components/ui/XButton";
 import { getSummaryPrompt } from "@/data/prompts/summaryPrompts";
-import useGenerateData from "@/hooks/useGenerateData";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 import { saveSummary } from "@/lib/summaryStorage";
 import { cn } from "@/lib/utils";

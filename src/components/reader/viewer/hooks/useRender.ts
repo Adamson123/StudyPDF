@@ -5,8 +5,8 @@ import {
     useEffect,
     useState,
 } from "react";
-import PDFPage from "../components/reader/viewer/pdfPage";
-import { getPDFDocument } from "../components/reader/viewer/utils";
+import PDFPage from "../pdfPage";
+import { getPDFDocument } from "../utils";
 
 /**
  * Custom hook to render PDF pages in a container.
@@ -49,6 +49,7 @@ function useRender({
             rect: DOMRect;
             index: number;
         }[] = [];
+
         for (let i = 0; i < currentPdfPages.length; i++) {
             const pageInstance = currentPdfPages[i]!;
             const pageElement = pdfsContainerElement.querySelector(
