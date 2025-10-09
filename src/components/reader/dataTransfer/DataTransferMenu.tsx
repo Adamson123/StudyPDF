@@ -13,17 +13,14 @@ export type DataTransferSelectionType = {
 
 const DataTransferMenu = ({
     setOpenDataTransferSelection,
-    setOpenDataTransferMenu
+    //   setOpenDataTransferMenu,
 }: {
     setOpenDataTransferSelection: Dispatch<
         SetStateAction<DataTransferSelectionType>
     >;
-    setOpenDataTransferMenu: Dispatch<
-        SetStateAction<boolean>
-    >;
+    setOpenDataTransferMenu: Dispatch<SetStateAction<boolean>>;
 }) => {
     const fileInputRef = useRef<HTMLInputElement & { dataType: string }>(null);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -31,7 +28,6 @@ const DataTransferMenu = ({
     ) => {
         const file = event.target.files?.[0];
         if (file) {
-            setSelectedFile(file);
             // You can add further processing of the file here
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -44,7 +40,7 @@ const DataTransferMenu = ({
                     transferMethod: "import",
                 });
                 event.target.value = ""; // Reset the input so the same file can be selected again if needed
-                setSelectedFile(null);
+                //  setOpenDataTransferMenu(false);
             };
             reader.readAsText(file);
         }
@@ -71,15 +67,11 @@ const DataTransferMenu = ({
             data,
             transferMethod: "download",
         });
+        // setOpenDataTransferMenu(false);
     };
 
     return (
-        <div 
-            onClick={(e)=>{
-                e.stopImmediatePropagation();
-                setOpenDataTransferMenu(true)
-            }}
-            className="absolute -right-[80px] top-8 z-10 flex flex-col items-start justify-center gap-3 rounded border border-gray-border bg-background p-3 text-sm shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
+        <div className="absolute -right-[80px] top-10 z-10 flex flex-col items-start justify-center gap-3 rounded border border-gray-border bg-background p-3 text-sm shadow-[0px_4px_3px_rgba(0,0,0,0.3)]">
             {/* Transfers */}
             {["Quizzes", "Flashcards", "Summaries"].map((item) => (
                 <div
@@ -90,7 +82,9 @@ const DataTransferMenu = ({
                     <div className="flex gap-2">
                         <Button
                             className="h-8 text-xs"
-                            onClick={() => handleDownload(item)}
+                            onClick={() => {
+                                handleDownload(item);
+                            }}
                         >
                             Download <Download />{" "}
                         </Button>

@@ -15,6 +15,7 @@ import {
     RefObject,
     SetStateAction,
     useEffect,
+    useRef,
     useState,
 } from "react";
 import Input from "../../ui/input";
@@ -71,9 +72,9 @@ const Header = ({
     pdfPages: PDFPage[];
 }) => {
     const [pageNum, setPageNum] = useState("1");
-    //TODO:Rename
-    const [openGenerationMenu, setOpenGenerationMenu] = useState(false);
 
+    const [openGenerateStudyMaterialsMenu, setOpenGenerateStudyMaterialsMenu] =
+        useState(false);
     const [openDataTransferMenu, setOpenDataTransferMenu] = useState(false);
 
     //TODO: put into one state object
@@ -81,6 +82,7 @@ const Header = ({
     const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
     const [openDataTransferSelection, setOpenDataTransferSelection] =
         useState<DataTransferSelectionType>(null);
+    const dataTransferMenuRef = useRef<HTMLDivElement>(null);
 
     const handlePageNumChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -112,6 +114,26 @@ const Header = ({
         renderPDFsOnView,
         setPageNum,
     });
+
+    // useEffect(() => {
+    //     const handleKeyDown = () => {
+    //         setOpenDataTransferMenu(false);
+    //     };
+    //     document.body.addEventListener("click", handleKeyDown);
+
+    //     return () => document.body.removeEventListener("click", handleKeyDown);
+    // }, []);
+
+    useEffect(() => {
+        const handleOutside = (e: MouseEvent) => {
+            // only close if click is truly outside (no stopPropagation needed if you check containment)
+            if (!dataTransferMenuRef.current?.contains(e.target as Node)) {
+                setOpenDataTransferMenu(false);
+            }
+        };
+        document.addEventListener("click", handleOutside);
+        return () => document.removeEventListener("click", handleOutside);
+    }, []);
 
     const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -178,34 +200,43 @@ const Header = ({
 
                 {/* Data transfer */}
                 <div
-                    onBlur={() => setOpenDataTransferMenu(false)}
-onClick={() => setOpenDataTransferMenu(true)
-                    }
+                    ref={dataTransferMenuRef}
+                    onClick={(e) => {
+                        setOpenDataTransferMenu((prev) => !prev);
+                    }}
                     tabIndex={0}
-                    className="relative cursor-pointer"
+                    className="relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
                 >
-                    <Upload className="h-[18px] w-[18px]" />
+                    <Upload
+                        // onClick={(e) => {
+                        //     e.stopPropagation();
+                        // }}
+                        className="h-[18px] w-[18px]"
+                    />
+                    {/* Will using class hidden instead of not rendering the component at all, as not rendering the component at all causes the pop up not to appear */}
                     {openDataTransferMenu && (
                         <DataTransferMenu
                             setOpenDataTransferSelection={
                                 setOpenDataTransferSelection
                             }
-                            setOpenDataTransferMenu={
-                                setOpenDataTransferMenu
-                            }
+                            setOpenDataTransferMenu={setOpenDataTransferMenu}
                         />
                     )}
                 </div>
 
                 {/* Generate Study Materials Menu */}
                 <div
-                    onBlur={() => setOpenGenerationMenu(false)}
-                    onClick={() => setOpenGenerationMenu(!openGenerationMenu)}
+                    onBlur={() => setOpenGenerateStudyMaterialsMenu(false)}
+                    onClick={() =>
+                        setOpenGenerateStudyMaterialsMenu(
+                            !openGenerateStudyMaterialsMenu,
+                        )
+                    }
                     tabIndex={0}
                     className="relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
                 >
                     <Stars className="h-[18px] w-[18px]" />
-                    {openGenerationMenu && (
+                    {openGenerateStudyMaterialsMenu && (
                         <GenerateStudyMaterialsMenu
                             setOpenQuestionMenu={setOpenQuestionMenu}
                             setOpenFlashCardMenu={setOpenFlashCardMenu}
