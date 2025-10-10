@@ -216,7 +216,7 @@ const DataTransferSelection = ({
                     </div>
                 ) : (
                     <NoItemsFound
-                        text={`No ${openDataTransferSelection?.transferMethod.toLocaleLowerCase()} found to export.`}
+                        text={`No ${openDataTransferSelection?.type.toLocaleLowerCase()} found to ${openDataTransferSelection?.transferMethod}.`}
                     />
                 )}
                 {/* Generate Button */}
