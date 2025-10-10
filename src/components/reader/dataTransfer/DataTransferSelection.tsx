@@ -64,6 +64,9 @@ const DataTransferSelection = ({
         setOpenDataTransferSelection(null);
 
         URL.revokeObjectURL(downloadUrl);
+        alert(
+            `${itemsToDownload.length} ${openDataTransferSelection.type.toLocaleLowerCase()} downloaded successfully!`,
+        );
     };
 
     const validateItemsToImport = (items: any[]) => {
@@ -77,13 +80,18 @@ const DataTransferSelection = ({
                         item.id &&
                         item.questions &&
                         Array.isArray(item.questions) &&
-                        item.questions?.every(
-                            (q: any) =>
+                        item.questions?.every((q: any) => {
+                            let isMultipleChoiceValid = true;
+                            if (q.type === "multichoice") {
+                                isMultipleChoiceValid =
+                                    q.options && Array.isArray(q.options);
+                            }
+                            return (
+                                isMultipleChoiceValid &&
                                 q.question &&
-                                q.options &&
-                                Array.isArray(q.options) &&
-                                typeof q.answer !== "undefined",
-                        ),
+                                typeof q.answer !== "undefined"
+                            );
+                        }),
                 );
             case "Flashcards":
                 return items.every(
@@ -132,6 +140,9 @@ const DataTransferSelection = ({
 
         setOpenDataTransferSelection(null);
         //TODO: A toast after this
+        alert(
+            `${itemsToImport.length} ${openDataTransferSelection.type.toLocaleLowerCase()} imported successfully!`,
+        );
     };
 
     const handleSelectAll = () => {

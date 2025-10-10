@@ -16,7 +16,7 @@ const quizzesSlice = createSlice({
             const newOnes = action.payload.filter(
                 (q) => !state.items.find((x) => x.id === q.id),
             );
-            state.items = [...state.items, ...newOnes];
+            state.items = [...newOnes, ...state.items];
         },
         addOneSetOfQuizzes(state, action: PayloadAction<StoredQuiz>) {
             const exists = state.items.find((q) => q.id === action.payload.id);

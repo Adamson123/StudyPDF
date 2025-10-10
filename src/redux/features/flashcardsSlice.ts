@@ -34,7 +34,7 @@ const flashcardsSlice = createSlice({
             const newFlashcards = action.payload.filter(
                 (f) => !state.items.find((f2) => f2.id === f.id),
             );
-            state.items = [...state.items, ...newFlashcards];
+            state.items = [...newFlashcards, ...state.items];
         },
         updateOneSetOfFlashcards(
             state,
