@@ -23,10 +23,7 @@ const DataTransferMenu = ({
     const flashcards = useAppSelector((state) => state.flashcards.items);
     const quizzes = useAppSelector((state) => state.quizzes.items);
 
-    const handleFileChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        //  type: string,
-    ) => {
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             // You can add further processing of the file here
@@ -45,8 +42,6 @@ const DataTransferMenu = ({
             reader.readAsText(file);
         }
     };
-
-    //  const handleImport = (type: string) => {};
 
     const handleDownload = (type: string) => {
         let data: any[] = [];

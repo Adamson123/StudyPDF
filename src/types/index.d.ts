@@ -63,3 +63,11 @@ type AIOption = {
     name: string;
     image: string;
 };
+
+// type StudyMaterialTypes<T> = T extends "Quizzes"
+//     ? QuizTypes
+//     : T extends "Flashcards"
+//       ? FlashcardTypes
+//       : T extends "Summaries"
+//         ? SummaryTypes
+//         : never;
