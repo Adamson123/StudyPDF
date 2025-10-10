@@ -7,6 +7,53 @@ import QuestionsPreview from "./QuestionsPreview";
 import { Play } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useAppSelector } from "@/hooks/useAppStore";
+import { shuffleArray } from "@/utils/shuffle";
+
+const randomizeOptions = (quizzes?: QuizTypes[]) => {
+    /**
+     * How this function randomizes the options of multiple-choice questions
+     * 0. It first finds the correct answer option before shuffling.
+     * 1. It iterates through each question in the quiz data.
+     * 2. For each multiple-choice question, it shuffles the options randomly.
+     * 3. It then finds the new index of the correct answer after shuffling.
+     * 4. Finally, it updates the question with the shuffled options and the new correct answer letter.
+     */
+
+    if (!quizzes || !quizzes.length) return [];
+
+    return quizzes.map((q) => {
+        if (q.type !== "multiChoice") return q;
+
+        const multiChoiceQuestion = structuredClone(
+            q,
+        ) as MultiChoiceQuestionTypes;
+
+        // Get index of the current answer letter
+        const optionLetters = ["A", "B", "C", "D"];
+        const answerLetterIndex = optionLetters.indexOf(
+            multiChoiceQuestion.answer,
+        );
+        const correctOption = multiChoiceQuestion.options[answerLetterIndex];
+
+        const shuffledOptions = shuffleArray(multiChoiceQuestion.options);
+        // shuffleArrayPosition(
+        //     multiChoiceQuestion.options,
+        //     answerLetterIndex,
+        // );
+
+        // Find the new index of the correct option after shuffling
+        const newAnswerOptionIndex = shuffledOptions.indexOf(
+            correctOption as string,
+        );
+        const newAnswerLetter = optionLetters[newAnswerOptionIndex];
+
+        return {
+            ...q,
+            options: shuffledOptions,
+            answer: newAnswerLetter,
+        };
+    });
+};
 
 const Quiz = () => {
     const { id } = useParams() as { id: string };
@@ -15,7 +62,9 @@ const Quiz = () => {
         state.quizzes.items.find((q) => q.id === id),
     );
     const title = quizzesData?.title || "";
-    const [questions, setQuestions] = useState(quizzesData?.questions || []);
+    const [questions, setQuestions] = useState(
+        randomizeOptions(quizzesData?.questions) as QuizTypes[],
+    );
 
     useEffect(() => {
         const warnOnPageReload = (event: BeforeUnloadEvent) => {
