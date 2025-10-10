@@ -115,15 +115,6 @@ const Header = ({
         setPageNum,
     });
 
-    // useEffect(() => {
-    //     const handleKeyDown = () => {
-    //         setOpenDataTransferMenu(false);
-    //     };
-    //     document.body.addEventListener("click", handleKeyDown);
-
-    //     return () => document.body.removeEventListener("click", handleKeyDown);
-    // }, []);
-
     useEffect(() => {
         const handleOutside = (e: MouseEvent) => {
             // only close if click is truly outside (no stopPropagation needed if you check containment)
@@ -185,9 +176,9 @@ const Header = ({
                 </button>
             </div>
             {/* Right section */}
-            <div className="flex items-center gap-[15px]">
+            <div className="flex items-center gap-[8px]">
                 {/* Upload file */}
-                <div className="relative flex h-[17px] w-[17px] cursor-pointer items-center justify-center">
+                <div className="relative flex h-[18px] w-[18px] cursor-pointer items-center justify-center">
                     <LucideFileInput className="pointer-events-none absolute inset-0 h-full w-full" />
                     <Input
                         onChange={handlePdfSelection}
@@ -207,12 +198,7 @@ const Header = ({
                     tabIndex={0}
                     className="relative flex h-8 w-9 cursor-pointer items-center justify-center rounded border border-gray-border bg-gray-border"
                 >
-                    <Upload
-                        // onClick={(e) => {
-                        //     e.stopPropagation();
-                        // }}
-                        className="h-[18px] w-[18px]"
-                    />
+                    <Upload className="h-[18px] w-[18px]" />
                     {/* Will using class hidden instead of not rendering the component at all, as not rendering the component at all causes the pop up not to appear */}
                     {openDataTransferMenu && (
                         <DataTransferMenu
