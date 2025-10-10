@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveQuiz } from "@/lib/quizStorage";
 import { v4 as uuidv4 } from "uuid";
-import { saveFlashcard } from "@/lib/flashcardStorage";
 import useGenerateWithAI from "@/hooks/useGenerateWithAI";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
 import {
     splitChunksByQuestionLimit,
     splitTextIntoChunksBySize,
 } from "@/utils/textChunkUtils";
+import { useDispatch } from "react-redux";
+import { addOneSetOfFlashcards } from "@/redux/features/flashcardsSlice";
+import { addOneSetOfQuizzes } from "@/redux/features/quizzesSlice";
 
 /**
  *
@@ -59,8 +60,8 @@ function useGenerateData<T>({
     const { getPDFTexts } = useGetPDFTexts();
     const [lastPDfBeforeErrorIndex, setLastPDfBeforeErrorIndex] =
         useState<number>(0);
+    const dispatch = useDispatch();
 
-    //
     const getAmountOfDataOnEachReq = (
         chunks: string[],
         index: number,
@@ -80,13 +81,7 @@ function useGenerateData<T>({
             const remainingData = totalAmountOfData - generatedData.length;
             amountOfDataToGenerate = remainingData;
         }
-        console.log({
-            index,
-            amountOfDataToGenerate,
-            totalAmountOfData,
-            chunkLength: chunks.length,
-            genLength: generatedData.length,
-        });
+       
 
         console.log(
             `📝 Generating ${amountOfDataToGenerate} data for chunk ${
@@ -104,10 +99,10 @@ function useGenerateData<T>({
 
         setRange({ from: 1, to: numOfPages });
         if (type === "quiz" || questionFrom === "summary") {
-            saveQuiz({ id, title, questionsToSave: data as any });
+            dispatch(addOneSetOfQuizzes({ id, title, questions: data as any }));
             router.push(`/quiz/${id}`);
         } else {
-            saveFlashcard({ id, title, cardsToSave: data as any });
+            dispatch(addOneSetOfFlashcards({ id, title, cards: data as any }));
             router.push(`/flashcard/${id}`);
         }
     };
@@ -120,20 +115,24 @@ function useGenerateData<T>({
         //TODO: IMprove Here
         let chunks: string[] = [];
 
+        // Decide how to split the text based on the question source
         if (questionFrom === "summary") {
+            // Use provided summaries as chunks
             chunks = splitChunksByQuestionLimit(
                 selectedSummaries,
                 totalAmountOfData,
             );
         } else {
+            // Split PDF text into chunks based on size
             chunks = splitChunksByQuestionLimit(
                 splitTextIntoChunksBySize(pdfTexts),
                 totalAmountOfData,
-            ); // Break chunks if needed
+            );
         }
 
         let error = "";
 
+        // Loop through each chunk and generate data
         for (
             let index = lastPDfBeforeErrorIndex;
             index < chunks.length;

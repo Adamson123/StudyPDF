@@ -4,9 +4,14 @@ import Input from "@/components/ui/input";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import XButton from "@/components/ui/XButton";
 import { getSummaryPrompt } from "@/data/prompts/summaryPrompts";
+import { useAppDispatch, useAppSelector } from "@/hooks/useAppStore";
 import useGetPDFTexts from "@/hooks/useGetPDFTexts";
-import { saveSummary } from "@/lib/summaryStorage";
+//import { saveSummary } from "@/lib/summaryStorage";
 import { cn } from "@/lib/utils";
+import {
+    addOneSummary,
+    updateOneSummary,
+} from "@/redux/features/summariesSlice";
 import { getNumberInput } from "@/utils";
 import { splitTextIntoChunksBySize } from "@/utils/textChunkUtils";
 import { Stars } from "lucide-react";
@@ -15,20 +20,15 @@ import { v4 as uuid } from "uuid";
 
 const GenerateSummary = ({
     setOpenGenerateSummary,
-    setSummary,
-    summary,
     setIsGenerating,
-    setSummaries,
     isGenerating,
     generateDataWithAI,
     setError,
     isCancelled,
 }: {
     setOpenGenerateSummary: Dispatch<SetStateAction<boolean>>;
-    setSummary: Dispatch<SetStateAction<{ title: string; content: string }>>;
-    summary: { title: string; content: string };
     setIsGenerating: Dispatch<SetStateAction<boolean>>;
-    setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
+    // setSummaries: Dispatch<SetStateAction<SummaryTypes[]>>;
     isGenerating: boolean;
     generateDataWithAI: (param: {
         text: string;
@@ -41,7 +41,6 @@ const GenerateSummary = ({
     setError: Dispatch<SetStateAction<string>>;
     isCancelled: RefObject<boolean>;
 }) => {
-    //  const { generateDataWithAI } = useGenerateWithAI();
     const {
         getPDFTexts,
         pdfData: { numOfPages },
@@ -53,11 +52,12 @@ const GenerateSummary = ({
     });
     const [userPrompt, setUserPrompt] = useState("");
     const [selectedAI, setSelectedAI] = useState<AvailableAIOptions>("gemini");
+    const dispatch = useAppDispatch();
+    const summaries = useAppSelector((state) => state.summaries.items);
 
     const generateSummary = async () => {
         // Close the popup and reset the summary state
         setOpenGenerateSummary(false);
-        setSummary({ title: "", content: "" });
         setIsGenerating(true);
         setError("");
 
@@ -77,8 +77,11 @@ const GenerateSummary = ({
         for (let index = 0; index < splittedTexts.length; index++) {
             const text = splittedTexts[index] as string;
 
+            const existingSummary = summaries.find((s) => s.id === id);
+
             // Get the last 1000 characters of the current summary content
-            const recentSummarySlice = summary.content.slice(-1000);
+            const recentSummarySlice =
+                existingSummary?.content.slice(-1000) || "";
 
             // Generate the prompt for OpenAI, including the user-provided prompt
             const prompt =
@@ -106,42 +109,31 @@ const GenerateSummary = ({
                 break;
             }
 
-            // Update the summaries state with the new summary content
-            setSummaries((prev) => {
-                let newSummary = {} as SummaryTypes;
-                const existingSummary = prev.find((s) => s.id === id);
-                let summaries = [] as SummaryTypes[];
+            let newSummary = {
+                title: name,
+                content: response.replace("```markdown", "").trim(),
+                isCompleted: false,
+                id,
+            };
 
-                if (existingSummary) {
-                    // Append the new content to the existing summary
-                    existingSummary.content += `\n\n${response.replace("```markdown", "").trim()}`;
-                    newSummary = existingSummary;
-                    summaries = prev.map((s) => (s.id === id ? newSummary : s));
-                } else {
-                    // Create a new summary entry
-                    newSummary = {
-                        title: name,
-                        content: response.replace("```markdown", "").trim(),
-                        isCompleted: false,
-                        id,
-                    };
-                    summaries = prev.length
-                        ? [...prev, newSummary]
-                        : [newSummary];
-                }
+            if (existingSummary) {
+                newSummary = {
+                    ...newSummary,
+                    content:
+                        existingSummary.content + "\n" + newSummary.content,
+                };
+            }
 
-                // Save the summary to persistent storage
-                saveSummary(newSummary);
-                return summaries;
-            });
+            dispatch(addOneSummary(newSummary));
         }
 
-        // Mark the last summary as completed
-        setSummaries((prev) => {
-            console.log({ prev });
-            (prev[prev.length - 1] as SummaryTypes).isCompleted = true;
-            return [...prev];
-        });
+        // After all chunks are processed, mark the summary as completed
+        const lastSummary = summaries.find((s) => s.id === id);
+
+        if (lastSummary) {
+            lastSummary.isCompleted = true;
+            dispatch(updateOneSummary(lastSummary));
+        }
 
         // Reset the generating state
         setIsGenerating(false);

@@ -4,9 +4,10 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { DataTransferSelectionType } from "./DataTransferMenu";
 import { Button } from "@/components/ui/button";
 import { Download, Upload } from "lucide-react";
-import { saveMultipleFlashcards } from "@/lib/flashcardStorage";
-import { saveMultipleQuizzes } from "@/lib/quizStorage";
-import { saveMultipleSummaries } from "@/lib/summaryStorage";
+import { useAppDispatch } from "@/hooks/useAppStore";
+import { addMultipleSummaries } from "@/redux/features/summariesSlice";
+import { addMultipleSetsOfFlashcards } from "@/redux/features/flashcardsSlice";
+import { addMultipleSetsOfQuizzes } from "@/redux/features/quizzesSlice";
 
 const DataTransferSelection = ({
     setOpenDataTransferSelection,
@@ -21,6 +22,7 @@ const DataTransferSelection = ({
         new Set(openDataTransferSelection?.data.map((d, i) => i)),
     );
     const [selectAll, setSelectAll] = useState(true);
+    const dispatch = useAppDispatch();
 
     const handleCheckboxChange = (index: number) => {
         const newSelectedItems = new Set(selectedItems);
@@ -72,13 +74,14 @@ const DataTransferSelection = ({
         switch (openDataTransferSelection.type) {
             //TODO: Validate imported items structure before saving
             case "Quizzes":
-                saveMultipleQuizzes(itemsToImport);
+                dispatch(addMultipleSetsOfQuizzes(itemsToImport));
                 break;
             case "Flashcards":
-                saveMultipleFlashcards(itemsToImport);
+                dispatch(addMultipleSetsOfFlashcards(itemsToImport));
                 break;
             case "Summaries":
-                saveMultipleSummaries(itemsToImport);
+                // saveMultipleSummaries(itemsToImport);
+                dispatch(addMultipleSummaries(itemsToImport));
                 break;
         }
         // console.log("Should run", openDataTransferSelection);

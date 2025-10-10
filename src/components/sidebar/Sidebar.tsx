@@ -3,27 +3,21 @@ import FlashcardList from "./FlashcardList";
 import QuizList from "./QuizList";
 import GenerateSummary from "./summary/GenerateSummary";
 import Summary from "./summary/Summary";
-import {
-    deleteSummaryById,
-    getAllSummariesFromStorage,
-} from "@/lib/summaryStorage";
 import Popup from "../ui/Popup";
-import { deleteQuizById, getAllQuizzesFromStorage } from "@/lib/quizStorage";
-import {
-    deleteFlashcardById,
-    getAllFlashcardsFromStorage,
-} from "@/lib/flashcardStorage";
 import { cn } from "@/lib/utils";
 import useGenerateWithAI from "@/hooks/useGenerateWithAI";
+import { useAppDispatch } from "@/hooks/useAppStore";
+import { deleteOneSummary } from "@/redux/features/summariesSlice";
+import { deleteOneSetOfFlashcards } from "@/redux/features/flashcardsSlice";
+import { deleteOneSetOfQuizzes } from "@/redux/features/quizzesSlice";
 
 const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
     const [openGenerateSummary, setOpenGenerateSummary] = useState(false);
     //TODO:Remove this state
-    const [summary, setSummary] = useState({ title: "", content: "" });
+
     const [isGenerating, setIsGenerating] = useState(false);
-    const [quizzes, setQuizzes] = useState<StoredQuiz[]>([]);
-    const [flashcards, setFlashcards] = useState<StoredFlashcard[]>([]);
-    const [summaries, setSummaries] = useState<SummaryTypes[]>([]);
+    // const [quizzes, setQuizzes] = useState<StoredQuiz[]>([]);
+    // const [flashcards, setFlashcards] = useState<StoredFlashcard[]>([]);
     const { generateDataWithAI, cancelDataGenerationWithAI, isCancelled } =
         useGenerateWithAI();
     const [error, setError] = useState("");
@@ -31,33 +25,12 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
         id: "",
         type: "",
     });
-
-    //Get All data from localStorage and set it to state
-    // This effect runs once when the component mounts to initialize state with stored data
-    useEffect(() => {
-        const storedSummaries = getAllSummariesFromStorage();
-        const storedQuizzes = getAllQuizzesFromStorage();
-        const storedFlashcarfs = getAllFlashcardsFromStorage();
-
-        if (storedSummaries) {
-            setSummaries(storedSummaries);
-        }
-
-        if (storedQuizzes) {
-            setQuizzes(storedQuizzes);
-        }
-
-        if (storedFlashcarfs) {
-            setFlashcards(storedFlashcarfs);
-        }
-    }, []);
+    const dispatch = useAppDispatch();
 
     const cancelSummaryGeneration = () => {
         cancelDataGenerationWithAI();
         setIsGenerating(false);
         setOpenGenerateSummary(false);
-        setSummary({ title: "", content: "" });
-        setSummaries(getAllSummariesFromStorage());
     };
 
     return (
@@ -73,21 +46,12 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
         >
             <div className="flex max-h-screen flex-col gap-5 overflow-x-auto overflow-y-auto pb-28">
                 <div className="flex flex-col pb-2">
-                    <QuizList
-                        dataToDelete={dataToDelete}
-                        setDataToDelete={setDataToDelete}
-                        quizzes={quizzes}
-                    />
-                    <FlashcardList
-                        dataToDelete={dataToDelete}
-                        setDataToDelete={setDataToDelete}
-                        flashcards={flashcards}
-                    />
+                    <QuizList setDataToDelete={setDataToDelete} />
+                    <FlashcardList setDataToDelete={setDataToDelete} />
                 </div>
                 <Summary
                     isGenerating={isGenerating}
                     setOpenGenerateSummary={setOpenGenerateSummary}
-                    summaries={summaries}
                     setDataToDelete={setDataToDelete}
                     cancelSummaryGeneration={cancelSummaryGeneration}
                     error={error}
@@ -97,10 +61,7 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
             {openGenerateSummary && (
                 <GenerateSummary
                     setIsGenerating={setIsGenerating}
-                    setSummary={setSummary}
-                    summary={summary}
                     setOpenGenerateSummary={setOpenGenerateSummary}
-                    setSummaries={setSummaries}
                     isGenerating={isGenerating}
                     generateDataWithAI={generateDataWithAI}
                     setError={setError}
@@ -116,16 +77,17 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
                     executeBtnFunc={() => {
                         switch (dataToDelete.type) {
                             case "quiz":
-                                deleteQuizById(dataToDelete.id);
-                                setQuizzes(getAllQuizzesFromStorage());
+                                dispatch(
+                                    deleteOneSetOfQuizzes(dataToDelete.id),
+                                );
                                 break;
                             case "flashcard":
-                                deleteFlashcardById(dataToDelete.id);
-                                setFlashcards(getAllFlashcardsFromStorage());
+                                dispatch(
+                                    deleteOneSetOfFlashcards(dataToDelete.id),
+                                );
                                 break;
                             case "summary":
-                                deleteSummaryById(dataToDelete.id);
-                                setSummaries(getAllSummariesFromStorage());
+                                dispatch(deleteOneSummary(dataToDelete.id));
                                 break;
                             default:
                                 break;

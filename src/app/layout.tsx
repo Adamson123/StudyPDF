@@ -1,3 +1,4 @@
+import ReduxProvider from "@/components/ReduxProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import "@/styles/globals.css";
 
@@ -16,14 +17,16 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning className="bg-background">
             <body>
-                <ThemeProvider
-                    attribute="class"
-                    enableSystem={false}
-                    // defaultTheme="light"
-                    forcedTheme="dark"
-                >
-                    {children}
-                </ThemeProvider>
+                <ReduxProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        enableSystem={false}
+                        // defaultTheme="light"
+                        forcedTheme="dark"
+                    >
+                        {children}
+                    </ThemeProvider>
+                </ReduxProvider>
             </body>
         </html>
     );

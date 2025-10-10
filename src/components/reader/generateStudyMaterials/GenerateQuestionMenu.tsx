@@ -10,9 +10,10 @@ import XButton from "@/components/ui/XButton";
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import OtherCustomInput from "./OtherCustomInput";
 import Input from "@/components/ui/input";
-import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
+//import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
 import useGenerateData from "@/components/reader/generateStudyMaterials/hooks/useGenerateData";
 import AIOptions from "@/components/AIOptions";
+import { useSelector } from "react-redux";
 
 const GenerateQuestionMenu = ({
     setOpenQuestionMenu,
@@ -31,7 +32,7 @@ const GenerateQuestionMenu = ({
     const [questionFrom, setQuestionFrom] = useState<"summary" | "pdf">("pdf");
     const [selectedAI, setSelectedAI] = useState<AvailableAIOptions>("gemini");
 
-    const summaries = useMemo(() => getAllSummariesFromStorage(), []);
+    const summaries = useSelector((state: any) => state.summaries.items);
 
     const getPrompt = (amountOfQuestionsEach: number) => {
         const questionPrompt =

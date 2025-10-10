@@ -1,9 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { getAllFlashcardsFromStorage } from "@/lib/flashcardStorage";
-import { getAllQuizzesFromStorage } from "@/lib/quizStorage";
-import { getAllSummariesFromStorage } from "@/lib/summaryStorage";
+import { useAppSelector } from "@/hooks/useAppStore";
 import { Download, Upload } from "lucide-react";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 
 export type DataTransferSelectionType = {
     type: string;
@@ -21,6 +19,9 @@ const DataTransferMenu = ({
     setOpenDataTransferMenu: Dispatch<SetStateAction<boolean>>;
 }) => {
     const fileInputRef = useRef<HTMLInputElement & { dataType: string }>(null);
+    const summaries = useAppSelector((state) => state.summaries.items);
+    const flashcards = useAppSelector((state) => state.flashcards.items);
+    const quizzes = useAppSelector((state) => state.quizzes.items);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -32,7 +33,7 @@ const DataTransferMenu = ({
             const reader = new FileReader();
             reader.onload = (e) => {
                 const content = e.target?.result;
-                // console.log(`File content for ${type}:`, content);
+
                 // Further processing based on file content
                 setOpenDataTransferSelection({
                     type: fileInputRef.current?.dataType as string,
@@ -40,7 +41,6 @@ const DataTransferMenu = ({
                     transferMethod: "import",
                 });
                 event.target.value = ""; // Reset the input so the same file can be selected again if needed
-                //  setOpenDataTransferMenu(false);
             };
             reader.readAsText(file);
         }
@@ -52,13 +52,13 @@ const DataTransferMenu = ({
         let data: any[] = [];
         switch (type) {
             case "Quizzes":
-                data = getAllQuizzesFromStorage();
+                data = quizzes;
                 break;
             case "Flashcards":
-                data = getAllFlashcardsFromStorage();
+                data = flashcards;
                 break;
             case "Summaries":
-                data = getAllSummariesFromStorage();
+                data = summaries;
                 break;
         }
 
