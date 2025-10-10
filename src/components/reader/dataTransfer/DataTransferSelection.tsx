@@ -235,6 +235,7 @@ const DataTransferSelection = ({
                     <Button
                         onClick={handleImport}
                         className="flex items-center"
+                        disabled={!selectedItems.size}
                     >
                         Import <Upload />
                     </Button>
@@ -242,6 +243,7 @@ const DataTransferSelection = ({
                     <Button
                         onClick={handleDownload}
                         className="flex items-center"
+                        disabled={!selectedItems.size}
                     >
                         Download
                         <Download />
