@@ -5,6 +5,7 @@ import { Plus, RefreshCcw } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import SummaryCard from "./SummaryCard";
 import { useAppSelector } from "@/hooks/useAppStore";
+import NoItemsFound from "@/components/ui/NoItemsFound";
 
 const Summary = ({
     setOpenGenerateSummary,
@@ -37,9 +38,7 @@ const Summary = ({
                         />
                     ))
                 ) : (
-                    <div className="w-full rounded-lg bg-secondary p-4 text-center text-sm text-secondary-foreground">
-                        No summaries available. Click the button to create one.
-                    </div>
+                    <NoItemsFound text="No summaries available. Click the button to create one." />
                 )}
             </div>
             {isGenerating ? (

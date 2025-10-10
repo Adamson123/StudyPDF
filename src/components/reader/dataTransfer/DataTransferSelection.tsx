@@ -8,6 +8,7 @@ import { useAppDispatch } from "@/hooks/useAppStore";
 import { addMultipleSummaries } from "@/redux/features/summariesSlice";
 import { addMultipleSetsOfFlashcards } from "@/redux/features/flashcardsSlice";
 import { addMultipleSetsOfQuizzes } from "@/redux/features/quizzesSlice";
+import NoItemsFound from "@/components/ui/NoItemsFound";
 
 const DataTransferSelection = ({
     setOpenDataTransferSelection,
@@ -84,7 +85,7 @@ const DataTransferSelection = ({
                 dispatch(addMultipleSummaries(itemsToImport));
                 break;
         }
-        // console.log("Should run", openDataTransferSelection);
+
         setOpenDataTransferSelection(null);
         //TODO: A toast after this
     };
@@ -128,20 +129,23 @@ const DataTransferSelection = ({
                         onClick={() => setOpenDataTransferSelection(null)}
                     />
                 </div>
-                {/* TODO: Option to select all */}
                 {/* Data */}
-                <div className="flex items-center justify-end gap-3">
-                    <label htmlFor="selectAll" className="cursor-pointer">
-                        Select All{" "}
-                    </label>
-                    <input
-                        onChange={handleSelectAll}
-                        checked={selectAll}
-                        id="selectAll"
-                        className="h-5 w-5 cursor-pointer accent-primary"
-                        type="checkbox"
-                    />
-                </div>
+                {openDataTransferSelection?.data.length ? (
+                    <div className="flex items-center justify-end gap-3">
+                        <label htmlFor="selectAll" className="cursor-pointer">
+                            Select All{" "}
+                        </label>
+                        <input
+                            onChange={handleSelectAll}
+                            checked={selectAll}
+                            id="selectAll"
+                            className="h-5 w-5 cursor-pointer accent-primary"
+                            type="checkbox"
+                        />
+                    </div>
+                ) : (
+                    ""
+                )}
                 {openDataTransferSelection?.data.length ? (
                     <div
                         style={{
@@ -167,10 +171,9 @@ const DataTransferSelection = ({
                         ))}
                     </div>
                 ) : (
-                    <p className="text-sm text-gray-500">
-                        No {openDataTransferSelection?.type.toLocaleLowerCase()}{" "}
-                        found to export.
-                    </p>
+                    <NoItemsFound
+                        text={`No ${openDataTransferSelection?.type.toLocaleLowerCase()} found to export.`}
+                    />
                 )}
                 {/* Generate Button */}
                 {openDataTransferSelection?.transferMethod === "import" ? (
