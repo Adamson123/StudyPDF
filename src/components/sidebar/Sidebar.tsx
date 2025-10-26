@@ -13,8 +13,6 @@ import { deleteOneSetOfQuizzes } from "@/redux/features/quizzesSlice";
 
 const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
     const [openGenerateSummary, setOpenGenerateSummary] = useState(false);
-    //TODO:Remove this state
-
     const [isGenerating, setIsGenerating] = useState(false);
     // const [quizzes, setQuizzes] = useState<StoredQuiz[]>([]);
     // const [flashcards, setFlashcards] = useState<StoredFlashcard[]>([]);

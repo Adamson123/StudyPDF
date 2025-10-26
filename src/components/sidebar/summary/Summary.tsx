@@ -2,7 +2,7 @@ import "@/styles/markdown.css";
 import "highlight.js/styles/github-dark.css";
 import { Button } from "../../ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import SummaryCard from "./SummaryCard";
 import { useAppSelector } from "@/hooks/useAppStore";
 import NoItemsFound from "@/components/ui/NoItemsFound";
@@ -23,6 +23,9 @@ const Summary = ({
     error: string;
 }) => {
     const summaries = useAppSelector((state) => state.summaries.items);
+    const summariesRef = useRef<(HTMLDivElement | null)[]>([]);
+
+    //  console.log(summariesRef.current);
 
     return (
         <div className="flex flex-col items-center gap-4 px-2 pb-20">
@@ -32,7 +35,10 @@ const Summary = ({
                 {summaries.length > 0 ? (
                     summaries.map((summary, index) => (
                         <SummaryCard
-                            key={index}
+                            ref={(el) => {
+                                summariesRef.current[index] = el;
+                            }}
+                            key={summary.id}
                             summary={summary}
                             setDataToDelete={setDataToDelete}
                         />
