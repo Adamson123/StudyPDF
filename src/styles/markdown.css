@@ -1,51 +1,51 @@
 .markdown {
-  word-break: break-word;
+    word-break: break-word;
 }
 .markdown table,
 th,
 td {
-  border: 1px solid;
-  padding: 0.5rem;
-  border-radius: 3px;
+    border: 1px solid;
+    padding: 0.5rem;
+    border-radius: 3px;
 }
 
 .markdown pre,
 .markdown code {
-  white-space: pre-wrap !important;
-  word-break: break-word !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
 }
 .markdown table {
-  display: block;
-  overflow-x: auto;
-  width: 100%;
+    display: block;
+    overflow-x: auto;
+    width: 100%;
 }
 
 .markdown ul {
-  list-style-type: circle;
-  padding-left: 2rem;
-  font-size: 13px;
+    list-style-type: circle;
+    padding-left: 2rem;
+    font-size: 13px;
 }
 
 .markdown h1 {
-  @apply mb-4 text-3xl font-bold;
+    @apply mb-4 text-3xl font-bold;
 }
 .markdown h2 {
-  @apply mb-2 text-xl font-semibold;
+    @apply mb-2 text-xl font-semibold;
 }
 .markdown h3 {
-  @apply mb-1 text-lg font-semibold;
+    @apply mb-1 text-lg font-semibold;
 }
 .markdown h4 {
-  @apply mb-1 text-sm font-semibold;
+    @apply mb-1 text-sm font-semibold;
 }
 .markdown h5 {
-  @apply mb-1 text-xs font-semibold;
+    @apply mb-1 text-xs font-semibold;
 }
 
 .markdown p {
-  font-size: 13px;
+    font-size: 13px;
 }
 
 .katex-html {
-  font-size: 14px;
+    font-size: 14px;
 }

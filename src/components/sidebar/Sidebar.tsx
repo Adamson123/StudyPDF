@@ -14,8 +14,6 @@ import { deleteOneSetOfQuizzes } from "@/redux/features/quizzesSlice";
 const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
     const [openGenerateSummary, setOpenGenerateSummary] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
-    // const [quizzes, setQuizzes] = useState<StoredQuiz[]>([]);
-    // const [flashcards, setFlashcards] = useState<StoredFlashcard[]>([]);
     const { generateDataWithAI, cancelDataGenerationWithAI, isCancelled } =
         useGenerateWithAI();
     const [error, setError] = useState("");
@@ -42,7 +40,7 @@ const Sidebar = ({ showSidebar }: { showSidebar: boolean }) => {
                 (dataToDelete.id || openGenerateSummary) && "z-[150]",
             )}
         >
-            <div className="flex max-h-screen flex-col gap-5 overflow-x-auto overflow-y-auto pb-28">
+            <div className="sidebar-scroll flex max-h-screen flex-col gap-5 overflow-x-auto overflow-y-auto pb-28">
                 <div className="flex flex-col pb-2">
                     <QuizList setDataToDelete={setDataToDelete} />
                     <FlashcardList setDataToDelete={setDataToDelete} />

@@ -23,21 +23,17 @@ const Summary = ({
     error: string;
 }) => {
     const summaries = useAppSelector((state) => state.summaries.items);
-    const summariesRef = useRef<(HTMLDivElement | null)[]>([]);
-
-    //  console.log(summariesRef.current);
+    const summariesContainerRef = useRef<HTMLDivElement | null>(null);
 
     return (
         <div className="flex flex-col items-center gap-4 px-2 pb-20">
             {/* Create Summary */}
             {/* Summaries */}
-            <div className="flex flex-col gap-5">
+            <div ref={summariesContainerRef} className="flex flex-col gap-5">
                 {summaries.length > 0 ? (
                     summaries.map((summary, index) => (
                         <SummaryCard
-                            ref={(el) => {
-                                summariesRef.current[index] = el;
-                            }}
+                            summariesContainerRef={summariesContainerRef}
                             key={summary.id}
                             summary={summary}
                             setDataToDelete={setDataToDelete}
