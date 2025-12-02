@@ -38,7 +38,7 @@ const FillAnswerCard = ({
       (answer) => answer?.value.trimEnd().trimStart() || "",
     );
     const isCorrect = pickedAnswers.every(
-      (pickedAnswer, i) => pickedAnswer === answer[i],
+      (pickedAnswer, i) => pickedAnswer.toLowerCase() === answer[i].toLowerCase(),
     );
     setCurrentQuestion(
       (prev) =>
