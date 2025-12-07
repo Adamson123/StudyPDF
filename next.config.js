@@ -12,7 +12,7 @@ const config = {
     },
   },
   typescript: {
-    ignoreBuildErrors: true, // 💀 Skip TS errors on build (DEATHWISH MODE)
+    ignoreBuildErrors: true,
   },
   // webpack: (config) => {
   //   config.resolve.alias = {
