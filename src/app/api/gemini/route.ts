@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const data = await request.json();
     const { prompt, text } = data;
 
-    const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    const genAI = new GoogleGenerativeAI("AIzaSyDPZgM38X_Pk0IvEufzJ5R8cxbqbtvD_2E");
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
     });
