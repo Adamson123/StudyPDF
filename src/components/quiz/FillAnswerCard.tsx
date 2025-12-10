@@ -98,7 +98,7 @@ const FillAnswerCard = ({
                                         getAnswerInputIndex(i)
                                     ] = el;
                                 }}
-                                className={`inline h-7 w-auto bg-gray-400/15 ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)] === answer[getAnswerInputIndex(i)] ? "bg-green-500/40" : "bg-red-500/40")}`}
+                                className={`inline h-7 w-auto bg-gray-400/15 ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)].toLowerCase() === answer[getAnswerInputIndex(i)]?.toLowerCase() ? "bg-green-500/40" : "bg-red-500/40")}`}
                             />{" "}
                             &nbsp;
                         </span>
