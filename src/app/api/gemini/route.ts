@@ -9,8 +9,6 @@ export async function POST(request: Request) {
         const { prompt, text } = data;
 
         const apiKey = env.GEMINI_API_KEY;
-        console.log(apiKey);
-
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
