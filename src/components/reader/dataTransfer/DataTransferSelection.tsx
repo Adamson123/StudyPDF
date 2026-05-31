@@ -69,60 +69,11 @@ const DataTransferSelection = ({
         );
     };
 
-    const validateItemsToImport = (items: any[]) => {
-        if (!items.length) return false;
-        // Basic validation based on type
-        switch (openDataTransferSelection?.type) {
-            case "Quizzes":
-                return items.every(
-                    (item) =>
-                        //  item.title &&
-                        item.id &&
-                        item.questions &&
-                        Array.isArray(item.questions) &&
-                        item.questions?.every((q: any) => {
-                            let isMultipleChoiceValid = true;
-                            if (q.type === "multichoice") {
-                                isMultipleChoiceValid =
-                                    q.options && Array.isArray(q.options);
-                            }
-                            return (
-                                isMultipleChoiceValid &&
-                                q.question &&
-                                typeof q.answer !== "undefined"
-                            );
-                        }),
-                );
-            case "Flashcards":
-                return items.every(
-                    (item) =>
-                        // item.title &&
-                        item.id &&
-                        Array.isArray(item.cards) &&
-                        item.cards.every((f: any) => f.front && f.back),
-                );
-            case "Summaries":
-                return items.every(
-                    (
-                        item, //item.title &&
-                    ) => item.id && item.content,
-                );
-            default:
-                return false;
-        }
-    };
-
     const handleImport = () => {
         if (!openDataTransferSelection) return;
         const itemsToImport = openDataTransferSelection.data.filter(
             (_, index) => selectedItems.has(index),
         );
-        if (!validateItemsToImport(itemsToImport)) {
-            alert(
-                "Some items are invalid and won't be imported. Please check the file format.",
-            );
-            return;
-        }
 
         switch (openDataTransferSelection.type) {
             //TODO: Validate imported items structure before saving

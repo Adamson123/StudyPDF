@@ -29,6 +29,7 @@ import DataTransferMenu, {
     DataTransferSelectionType,
 } from "../dataTransfer/DataTransferMenu";
 import DataTransferSelection from "../dataTransfer/DataTransferSelection";
+import DataTransferInput from "../dataTransfer/DataTransferInput";
 
 /**
  * @param setShowSidebar - Function to toggle the visibility of the sidebar.
@@ -75,7 +76,7 @@ const Header = ({
     const [openGenerateStudyMaterialsMenu, setOpenGenerateStudyMaterialsMenu] =
         useState(false);
     const [openDataTransferMenu, setOpenDataTransferMenu] = useState(false);
-
+    const [openDataTransferInput, setOpenDataTransferInput] = useState("");
     //TODO: put into one state object
     const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
     const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
@@ -204,6 +205,7 @@ const Header = ({
                                 setOpenDataTransferSelection
                             }
                             setOpenDataTransferMenu={setOpenDataTransferMenu}
+                            setOpenDataTransferInput={setOpenDataTransferInput}
                         />
                     )}
                 </div>
@@ -245,6 +247,14 @@ const Header = ({
                     />
                 )}
             </>
+            {/*  */}
+            {openDataTransferInput && (
+                <DataTransferInput
+                    setOpenDataTransferSelection={setOpenDataTransferSelection}
+                    setOpenDataTransferInput={setOpenDataTransferInput}
+                    type={openDataTransferInput}
+                />
+            )}
             {/* Study Materials Data Transfer selection  */}
             <>
                 {openDataTransferSelection && (

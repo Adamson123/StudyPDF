@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/hooks/useAppStore";
 import { Download, Upload } from "lucide-react";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 export type DataTransferSelectionType = {
     type: string;
@@ -11,39 +11,24 @@ export type DataTransferSelectionType = {
 
 const DataTransferMenu = ({
     setOpenDataTransferSelection,
+    setOpenDataTransferInput,
     //   setOpenDataTransferMenu,
 }: {
     setOpenDataTransferSelection: Dispatch<
         SetStateAction<DataTransferSelectionType>
     >;
     setOpenDataTransferMenu: Dispatch<SetStateAction<boolean>>;
+    setOpenDataTransferInput: Dispatch<SetStateAction<string>>;
 }) => {
-    const fileInputRef = useRef<HTMLInputElement & { dataType: string }>(null);
     const summaries = useAppSelector((state) => state.summaries.items);
     const flashcards = useAppSelector((state) => state.flashcards.items);
     const quizzes = useAppSelector((state) => state.quizzes.items);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            // You can add further processing of the file here
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = e.target?.result;
-
-                // Further processing based on file content
-                setOpenDataTransferSelection({
-                    type: fileInputRef.current?.dataType as string,
-                    data: content ? JSON.parse(content as string) : [],
-                    transferMethod: "import",
-                });
-                event.target.value = ""; // Reset the input so the same file can be selected again if needed
-            };
-            reader.readAsText(file);
-        }
+    const openDataInputPopUp = (type: string) => {
+        setOpenDataTransferInput(type);
     };
 
-    const handleDownload = (type: string) => {
+    const handleDownloadSelectionMenu = (type: string) => {
         let data: any[] = [];
         switch (type) {
             case "Quizzes":
@@ -78,29 +63,15 @@ const DataTransferMenu = ({
                         <Button
                             className="h-8 text-xs"
                             onClick={() => {
-                                handleDownload(item);
+                                handleDownloadSelectionMenu(item);
                             }}
                         >
                             Download <Download />{" "}
                         </Button>
                         <Button
-                            onClick={() => {
-                                fileInputRef.current?.click();
-                                (
-                                    fileInputRef.current as HTMLInputElement & {
-                                        dataType: string;
-                                    }
-                                ).dataType = item;
-                            }}
+                            onClick={() => openDataInputPopUp(item)}
                             className="h-8 border border-border bg-transparent text-xs hover:bg-gray-100/10"
                         >
-                            <input
-                                onChange={(e) => handleFileChange(e)}
-                                type="file"
-                                accept="application/json"
-                                ref={fileInputRef}
-                                className="hidden"
-                            />
                             Import <Upload />{" "}
                         </Button>{" "}
                     </div>
