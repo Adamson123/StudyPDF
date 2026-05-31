@@ -6,7 +6,7 @@ import Header from "../header/Header";
 import Sidebar from "../../sidebar/Sidebar";
 import { Loader2 } from "lucide-react";
 import { Message } from "../../ui/Message";
-import useRender from "./hooks/useRender";
+import useRenderPDF from "../hooks/useRenderPDF";
 import { PDFDocumentProxy } from "pdfjs-dist";
 
 export const ViewerContext = createContext<{
@@ -39,7 +39,7 @@ const Viewer = () => {
         name: "pdf-name",
     });
 
-    const { renderPDFsOnView, loadingPDF, pdfPages, pdfData } = useRender({
+    const { renderPDFsOnView, loadingPDF, pdfPages, pdfData } = useRenderPDF({
         pdfInfo,
         pdfsContainer,
         scale,

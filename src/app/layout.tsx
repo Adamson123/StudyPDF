@@ -16,7 +16,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en" suppressHydrationWarning className="bg-background">
-            <body>
+            <body suppressHydrationWarning>
                 <ReduxProvider>
                     <ThemeProvider
                         attribute="class"

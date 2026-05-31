@@ -5,7 +5,6 @@ function useUpdateOnScroll({
     pdfsContainer,
     pdfPages,
     setPageNum,
-    debouncedHandler,
     pageNum,
     renderPDFsOnView,
 }: {
@@ -14,11 +13,6 @@ function useUpdateOnScroll({
     setPageNum: (pageNum: string) => void;
     pageNum: string;
     renderPDFsOnView: (pdfPage: PDFPage[]) => Promise<void>;
-    debouncedHandler: (
-        func: () => Promise<void>,
-        timeoutId: NodeJS.Timeout | any,
-        delay: number,
-    ) => () => void;
 }) {
     useEffect(() => {
         /**
@@ -97,18 +91,17 @@ function useUpdateOnScroll({
         };
 
         let scrollTimeoutId: NodeJS.Timeout | any = null;
-        const renderPDFsOnDebounce = debouncedHandler(
-            async () => {
+        const renderPDFsOnTimeout = () => {
+            clearTimeout(scrollTimeoutId);
+            scrollTimeoutId = setTimeout(async () => {
                 await renderPDFsOnView(pdfPages);
-            },
-            scrollTimeoutId,
-            500,
-        );
+            }, 1000);
+        };
 
         const onScroll = () => {
             //TODO: update page num on debounce too
             updatePageNumOnScroll();
-            renderPDFsOnDebounce();
+            renderPDFsOnTimeout();
         };
 
         window.addEventListener("scroll", onScroll);

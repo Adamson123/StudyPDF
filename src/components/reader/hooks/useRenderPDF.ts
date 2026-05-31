@@ -5,8 +5,8 @@ import {
     useEffect,
     useState,
 } from "react";
-import PDFPage from "../pdfPage";
-import { getPDFDocument } from "../utils";
+import PDFPage from "../viewer/pdfPage";
+import { getPDFDocument } from "../viewer/utils";
 
 /**
  * Custom hook to render PDF pages in a container.

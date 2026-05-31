@@ -1,6 +1,6 @@
 import PopUpWrapper from "@/components/ui/PopUpWrapper";
 import XButton from "@/components/ui/XButton";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { DataTransferSelectionType } from "./DataTransferMenu";
 import { Button } from "@/components/ui/button";
 import { Download, Upload } from "lucide-react";

@@ -23,7 +23,6 @@ import { MessageType } from "../../ui/Message";
 import GenerateQuestionMenu from "../generateStudyMaterials/GenerateQuestionMenu";
 import GenerateFlashcardMenu from "../generateStudyMaterials/GenerateFlashcardMenu";
 import PDFPage from "../viewer/pdfPage";
-import debouncedHandler from "@/utils/debounceHandler";
 import GenerateStudyMaterialsMenu from "../generateStudyMaterials/GenerateStudyMaterialsMenu";
 import useUpdateOnScroll from "./hooks/useUpdateOnScroll";
 import DataTransferMenu, {
@@ -107,7 +106,6 @@ const Header = ({
     };
 
     useUpdateOnScroll({
-        debouncedHandler,
         pageNum,
         pdfPages,
         pdfsContainer,
