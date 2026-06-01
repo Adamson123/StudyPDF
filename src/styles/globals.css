@@ -170,11 +170,17 @@ select:focus {
     font-size: 16px !important;
 } */
 
-.ios-safari input[type="text"],
+/* .ios-safari input[type="text"],
 .ios-safari input[type="email"],
 .ios-safari input[type="number"],
 .ios-safari input[type="tel"],
 .ios-safari textarea,
 .ios-safari select {
+    font-size: 16px !important;
+} */
+
+.ios-safari input:focus,
+.ios-safari textarea:focus,
+.ios-safari select:focus {
     font-size: 16px !important;
 }
