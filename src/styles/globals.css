@@ -167,5 +167,14 @@ progress::-moz-progress-bar {
 /* input:focus,
 textarea:focus,
 select:focus {
-    font-size: inherit !important;
+    font-size: 16px !important;
 } */
+
+.ios-safari input[type="text"],
+.ios-safari input[type="email"],
+.ios-safari input[type="number"],
+.ios-safari input[type="tel"],
+.ios-safari textarea,
+.ios-safari select {
+    font-size: 16px !important;
+}

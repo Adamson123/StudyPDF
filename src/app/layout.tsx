@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 
 //import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import MainLayout from "./MainLayout";
 
 export const metadata: Metadata = {
     title: "StudyPDF",
@@ -24,7 +25,7 @@ export default function RootLayout({
                         // defaultTheme="light"
                         forcedTheme="dark"
                     >
-                        {children}
+                        <MainLayout>{children}</MainLayout>
                     </ThemeProvider>
                 </ReduxProvider>
             </body>

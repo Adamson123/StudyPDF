@@ -76,7 +76,7 @@ const Header = ({
     const [openGenerateStudyMaterialsMenu, setOpenGenerateStudyMaterialsMenu] =
         useState(false);
     const [openDataTransferMenu, setOpenDataTransferMenu] = useState(false);
-    const [openDataTransferInput, setOpenDataTransferInput] = useState("");
+    const [dataTransferType, setDataTransferType] = useState("");
     //TODO: put into one state object
     const [openQuestionMenu, setOpenQuestionMenu] = useState(false);
     const [openFlashCardMenu, setOpenFlashCardMenu] = useState(false);
@@ -205,7 +205,7 @@ const Header = ({
                                 setOpenDataTransferSelection
                             }
                             setOpenDataTransferMenu={setOpenDataTransferMenu}
-                            setOpenDataTransferInput={setOpenDataTransferInput}
+                            setDataTransferType={setDataTransferType}
                         />
                     )}
                 </div>
@@ -248,11 +248,11 @@ const Header = ({
                 )}
             </>
             {/*  */}
-            {openDataTransferInput && (
+            {dataTransferType && (
                 <DataTransferInput
                     setOpenDataTransferSelection={setOpenDataTransferSelection}
-                    setOpenDataTransferInput={setOpenDataTransferInput}
-                    type={openDataTransferInput}
+                    setDataTransferType={setDataTransferType}
+                    type={dataTransferType}
                 />
             )}
             {/* Study Materials Data Transfer selection  */}

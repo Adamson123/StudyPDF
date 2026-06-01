@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const DataTransferInput = ({
     setOpenDataTransferSelection,
-    setOpenDataTransferInput,
+    setDataTransferType,
     type,
 }: {
     setOpenDataTransferSelection: React.Dispatch<
@@ -16,7 +16,7 @@ const DataTransferInput = ({
             transferMethod: "import" | "download";
         } | null>
     >;
-    setOpenDataTransferInput: React.Dispatch<React.SetStateAction<string>>;
+    setDataTransferType: React.Dispatch<React.SetStateAction<string>>;
     type: string;
 }) => {
     const [inputData, setInputData] = useState("");
@@ -70,7 +70,7 @@ const DataTransferInput = ({
             data,
             transferMethod: "import",
         });
-        setOpenDataTransferInput("");
+        setDataTransferType("");
     };
 
     return (
@@ -84,7 +84,7 @@ const DataTransferInput = ({
                         </h2>
                     </div>
 
-                    <XButton onClick={() => setOpenDataTransferInput("")} />
+                    <XButton onClick={() => setDataTransferType("")} />
                 </div>
 
                 <textarea

@@ -11,21 +11,21 @@ export type DataTransferSelectionType = {
 
 const DataTransferMenu = ({
     setOpenDataTransferSelection,
-    setOpenDataTransferInput,
+    setDataTransferType,
     //   setOpenDataTransferMenu,
 }: {
     setOpenDataTransferSelection: Dispatch<
         SetStateAction<DataTransferSelectionType>
     >;
     setOpenDataTransferMenu: Dispatch<SetStateAction<boolean>>;
-    setOpenDataTransferInput: Dispatch<SetStateAction<string>>;
+    setDataTransferType: Dispatch<SetStateAction<string>>;
 }) => {
     const summaries = useAppSelector((state) => state.summaries.items);
     const flashcards = useAppSelector((state) => state.flashcards.items);
     const quizzes = useAppSelector((state) => state.quizzes.items);
 
     const openDataInputPopUp = (type: string) => {
-        setOpenDataTransferInput(type);
+        setDataTransferType(type);
     };
 
     const handleDownloadSelectionMenu = (type: string) => {
