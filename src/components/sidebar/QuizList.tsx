@@ -50,7 +50,7 @@ const QuizList = ({
                                           type: "quiz",
                                       });
                                   }}
-                                  className="h-5 w-5 cursor-pointer stroke-primary hover:fill-primary"
+                                  className="h-5 w-5 min-h-5 min-w-5 cursor-pointer stroke-primary hover:fill-primary"
                               />
                           </div>
                       ))
