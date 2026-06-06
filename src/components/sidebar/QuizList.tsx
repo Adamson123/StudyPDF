@@ -39,7 +39,7 @@ const QuizList = ({
                               key={i}
                               className="flex cursor-pointer items-center justify-between border-b border-primary bg-primary/15 p-3 text-xs transition-colors hover:bg-primary/50"
                           >
-                              <span className="overflow-hidden text-nowrap">
+                              <span className="text-nowrap truncate">
                                   {quiz.title || quiz.id}
                               </span>
                               <Trash2
