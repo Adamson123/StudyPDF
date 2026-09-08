@@ -13,10 +13,10 @@ const MultiChoiceCard = ({
   index: number;
   numberOfQuestions: number;
   setQuestions: React.Dispatch<
-    React.SetStateAction<(FillAnswerTypes | MultiChoiceQuestionTypes)[]>
+    React.SetStateAction<QuizTypes[]>
   >;
   setCurrentQuestion: React.Dispatch<
-    React.SetStateAction<FillAnswerTypes | MultiChoiceQuestionTypes>
+    React.SetStateAction<QuizTypes>
   >;
 }) => {
   const handleOptionClick = (option: string) => {
@@ -36,7 +36,7 @@ const MultiChoiceCard = ({
                 isCorrect: isCorrect(option),
               }
             : q,
-        ) as (FillAnswerTypes | MultiChoiceQuestionTypes)[],
+        ) as QuizTypes[],
     );
   };
 
