@@ -2,12 +2,13 @@ import { Dispatch, SetStateAction, useState } from "react";
 import Popup from "../ui/Popup";
 import FillAnswerCard from "./FillAnswerCard";
 import MultiChoiceCard from "./MultiChoiceCard";
+import DefinitionCard from "./DefinitionCard";
 
 const QuestionsPreview = ({
     questions,
     setStartQuiz,
 }: {
-    questions: (FillAnswerTypes | MultiChoiceQuestionTypes)[];
+    questions: QuizTypes[];
     setStartQuiz: Dispatch<SetStateAction<boolean>>;
 }) => {
     const [showPopUp, setShowPopUp] = useState(false);
@@ -25,6 +26,17 @@ const QuestionsPreview = ({
                         setCurrentQuestion={() => {}}
                         numberOfQuestions={questions.length}
                         question={question as MultiChoiceQuestionTypes}
+                    />
+                ) : (question as DefinitionQuestionTypes).type === "definition" ? (
+                    <DefinitionCard
+                        key={index}
+                        setQuestions={() => {
+                            setShowPopUp(true);
+                        }}
+                        question={question as DefinitionQuestionTypes}
+                        index={index}
+                        setCurrentQuestion={() => {}}
+                        numberOfQuestions={questions.length}
                     />
                 ) : (
                     <FillAnswerCard
