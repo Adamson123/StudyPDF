@@ -2,6 +2,7 @@ import { Check, Home, RotateCcw, X } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import MultiChoiceCard from "./MultiChoiceCard";
 import FillAnswerCard from "./FillAnswerCard";
+import DefinitionCard from "./DefinitionCard";
 import { useRouter } from "next/navigation";
 
 const getRemark = (score: number) => {
@@ -49,9 +50,9 @@ const Result = ({
                 (q) =>
                     ({
                         ...q,
-                        choosenAnswer: q.type === "multiChoice" ? "" : [],
+                        choosenAnswer: q.type === "fillAnswer" ? [] : "",
                         isCorrect: false,
-                    }) as MultiChoiceQuestionTypes | FillAnswerTypes,
+                    }) as QuizTypes,
             ),
         );
         setCurrentQuestionIndex(0);
@@ -133,6 +134,16 @@ const Result = ({
                             setCurrentQuestion={() => {}}
                             numberOfQuestions={questions.length}
                             question={question as MultiChoiceQuestionTypes}
+                        />
+                    ) : (question as DefinitionQuestionTypes).type ===
+                      "definition" ? (
+                        <DefinitionCard
+                            key={index}
+                            index={index}
+                            setQuestions={() => {}}
+                            setCurrentQuestion={() => {}}
+                            numberOfQuestions={questions.length}
+                            question={question as DefinitionQuestionTypes}
                         />
                     ) : (
                         <FillAnswerCard
