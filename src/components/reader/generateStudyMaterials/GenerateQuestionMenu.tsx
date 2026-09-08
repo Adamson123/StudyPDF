@@ -132,6 +132,12 @@ const GenerateQuestionMenu = ({
                                     "Generate fill-in-gap questions from the PDF.",
                             },
                             {
+                                type: "definition",
+                                label: "Definition",
+                                description:
+                                    "Generate definition questions graded by required keywords.",
+                            },
+                            {
                                 type: "mixed",
                                 label: "Mixed",
                                 description:
