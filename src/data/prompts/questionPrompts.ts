@@ -27,6 +27,11 @@ const getAnswerLetter = (options, correctAnswer) =>
 \`\`\`
 `;
 
+const definitionAdditionalPrompt = `
+- Definition questions must include \`question\` (a prompt asking the learner to define one concept), \`answer\` (the complete expected definition), \`keywords\` (an array of 3–6 essential words or short phrases found in the answer), \`choosenAnswer\` (an empty string), \`explanation\` (string), \`type\` ("definition"), and \`isCorrect\` (false).
+- Keywords must be specific, essential terms from the expected definition. Do not include generic filler words.
+`;
+
 export const getQuestionGeneralPrompt = (
   amountOfQuestionsEach: number,
   type: string,
@@ -40,6 +45,8 @@ export const getQuestionGeneralPrompt = (
 - Strictly return only a JSON array of ${amountOfQuestionsEach} questions. Do NOT include explanations, markdown, or any introductory or closing text.
 
 ${type === "multiChoice" && multiChoiceAdditionalPrompt}
+
+${type === "definition" && definitionAdditionalPrompt}
 
 📐🚨 MATH & PHYSICS QUESTION RULES (Strict):
 - For **all calculation questions** in Maths or Physics topics:
@@ -244,6 +251,24 @@ export const questionPrompts: { [key: string]: string } = {
   
   - When it comes to Maths or Physics or any calculation-like subject or topic or texts, 
   calculation questions (or questions that require calculation) should take up 80% of the questions and the rest 20% should be normal questions.
+  `,
+  definition: `
+  Generate only "definition" question objects from the educational document\'s core content.
+
+  Each question must ask the learner to define one important concept. The answer must be the full expected definition. Provide 3–6 specific, required keywords that appear in that answer. These keywords will be matched against the learner\'s definition, so use concise terms that represent the essential meaning.
+
+  Example:
+  {
+    "question": "Define context switching.",
+    "answer": "Context switching is the process of saving the state of a currently running process and loading the saved state of a new process so the CPU can switch between processes.",
+    "keywords": ["process", "saving", "loading", "state"],
+    "choosenAnswer": "",
+    "explanation": "The CPU saves one process state and loads another before execution continues.",
+    "type": "definition",
+    "isCorrect": false
+  }
+
+  Return only a valid JSON array containing definition question objects.
   `,
   multiChoice: `WARNING: You are a highly specialized quiz generator AI. STRICTLY follow these instructions. Any deviation = REJECTION. ❌
 
