@@ -17,7 +17,21 @@ interface FillAnswerTypes {
     isCorrect: false;
 }
 
-type QuizTypes = MultiChoiceQuestionTypes | FillAnswerTypes;
+interface DefinitionQuestionTypes {
+    question: string;
+    answer: string;
+    keywords: string[];
+    choosenAnswer: string;
+    explanation: string;
+    type: "definition";
+    isCorrect: boolean;
+    matchedKeywords?: string[];
+}
+
+type QuizTypes =
+    | MultiChoiceQuestionTypes
+    | FillAnswerTypes
+    | DefinitionQuestionTypes;
 interface FlashcardTypes {
     front: string;
     back: string;
