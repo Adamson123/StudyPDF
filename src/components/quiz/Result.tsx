@@ -65,9 +65,9 @@ const Result = ({
                 (q) =>
                     ({
                         ...q,
-                        choosenAnswer: q.type === "multiChoice" ? "" : [],
+                        choosenAnswer: q.type === "fillAnswer" ? [] : "",
                         isCorrect: false,
-                    }) as MultiChoiceQuestionTypes | FillAnswerTypes,
+                    }) as QuizTypes,
             ),
         );
         setShowResult(false);
