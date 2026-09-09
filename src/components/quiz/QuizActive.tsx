@@ -84,7 +84,7 @@ export const QuizActive = ({
                             />
                         </div>
                         {currentQuestion && (
-                            <div className="">
+                            <>
                                 {(currentQuestion as MultiChoiceQuestionTypes)
                                     .type === "multiChoice" ? (
                                     <MultiChoiceCard
@@ -132,7 +132,7 @@ export const QuizActive = ({
                                         }
                                     />
                                 )}
-                            </div>
+                            </>
                         )}
                     </div>
                     {/* Question */}
