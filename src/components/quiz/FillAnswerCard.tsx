@@ -14,10 +14,10 @@ const FillAnswerCard = ({
     index: number;
     numberOfQuestions: number;
     setQuestions: React.Dispatch<
-        React.SetStateAction<(FillAnswerTypes | MultiChoiceQuestionTypes)[]>
+        React.SetStateAction<QuizTypes[]>
     >;
     setCurrentQuestion: React.Dispatch<
-        React.SetStateAction<FillAnswerTypes | MultiChoiceQuestionTypes>
+        React.SetStateAction<QuizTypes>
     >;
 }) => {
     const answerInputs = useRef<(HTMLInputElement | null)[]>([]);
@@ -57,7 +57,7 @@ const FillAnswerCard = ({
                     i === index
                         ? { ...q, choosenAnswer: pickedAnswers, isCorrect }
                         : q,
-                ) as (FillAnswerTypes | MultiChoiceQuestionTypes)[],
+                ) as QuizTypes[],
         );
     };
 

@@ -1,8 +1,8 @@
-import { Check, Home, RotateCcw, X } from "lucide-react";
+import { Check, Download, Home, RotateCcw, X } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import MultiChoiceCard from "./MultiChoiceCard";
 import FillAnswerCard from "./FillAnswerCard";
-import { useRouter } from "next/navigation";
+import DefinitionCard from "./DefinitionCard";
 
 const getRemark = (score: number) => {
     if (score === 100) return "Excellent!";
@@ -30,7 +30,6 @@ const Result = ({
         incorrectAnswers: 0,
         score: 0,
     });
-    const router = useRouter();
 
     useEffect(() => {
         if (questions.length === 0) return;
@@ -49,9 +48,9 @@ const Result = ({
                 (q) =>
                     ({
                         ...q,
-                        choosenAnswer: q.type === "multiChoice" ? "" : [],
+                        choosenAnswer: q.type === "fillAnswer" ? [] : "",
                         isCorrect: false,
-                    }) as MultiChoiceQuestionTypes | FillAnswerTypes,
+                    }) as QuizTypes,
             ),
         );
         setCurrentQuestionIndex(0);
@@ -64,13 +63,74 @@ const Result = ({
                 (q) =>
                     ({
                         ...q,
-                        choosenAnswer: q.type === "multiChoice" ? "" : [],
+                        choosenAnswer: q.type === "fillAnswer" ? [] : "",
                         isCorrect: false,
-                    }) as MultiChoiceQuestionTypes | FillAnswerTypes,
+                    }) as QuizTypes,
             ),
         );
         setShowResult(false);
         setStartQuiz(false);
+    };
+
+    const downloadResults = () => {
+        const exportedQuestions = questions.map((question) => {
+            if ((question as MultiChoiceQuestionTypes).type === "multiChoice") {
+                const multiChoiceQuestion = question as MultiChoiceQuestionTypes;
+                const answerIndex = ["A", "B", "C", "D"].indexOf(
+                    multiChoiceQuestion.answer,
+                );
+
+                return {
+                    type: "multiChoice",
+                    question: multiChoiceQuestion.question,
+                    selectedAnswer: multiChoiceQuestion.choosenAnswer,
+                    correctAnswer: multiChoiceQuestion.options[answerIndex],
+                    isCorrect: multiChoiceQuestion.isCorrect,
+                    explanation: multiChoiceQuestion.explanation,
+                };
+            }
+
+            if ((question as DefinitionQuestionTypes).type === "definition") {
+                const definitionQuestion = question as DefinitionQuestionTypes;
+
+                return {
+                    type: "definition",
+                    question: definitionQuestion.question,
+                    selectedAnswer: definitionQuestion.choosenAnswer,
+                    correctAnswer: definitionQuestion.answer,
+                    keywords: definitionQuestion.keywords,
+                    matchedKeywords: definitionQuestion.matchedKeywords || [],
+                    isCorrect: definitionQuestion.isCorrect,
+                    explanation: definitionQuestion.explanation,
+                };
+            }
+
+            const fillAnswerQuestion = question as FillAnswerTypes;
+            return {
+                type: "fillInAnswer",
+                question: fillAnswerQuestion.question,
+                selectedAnswer: fillAnswerQuestion.choosenAnswer,
+                correctAnswer: fillAnswerQuestion.answer,
+                isCorrect: fillAnswerQuestion.isCorrect,
+                explanation: fillAnswerQuestion.explanation,
+            };
+        });
+
+        const exportData = {
+            exportedAt: new Date().toISOString(),
+            summary: result,
+            questions: exportedQuestions,
+        };
+        const blob = new Blob(
+            [JSON.stringify(exportData, null, 2)],
+            { type: "application/json" },
+        );
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "quiz-results.json";
+        link.click();
+        URL.revokeObjectURL(url);
     };
 
     const { totalQuestions, correctAnswers, incorrectAnswers, score } = result;
@@ -112,6 +172,14 @@ const Result = ({
                         <RotateCcw className="h-4 w-4" />
                     </button>
                     <button
+                        onClick={downloadResults}
+                        className="flex items-center gap-2 rounded-md border border-gray-border px-4 py-2 text-sm"
+                        aria-label="Download quiz results as JSON"
+                    >
+                        Download JSON
+                        <Download className="h-4 w-4" />
+                    </button>
+                    <button
                         onClick={goHome}
                         className="flex items-center gap-2 rounded-md bg-green-500 px-4 py-2 text-sm text-white"
                         aria-label="Retry"
@@ -133,6 +201,16 @@ const Result = ({
                             setCurrentQuestion={() => {}}
                             numberOfQuestions={questions.length}
                             question={question as MultiChoiceQuestionTypes}
+                        />
+                    ) : (question as DefinitionQuestionTypes).type ===
+                      "definition" ? (
+                        <DefinitionCard
+                            key={index}
+                            index={index}
+                            setQuestions={() => {}}
+                            setCurrentQuestion={() => {}}
+                            numberOfQuestions={questions.length}
+                            question={question as DefinitionQuestionTypes}
                         />
                     ) : (
                         <FillAnswerCard
