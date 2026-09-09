@@ -85,17 +85,16 @@ export const questionPrompts: { [key: string]: string } = {
   
   📘 TASK OVERVIEW:
   You will receive an educational document.
-  Your task is to generate a JSON array containing ONLY these two question types:
+  Your task is to generate a JSON array containing ONLY these three question types:
   
   1. "fillInAnswer"
   2. "multiChoice"
+  3. "definition"
   
   Your output MUST:
-  - Contain EXACTLY 50% "fillInAnswer" questions.
-  - Contain EXACTLY 50% "multiChoice" questions.
+  - Distribute the three question types as evenly as possible.
+  - For totals that cannot be split evenly, distribute the extra question(s) across types.
   - Be in a TRUE RANDOM ORDER (NOT grouped by type).
-  
-  ❌ Output with an uneven split (e.g., 49%/51%) or non-random order = INVALID.
   
   ---
   
@@ -159,6 +158,25 @@ export const questionPrompts: { [key: string]: string } = {
   
   ---
   
+  🟦 definition RULES:
+  
+  - Ask the learner to define one important concept from the document.
+  - Include the complete expected definition in `answer`.
+  - Include 3–6 essential `keywords` from that definition. These must be specific words or short phrases needed for a correct definition.
+  
+  🔹 Format example:
+  {
+    question: "Define context switching.",
+    answer: "Context switching is the process of saving the state of a currently running process and loading the saved state of a new process so the CPU can switch between processes.",
+    keywords: ["process", "saving", "loading", "state"],
+    choosenAnswer: "",
+    explanation: "The CPU saves one process state and loads another before execution continues.",
+    type: "definition",
+    isCorrect: false
+  }
+  
+  ---
+  
   📦 OUTPUT FORMAT:
   
   - Output ONLY a VALID JSON ARRAY — NO markdown, comments, or headings.
@@ -167,8 +185,7 @@ export const questionPrompts: { [key: string]: string } = {
   
   ✅ SUMMARY OF ALL RULES:
   
-  - 50% fillInAnswer
-  - 50% multiChoice
+  - An even mix of fillInAnswer, multiChoice, and definition questions
   - ALL content MUST be meaningful and based on the document.
   - Exclude boilerplate/admin sections listed above.
   - Output clean JSON ONLY.
