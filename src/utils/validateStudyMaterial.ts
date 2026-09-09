@@ -286,6 +286,16 @@ export const getStudyMaterialValidationIssues = (
     items: unknown,
     type: string,
 ): ValidationIssue[] => {
+    if (isRecord(items) && Array.isArray(items.questions) && isRecord(items.summary)) {
+        return [
+            {
+                path: "$",
+                message:
+                    "is a quiz-results report, not an importable quiz export",
+            },
+        ];
+    }
+
     if (!Array.isArray(items)) {
         return [{ path: "$", message: "must be a JSON array" }];
     }
