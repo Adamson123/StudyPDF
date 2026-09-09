@@ -14,10 +14,6 @@ const getAnswerText = (question: QuizTypes) => {
         return `${multipleChoiceQuestion.answer}. ${multipleChoiceQuestion.options[answerIndex] || ""}`;
     }
 
-    if ((question as DefinitionQuestionTypes).type === "definition") {
-        return (question as DefinitionQuestionTypes).answer;
-    }
-
     return (question as FillAnswerTypes).answer.join(", ");
 };
 
@@ -80,12 +76,41 @@ const QuestionsPreview = ({
                             />
                         )}
 
-                        {showAnswers && (
-                            <div className="max-w-[600px] rounded-md border border-green-500/40 bg-green-500/10 p-3 text-sm">
-                                <strong>Answer: </strong>
-                                {getAnswerText(question)}
-                            </div>
-                        )}
+                        {showAnswers &&
+                            ((question as DefinitionQuestionTypes).type ===
+                            "definition" ? (
+                                <div className="flex max-w-[600px] flex-col gap-2 rounded-md border border-green-500/40 bg-green-500/10 p-3 text-sm">
+                                    <div>
+                                        <strong>Expected definition: </strong>
+                                        {
+                                            (
+                                                question as DefinitionQuestionTypes
+                                            ).answer
+                                        }
+                                    </div>
+                                    <div>
+                                        <strong>Expected key points: </strong>
+                                        {
+                                            (
+                                                question as DefinitionQuestionTypes
+                                            ).keywords.join(", ")
+                                        }
+                                    </div>
+                                    <div>
+                                        <strong>Description: </strong>
+                                        {
+                                            (
+                                                question as DefinitionQuestionTypes
+                                            ).explanation
+                                        }
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="max-w-[600px] rounded-md border border-green-500/40 bg-green-500/10 p-3 text-sm">
+                                    <strong>Answer: </strong>
+                                    {getAnswerText(question)}
+                                </div>
+                            ))}
                     </div>
                 ))}
             </div>
