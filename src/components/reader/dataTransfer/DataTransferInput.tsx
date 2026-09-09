@@ -78,7 +78,7 @@ const DataTransferInput = ({
         setValidationIssues([]);
         setOpenDataTransferSelection({
             type,
-            data: data as any[],
+            data: data as unknown[],
             transferMethod: "import",
         });
         setDataTransferType("");
