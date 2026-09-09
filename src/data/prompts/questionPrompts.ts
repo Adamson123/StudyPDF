@@ -161,8 +161,8 @@ export const questionPrompts: { [key: string]: string } = {
   🟦 definition RULES:
   
   - Ask the learner to define one important concept from the document.
-  - Include the complete expected definition in `answer`.
-  - Include 3–6 essential `keywords` from that definition. These must be specific words or short phrases needed for a correct definition.
+  - Include the complete expected definition in \`answer\`.
+  - Include 3–6 essential \`keywords\` from that definition. These must be specific words or short phrases needed for a correct definition.
   
   🔹 Format example:
   {
