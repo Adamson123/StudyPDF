@@ -61,7 +61,7 @@ const DefinitionCard = ({
     );
 
     return (
-        <div className="flex w-full max-w-[600px] flex-col items-start gap-5 rounded-md border border-gray-border p-5">
+        <div className="flex max-w-[600px] flex-col items-start gap-5 rounded-md border border-gray-border p-5">
             <div className="flex items-center gap-1 rounded-md bg-primary/30 p-2 text-sm">
                 <Stars className="h-4 w-4 fill-primary stroke-primary" />
                 Question {index + 1} of {numberOfQuestions}
