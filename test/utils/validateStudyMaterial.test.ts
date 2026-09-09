@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import validateStudyMaterial from "@/utils/validateStudyMaterial";
+import validateStudyMaterial, {
+    getStudyMaterialValidationIssues,
+} from "@/utils/validateStudyMaterial";
 
 const validMultipleChoiceQuestion = {
     question: "Which option is correct?",
@@ -58,6 +60,29 @@ describe("validateStudyMaterial", () => {
                 "Quizzes",
             ),
         ).toBe(false);
+    });
+
+    it("returns field-level errors for invalid definition questions", () => {
+        const issues = getStudyMaterialValidationIssues(
+            [
+                {
+                    id: "quiz-1",
+                    title: "Invalid definition quiz",
+                    questions: [
+                        {
+                            ...validDefinitionQuestion,
+                            keywords: [],
+                        },
+                    ],
+                },
+            ],
+            "Quizzes",
+        );
+
+        expect(issues).toContainEqual({
+            path: "[0].questions[0].keywords",
+            message: "must contain at least one expected key point",
+        });
     });
 
     it("rejects definition questions without usable keywords", () => {
