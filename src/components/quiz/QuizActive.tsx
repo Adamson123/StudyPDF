@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import MultiChoiceCard from "./MultiChoiceCard";
 import FillAnswerCard from "./FillAnswerCard";
+import DefinitionCard from "./DefinitionCard";
 import Result from "./Result";
 import { ChevronLeft } from "lucide-react";
 
@@ -20,7 +21,7 @@ export const QuizActive = ({
     setStartQuiz: Dispatch<SetStateAction<boolean>>;
 }) => {
     const [currentQuestion, setCurrentQuestion] = useState<
-        MultiChoiceQuestionTypes | FillAnswerTypes
+        MultiChoiceQuestionTypes | FillAnswerTypes | DefinitionQuestionTypes
     >();
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [showResult, setShowResult] = useState(false);
@@ -83,7 +84,7 @@ export const QuizActive = ({
                             />
                         </div>
                         {currentQuestion && (
-                            <div className="">
+                            <>
                                 {(currentQuestion as MultiChoiceQuestionTypes)
                                     .type === "multiChoice" ? (
                                     <MultiChoiceCard
@@ -95,6 +96,21 @@ export const QuizActive = ({
                                         }
                                         setCurrentQuestion={
                                             setCurrentQuestion as any
+                                        }
+                                    />
+                                ) : (currentQuestion as DefinitionQuestionTypes)
+                                      .type === "definition" ? (
+                                    <DefinitionCard
+                                        question={
+                                            currentQuestion as DefinitionQuestionTypes
+                                        }
+                                        index={currentQuestionIndex}
+                                        setQuestions={setQuestions}
+                                        numberOfQuestions={questions.length}
+                                        setCurrentQuestion={
+                                            setCurrentQuestion as React.Dispatch<
+                                                React.SetStateAction<QuizTypes>
+                                            >
                                         }
                                     />
                                 ) : (
@@ -110,12 +126,13 @@ export const QuizActive = ({
                                                 React.SetStateAction<
                                                     | FillAnswerTypes
                                                     | MultiChoiceQuestionTypes
+                                                    | DefinitionQuestionTypes
                                                 >
                                             >
                                         }
                                     />
                                 )}
-                            </div>
+                            </>
                         )}
                     </div>
                     {/* Question */}
