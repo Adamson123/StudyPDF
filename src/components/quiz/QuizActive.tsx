@@ -12,27 +12,33 @@ import Result from "./Result";
 import { ChevronLeft } from "lucide-react";
 
 export const QuizActive = ({
+    autoSaveEnabled,
+    currentQuestionIndex,
+    onQuizCompleted,
     questions,
+    setAutoSaveEnabled,
+    setCurrentQuestionIndex,
     setQuestions,
     setStartQuiz,
 }: {
+    autoSaveEnabled: boolean;
+    currentQuestionIndex: number;
+    onQuizCompleted: () => void;
     questions: QuizTypes[];
+    setAutoSaveEnabled: (enabled: boolean) => void;
+    setCurrentQuestionIndex: Dispatch<SetStateAction<number>>;
     setQuestions: React.Dispatch<React.SetStateAction<QuizTypes[]>>;
     setStartQuiz: Dispatch<SetStateAction<boolean>>;
 }) => {
     const [currentQuestion, setCurrentQuestion] = useState<
         MultiChoiceQuestionTypes | FillAnswerTypes | DefinitionQuestionTypes
     >();
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [showResult, setShowResult] = useState(false);
 
     useEffect(() => {
-        //TODO: Remove the event listener when the component unmounts
         const warnOnPageReload = (event: BeforeUnloadEvent) => {
-            // if (questions.some((question) => question.choosenAnswer.length)) {
             event.preventDefault();
-            event.returnValue = ""; // This is required for some browsers to show the confirmation dialog
-            // }
+            event.returnValue = "";
         };
 
         window.addEventListener("beforeunload", warnOnPageReload);
@@ -43,26 +49,29 @@ export const QuizActive = ({
     }, []);
 
     useEffect(() => {
-        const question = questions[currentQuestionIndex];
-        setCurrentQuestion(question);
+        setCurrentQuestion(questions[currentQuestionIndex]);
     }, [currentQuestionIndex, questions]);
 
-    const amountOfAnsweredQuestion = useMemo(() => {
-        return questions.filter((question) => question.choosenAnswer.length)
-            .length;
-    }, [questions]);
+    useEffect(() => {
+        if (showResult) onQuizCompleted();
+    }, [onQuizCompleted, showResult]);
+
+    const amountOfAnsweredQuestion = useMemo(
+        () =>
+            questions.filter((question) => question.choosenAnswer.length)
+                .length,
+        [questions],
+    );
 
     const handleBack = () => {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(currentQuestionIndex - 1);
-            console.log(currentQuestionIndex - 1);
         }
     };
 
     const handleNext = () => {
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
-            console.log(currentQuestionIndex + 1);
         }
     };
 
@@ -71,7 +80,6 @@ export const QuizActive = ({
             {!showResult && (
                 <>
                     <div className="m-auto flex w-full flex-col items-center gap-7">
-                        {/* Progress */}
                         <div className="flex w-full max-w-[600px] flex-col items-center gap-2 pb-2 text-sm text-gray-500">
                             <p>
                                 Answered &nbsp;{amountOfAnsweredQuestion} /{" "}
@@ -82,7 +90,25 @@ export const QuizActive = ({
                                 max={questions.length}
                                 className="h-2 w-full"
                             />
+                            <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-foreground">
+                                <input
+                                    type="checkbox"
+                                    checked={autoSaveEnabled}
+                                    onChange={(event) =>
+                                        setAutoSaveEnabled(
+                                            event.target.checked,
+                                        )
+                                    }
+                                    className="h-4 w-4 accent-primary"
+                                />
+                                Auto-save quiz progress on this device
+                            </label>
+                            <p className="text-center text-xs">
+                                Resume from your last answered question after a
+                                reload or accidental browser close.
+                            </p>
                         </div>
+
                         {currentQuestion && (
                             <>
                                 {(currentQuestion as MultiChoiceQuestionTypes)
@@ -135,14 +161,12 @@ export const QuizActive = ({
                             </>
                         )}
                     </div>
-                    {/* Question */}
+
                     <div className="flex w-full items-center justify-between gap-2 pt-10">
                         <div className="flex w-full items-center justify-between gap-2">
                             {currentQuestionIndex ? (
                                 <button
-                                    onClick={() => {
-                                        handleBack();
-                                    }}
+                                    onClick={handleBack}
                                     className="h-10 w-32 rounded-full border border-gray-border"
                                 >
                                     <ChevronLeft className="inline" /> &nbsp;
@@ -153,9 +177,7 @@ export const QuizActive = ({
                             )}
                             {amountOfAnsweredQuestion === questions.length && (
                                 <button
-                                    onClick={() => {
-                                        setShowResult(true);
-                                    }}
+                                    onClick={() => setShowResult(true)}
                                     className="h-10 w-32 rounded-md bg-primary text-white"
                                 >
                                     Submit
@@ -164,12 +186,10 @@ export const QuizActive = ({
                             {currentQuestion?.choosenAnswer.length &&
                             currentQuestionIndex < questions.length - 1 ? (
                                 <button
-                                    onClick={() => {
-                                        handleNext();
-                                    }}
+                                    onClick={handleNext}
                                     className="h-10 w-32 rounded-full border border-gray-border"
                                 >
-                                    Next &nbsp;{" "}
+                                    Next &nbsp;
                                     <ChevronLeft className="inline rotate-180" />
                                 </button>
                             ) : (
@@ -180,7 +200,6 @@ export const QuizActive = ({
                 </>
             )}
 
-            {/* result */}
             {showResult && (
                 <Result
                     setCurrentQuestionIndex={setCurrentQuestionIndex}
