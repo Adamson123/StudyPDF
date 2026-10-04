@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-//import { questionsMock } from "@/data/static-data/questionMock";
+import { useCallback, useEffect, useState } from "react";
 import { QuizActive } from "./QuizActive";
 import QuestionsPreview from "./QuestionsPreview";
 import { Play } from "lucide-react";
@@ -9,16 +8,13 @@ import { useParams } from "next/navigation";
 import { useAppSelector } from "@/hooks/useAppStore";
 import { shuffleArray } from "@/utils/shuffle";
 
-const randomizeOptions = (quizzes?: QuizTypes[]) => {
-    /**
-     * How this function randomizes the options of multiple-choice questions
-     * 0. It first finds the correct answer option before shuffling.
-     * 1. It iterates through each question in the quiz data.
-     * 2. For each multiple-choice question, it shuffles the options randomly.
-     * 3. It then finds the new index of the correct answer after shuffling.
-     * 4. Finally, it updates the question with the shuffled options and the new correct answer letter.
-     */
+type SavedQuizProgress = {
+    version: 1;
+    questions: QuizTypes[];
+    currentQuestionIndex: number;
+};
 
+const randomizeOptions = (quizzes?: QuizTypes[]) => {
     if (!quizzes || !quizzes.length) return [];
 
     return quizzes.map((q) => {
@@ -27,30 +23,20 @@ const randomizeOptions = (quizzes?: QuizTypes[]) => {
         const multiChoiceQuestion = structuredClone(
             q,
         ) as MultiChoiceQuestionTypes;
-
-        // Get index of the current answer letter
         const optionLetters = ["A", "B", "C", "D"];
         const answerLetterIndex = optionLetters.indexOf(
             multiChoiceQuestion.answer,
         );
         const correctOption = multiChoiceQuestion.options[answerLetterIndex];
-
         const shuffledOptions = shuffleArray(multiChoiceQuestion.options);
-        // shuffleArrayPosition(
-        //     multiChoiceQuestion.options,
-        //     answerLetterIndex,
-        // );
-
-        // Find the new index of the correct option after shuffling
         const newAnswerOptionIndex = shuffledOptions.indexOf(
             correctOption as string,
         );
-        const newAnswerLetter = optionLetters[newAnswerOptionIndex];
 
         return {
             ...q,
             options: shuffledOptions,
-            answer: newAnswerLetter,
+            answer: optionLetters[newAnswerOptionIndex],
         };
     });
 };
@@ -58,6 +44,9 @@ const randomizeOptions = (quizzes?: QuizTypes[]) => {
 const Quiz = () => {
     const { id } = useParams() as { id: string };
     const [startQuiz, setStartQuiz] = useState(false);
+    const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [hydrated, setHydrated] = useState(false);
     const quizzesData = useAppSelector((state) =>
         state.quizzes.items.find((q) => q.id === id),
     );
@@ -65,24 +54,83 @@ const Quiz = () => {
     const [questions, setQuestions] = useState(
         randomizeOptions(quizzesData?.questions) as QuizTypes[],
     );
+    const progressKey = `study-pdf:quiz-progress:${id}`;
+
+    const clearSavedProgress = useCallback(() => {
+        try {
+            localStorage.removeItem(progressKey);
+        } catch {
+            // Keep the quiz usable when browser storage is unavailable.
+        }
+    }, [progressKey]);
 
     useEffect(() => {
-        const warnOnPageReload = (event: BeforeUnloadEvent) => {
-            event.preventDefault();
-            event.returnValue = ""; // This is required for some browsers to show the confirmation dialog
+        try {
+            const rawProgress = localStorage.getItem(progressKey);
+            if (!rawProgress) return;
+
+            const savedProgress = JSON.parse(rawProgress) as SavedQuizProgress;
+            if (
+                savedProgress.version !== 1 ||
+                !Array.isArray(savedProgress.questions) ||
+                savedProgress.questions.length === 0 ||
+                !Number.isInteger(savedProgress.currentQuestionIndex)
+            ) {
+                clearSavedProgress();
+                return;
+            }
+
+            setQuestions(savedProgress.questions);
+            setCurrentQuestionIndex(
+                Math.max(
+                    0,
+                    Math.min(
+                        savedProgress.currentQuestionIndex,
+                        savedProgress.questions.length - 1,
+                    ),
+                ),
+            );
+            setAutoSaveEnabled(true);
+            setStartQuiz(true);
+        } catch {
+            clearSavedProgress();
+        } finally {
+            setHydrated(true);
+        }
+    }, [clearSavedProgress, progressKey]);
+
+    useEffect(() => {
+        if (!hydrated || !autoSaveEnabled || !startQuiz) return;
+
+        const progress: SavedQuizProgress = {
+            version: 1,
+            questions,
+            currentQuestionIndex,
         };
 
-        window.addEventListener("beforeunload", warnOnPageReload);
+        try {
+            localStorage.setItem(progressKey, JSON.stringify(progress));
+        } catch {
+            // Keep the quiz usable when browser storage is unavailable.
+        }
+    }, [
+        autoSaveEnabled,
+        currentQuestionIndex,
+        hydrated,
+        progressKey,
+        questions,
+        startQuiz,
+    ]);
 
-        return () => {
-            window.removeEventListener("beforeunload", warnOnPageReload);
-        };
-    }, []);
+    const handleAutoSaveChange = (enabled: boolean) => {
+        setAutoSaveEnabled(enabled);
+        if (!enabled) clearSavedProgress();
+    };
 
     return (
         <main className="flex w-full flex-col gap-6 overflow-y-auto bg-background p-6">
             <div className="flex items-center justify-between border-gray-border bg-background">
-                <div className="">
+                <div>
                     <h2 className="text-2xl">{title}</h2>
                     <h3 className="text-sm text-gray-500">
                         Total Questions: {questions.length}
@@ -97,12 +145,17 @@ const Quiz = () => {
                     </button>
                 )}
             </div>
-            {/* Quiz Active */}
+
             {startQuiz ? (
                 <QuizActive
-                    setStartQuiz={setStartQuiz}
+                    autoSaveEnabled={autoSaveEnabled}
+                    currentQuestionIndex={currentQuestionIndex}
+                    onQuizCompleted={clearSavedProgress}
                     questions={questions}
+                    setAutoSaveEnabled={handleAutoSaveChange}
+                    setCurrentQuestionIndex={setCurrentQuestionIndex}
                     setQuestions={setQuestions}
+                    setStartQuiz={setStartQuiz}
                 />
             ) : (
                 <QuestionsPreview
