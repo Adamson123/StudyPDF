@@ -44,7 +44,7 @@ const randomizeOptions = (quizzes?: QuizTypes[]) => {
 const Quiz = () => {
     const { id } = useParams() as { id: string };
     const [startQuiz, setStartQuiz] = useState(false);
-    const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
+    const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [hydrated, setHydrated] = useState(false);
     const quizzesData = useAppSelector((state) =>
