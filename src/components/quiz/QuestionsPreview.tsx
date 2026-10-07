@@ -109,6 +109,10 @@ const QuestionsPreview = ({
                                 <div className="max-w-[600px] rounded-md border border-green-500/40 bg-green-500/10 p-3 text-sm">
                                     <strong>Answer: </strong>
                                     {getAnswerText(question)}
+                                    <strong>Description: </strong>
+                                        {
+                                            question.explanation
+                                        }
                                 </div>
                             ))}
                     </div>
