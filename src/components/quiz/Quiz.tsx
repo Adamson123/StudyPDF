@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { QuizActive } from "./QuizActive";
 import QuestionsPreview from "./QuestionsPreview";
 import { Play } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useAppSelector } from "@/hooks/useAppStore";
 import { shuffleArray } from "@/utils/shuffle";
 
@@ -43,18 +43,45 @@ const randomizeOptions = (quizzes?: QuizTypes[]) => {
 
 const Quiz = () => {
     const { id } = useParams() as { id: string };
+    const searchParams = useSearchParams();
+    const selectedIdsKey = searchParams.get("ids") || id;
+    const selectedIds = useMemo(
+        () =>
+            selectedIdsKey
+                .split(",")
+                .map((selectedId) => decodeURIComponent(selectedId))
+                .filter(Boolean),
+        [selectedIdsKey],
+    );
+    const quizzes = useAppSelector((state) => state.quizzes.items);
+    const selectedQuizzes = useMemo(
+        () =>
+            selectedIds
+                .map((selectedId) =>
+                    quizzes.find((quiz) => quiz.id === selectedId),
+                )
+                .filter((quiz): quiz is StoredQuiz => Boolean(quiz)),
+        [quizzes, selectedIds],
+    );
+    const initialQuestions = useMemo(
+        () => selectedQuizzes.flatMap((quiz) => quiz.questions),
+        [selectedQuizzes],
+    );
+    const title =
+        selectedQuizzes.length > 1
+            ? `${selectedQuizzes.length} quizzes`
+            : selectedQuizzes[0]?.title || "";
+    const selectionKey = useMemo(
+        () => [...selectedIds].sort().join("|"),
+        [selectedIds],
+    );
+
     const [startQuiz, setStartQuiz] = useState(false);
     const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [hydrated, setHydrated] = useState(false);
-    const quizzesData = useAppSelector((state) =>
-        state.quizzes.items.find((q) => q.id === id),
-    );
-    const title = quizzesData?.title || "";
-    const [questions, setQuestions] = useState(
-        randomizeOptions(quizzesData?.questions) as QuizTypes[],
-    );
-    const progressKey = `study-pdf:quiz-progress:${id}`;
+    const [questions, setQuestions] = useState<QuizTypes[]>([]);
+    const progressKey = `study-pdf:quiz-progress:${selectionKey}`;
 
     const clearSavedProgress = useCallback(() => {
         try {
@@ -100,6 +127,12 @@ const Quiz = () => {
     }, [clearSavedProgress, progressKey]);
 
     useEffect(() => {
+        if (!hydrated || startQuiz || !initialQuestions.length) return;
+
+        setQuestions(randomizeOptions(initialQuestions) as QuizTypes[]);
+    }, [hydrated, initialQuestions, startQuiz]);
+
+    useEffect(() => {
         if (!hydrated || !autoSaveEnabled || !startQuiz) return;
 
         const progress: SavedQuizProgress = {
@@ -139,7 +172,8 @@ const Quiz = () => {
                 {!startQuiz && (
                     <button
                         onClick={() => setStartQuiz(true)}
-                        className="flex items-center gap-2 text-nowrap rounded bg-green-500 p-2 px-3 text-sm text-white transition-all hover:bg-green-600"
+                        disabled={!questions.length}
+                        className="flex items-center gap-2 text-nowrap rounded bg-green-500 p-2 px-3 text-sm text-white transition-all hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Start Quiz <Play className="h-4 w-4 fill-white" />
                     </button>
