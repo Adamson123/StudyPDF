@@ -10,14 +10,15 @@ const Flashcard = ({
     index,
     setFlashcardToEdit,
     flashcardsInfo,
+    allowEditing = true,
 }: {
     flashcard: FlashcardTypes;
-
     setFlashcardToEdit: Dispatch<
         SetStateAction<(FlashcardTypes & { index: number }) | null>
     >;
     flashcardsInfo: { id: string; title: string };
     index: number;
+    allowEditing?: boolean;
 }) => {
     const flashcardLevel = getColorClass(flashcard.level);
     const dispatch = useAppDispatch();
@@ -29,7 +30,9 @@ const Flashcard = ({
     return (
         <div
             className={cn(
-                `relative space-y-6 rounded bg-border/35 p-7 pb-16 transition-all`,
+                `relative space-y-6 rounded bg-border/35 p-7 ${
+                    allowEditing ? "pb-16" : ""
+                } transition-all`,
                 flashcardLevel.color,
             )}
         >
@@ -41,24 +44,26 @@ const Flashcard = ({
                 <h3 className="underline">Back</h3>
                 <p className="text-xs">{flashcard.back}</p>
             </div>
-            <div className="absolute bottom-2 right-2 flex items-center">
-                <button
-                    onClick={() => {
-                        setFlashcardToEdit({ ...flashcard, index } as
-                            | (FlashcardTypes & { index: number })
-                            | null);
-                    }}
-                    className="rounded p-3 hover:bg-gray-500/10"
-                >
-                    <Pencil className="h-4 w-4" />
-                </button>
-                <button
-                    onClick={deleteFlashcard}
-                    className="rounded p-3 hover:bg-gray-500/10"
-                >
-                    <Trash2 className="h-4 w-4" />
-                </button>
-            </div>
+            {allowEditing && (
+                <div className="absolute bottom-2 right-2 flex items-center">
+                    <button
+                        onClick={() => {
+                            setFlashcardToEdit({ ...flashcard, index } as
+                                | (FlashcardTypes & { index: number })
+                                | null);
+                        }}
+                        className="rounded p-3 hover:bg-gray-500/10"
+                    >
+                        <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                        onClick={deleteFlashcard}
+                        className="rounded p-3 hover:bg-gray-500/10"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
