@@ -36,6 +36,7 @@ const FlashcardList = ({
 
     const toggleSelectionMode = () => {
         setSelectionMode((previous) => !previous);
+        setOpenDropDown(true);
         setSelectedIds([]);
         setEditingId(null);
     };
@@ -107,6 +108,7 @@ const FlashcardList = ({
                         )}
                         {editingId === flashcardSet.id ? (
                             <form
+                                onClick={(event) => event.stopPropagation()}
                                 onSubmit={(event) => {
                                     event.preventDefault();
                                     saveRename(flashcardSet);
