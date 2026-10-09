@@ -36,6 +36,7 @@ const QuizList = ({
 
     const toggleSelectionMode = () => {
         setSelectionMode((previous) => !previous);
+        setOpenDropDown(true);
         setSelectedIds([]);
         setEditingId(null);
     };
@@ -103,6 +104,7 @@ const QuizList = ({
                         )}
                         {editingId === quiz.id ? (
                             <form
+                                onClick={(event) => event.stopPropagation()}
                                 onSubmit={(event) => {
                                     event.preventDefault();
                                     saveRename(quiz);
