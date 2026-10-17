@@ -26,11 +26,10 @@ const FillAnswerCard = ({
         const inputs = answerInputs.current;
         if (inputs.length) {
             inputs.forEach((input, i) => {
-                console.log("Setting input value", choosenAnswer[i], i);
-                if (input) input!.value = (choosenAnswer[i] as string) || "";
+                if (input) input.value = choosenAnswer[i] || "";
             });
         }
-    }, [answer]);
+    }, [choosenAnswer]);
 
     const handleSubmitAnswer = () => {
         if (choosenAnswer.length) return;
@@ -61,19 +60,14 @@ const FillAnswerCard = ({
         );
     };
 
-    const getAnswerInputIndex = (i: number) => (i + 1) / 2 - 1;
+    const getAnswerInputIndex = (partIndex: number) => (partIndex - 1) / 2;
 
-    const splittedQuestion = question.split(/_{5,}/g);
-    let count = 0;
-    question.split(/_{5,}/g).forEach((q, i) => {
-        if (i % 2 === 0) {
-            // const word = splittedQuestion[i + 1] as string;
-            // splittedQuestion[i + 1] = answer[count] as string;
-            // splittedQuestion[i + 2] = word;
-            const ans = answer[count] as string;
-            splittedQuestion.splice(i + 1, 0, ans);
-        }
-    });
+    const normalizeAnswer = (value?: string) => value?.trim().toLowerCase() || "";
+    const isAnswerCorrect = (answerIndex: number) =>
+        normalizeAnswer(choosenAnswer[answerIndex]) ===
+        normalizeAnswer(answer[answerIndex]);
+
+    const splittedQuestion = question.split(/(_{5,})/g);
 
     return (
         <div className="flex max-w-[600px] snap-center flex-col items-start gap-5 rounded-md border border-gray-border p-5">
@@ -98,7 +92,13 @@ const FillAnswerCard = ({
                                         getAnswerInputIndex(i)
                                     ] = el;
                                 }}
-                                className={`inline h-7 w-auto bg-gray-400/15 ${choosenAnswer.length && (choosenAnswer[getAnswerInputIndex(i)].toLowerCase() === answer[getAnswerInputIndex(i)]?.toLowerCase() ? "bg-green-500/40" : "bg-red-500/40")}`}
+                                className={`inline h-7 w-auto bg-gray-400/15 ${
+                                    choosenAnswer.length > 0
+                                        ? isAnswerCorrect(getAnswerInputIndex(i))
+                                            ? "border-2 border-green-500"
+                                            : "border-2 border-red-500"
+                                        : ""
+                                }`}
                             />{" "}
                             &nbsp;
                         </span>
@@ -117,8 +117,11 @@ const FillAnswerCard = ({
                                     {part}
                                 </span>
                             ) : (
-                                <span key={i} className="text-green-500">
-                                    {part}
+                                <span
+                                    key={i}
+                                    className="mx-1 inline-block rounded border-2 border-green-500 px-1 text-green-500"
+                                >
+                                    {answer[getAnswerInputIndex(i)] || ""}
                                 </span>
                             ),
                         )}
