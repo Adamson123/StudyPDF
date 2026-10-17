@@ -4,78 +4,74 @@ import { getColorClass } from "./utils";
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppStore";
-import { updateOneSetOfFlashcards } from "@/redux/features/flashcardsSlice";
+import { updateOneCard } from "@/redux/features/flashcardsSlice";
+
+export type PracticeFlashcard = FlashcardTypes & {
+    sourceSetId: string;
+    sourceCardIndex: number;
+};
+
+type SessionFlashcard = PracticeFlashcard & { sessionId: number };
 
 const PracticeFlashcards = ({
     setPracticeFlashcards,
     flashcards,
-    flashcardsInfo,
 }: {
     setPracticeFlashcards: Dispatch<SetStateAction<boolean>>;
-    flashcards: FlashcardTypes[];
-    flashcardsInfo: { id: string; title: string };
+    flashcards: PracticeFlashcard[];
 }) => {
-    const randomizeFlashcards = () => {
-        const shuffledFlashcards = [...flashcards]
-            .map((card, index) => ({ ...card, id: index }))
+    const randomizeFlashcards = (): SessionFlashcard[] =>
+        [...flashcards]
+            .map((card, sessionId) => ({ ...card, sessionId }))
             .sort(() => Math.random() - 0.5);
-        return shuffledFlashcards;
-    };
 
     const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
-    const [shuffledFlashcards, setShuffledFlashcards] = useState<
-        (FlashcardTypes & { id: number })[]
-    >(randomizeFlashcards());
+    const [shuffledFlashcards] = useState<SessionFlashcard[]>(
+        randomizeFlashcards,
+    );
     const dispatch = useAppDispatch();
 
-    // Function to update the level of the current flashcard
     const updateFlashcardLevel = (level: string) => {
-        // Get the flashcard with its original index
-        const flashcardWidthID = shuffledFlashcards[
-            currentFlashcardIndex
-        ] as FlashcardTypes & { id: number };
-
-        // Update the level of the flashcard with the matching id
-        const updatedFlashcards = flashcards.map((flashcard, i) => {
-            if (i === flashcardWidthID.id) {
-                return { ...flashcard, level };
-            }
-            return flashcard;
-        });
-
-        //TODO:Remove comments
-        // setFlashcards(updatedFlashcards);
-        // saveFlashcard({ ...flashcardsInfo, cardsToSave: updatedFlashcards });
+        const currentFlashcard = shuffledFlashcards[currentFlashcardIndex];
+        if (!currentFlashcard) return;
 
         dispatch(
-            updateOneSetOfFlashcards({
-                ...flashcardsInfo,
-                cards: updatedFlashcards,
+            updateOneCard({
+                id: currentFlashcard.sourceSetId,
+                cardIndex: currentFlashcard.sourceCardIndex,
+                card: {
+                    front: currentFlashcard.front,
+                    back: currentFlashcard.back,
+                    level,
+                },
             }),
         );
 
-        // Move to the next flashcard or end practice if it was the last one
-        if (currentFlashcardIndex < flashcards.length - 1) {
+        if (currentFlashcardIndex < shuffledFlashcards.length - 1) {
             setCurrentFlashcardIndex(currentFlashcardIndex + 1);
         } else {
-            // If it was the last flashcard, reset to the beginning and exit practice mode
             setPracticeFlashcards(false);
         }
         setShowAnswer(false);
-        return updatedFlashcards;
     };
 
     const flashcardLevel = getColorClass(
-        (shuffledFlashcards[currentFlashcardIndex] as FlashcardTypes).level,
+        shuffledFlashcards[currentFlashcardIndex]?.level || "medium",
     );
+
+    if (!shuffledFlashcards.length) {
+        return (
+            <div className="mx-auto max-w-[600px] py-10 text-center text-sm text-gray-500">
+                There are no cards to practice.
+            </div>
+        );
+    }
 
     return (
         <div>
             <div className="mx-auto flex w-full max-w-[600px] flex-col items-center gap-5 pb-2 text-sm text-gray-500">
-                {/* Head */}
                 <div className="flex w-full flex-col items-center justify-between gap-4 pt-5">
-                    {/* Count */}
                     <div className="flex w-full items-center justify-between gap-2">
                         <Button
                             onClick={() => setPracticeFlashcards(false)}
@@ -87,20 +83,18 @@ const PracticeFlashcards = ({
                         </Button>
                         <p>
                             Card &nbsp;{currentFlashcardIndex + 1} of{" "}
-                            {flashcards.length}
+                            {shuffledFlashcards.length}
                         </p>
                     </div>
-                    {/* Progress */}
                     <progress
                         value={currentFlashcardIndex}
                         max={shuffledFlashcards.length}
                         className="h-2 w-full"
                     />
                 </div>
-                {/* Card */}
                 <div
                     className={cn(
-                        `flex min-h-80 w-full flex-col rounded bg-border/55 p-3 text-sm text-white`,
+                        "flex min-h-80 w-full flex-col rounded bg-border/55 p-3 text-sm text-white",
                         flashcardLevel.color,
                     )}
                 >
@@ -110,7 +104,6 @@ const PracticeFlashcards = ({
                             flashcardLevel.border,
                         )}
                     >
-                        {" "}
                         {shuffledFlashcards[currentFlashcardIndex]?.front}
                     </div>
                     <div
@@ -129,27 +122,18 @@ const PracticeFlashcards = ({
                 ) : (
                     <div className="flex w-full gap-2">
                         {[
-                            {
-                                level: "hard",
-                                color: "bg-red-500",
-                            },
-                            {
-                                level: "medium",
-                                color: "bg-yellow-500",
-                            },
-                            {
-                                level: "easy",
-                                color: "bg-green-500",
-                            },
-                        ].map((level, i) => (
+                            { level: "hard", color: "bg-red-500" },
+                            { level: "medium", color: "bg-yellow-500" },
+                            { level: "easy", color: "bg-green-500" },
+                        ].map((level) => (
                             <Button
                                 onClick={() =>
                                     updateFlashcardLevel(level.level)
                                 }
-                                key={i}
+                                key={level.level}
                                 variant="outline"
                                 className={cn(
-                                    `flex-1 p-7 text-white`,
+                                    "flex-1 p-7 text-white",
                                     level.color,
                                     `hover:${level.color} hover:opacity-[0.9]`,
                                 )}

@@ -1,22 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import FlashcardsPreview from "./FlashcardsPreview";
-import PracticeFlashcards from "./PracticeFlashcards";
-import { useParams } from "next/navigation";
+import PracticeFlashcards, {
+    type PracticeFlashcard,
+} from "./PracticeFlashcards";
+import { useParams, useSearchParams } from "next/navigation";
 import { useAppSelector } from "@/hooks/useAppStore";
 
 const FlashCard = () => {
     const { id } = useParams() as { id: string };
-    const [practiceFlashcards, setPracticeFlashcards] = useState(false);
-    const flashcardsData = useAppSelector((state) =>
-        state.flashcards.items.find((f) => f.id === id),
+    const searchParams = useSearchParams();
+    const selectedIdsKey = searchParams.get("ids") || id;
+    const selectedIds = useMemo(
+        () =>
+            selectedIdsKey
+                .split(",")
+                .map((selectedId) => decodeURIComponent(selectedId))
+                .filter(Boolean),
+        [selectedIdsKey],
     );
+    const [practiceFlashcards, setPracticeFlashcards] = useState(false);
+    const flashcardSets = useAppSelector((state) => state.flashcards.items);
+    const selectedSets = useMemo(
+        () =>
+            selectedIds
+                .map((selectedId) =>
+                    flashcardSets.find((flashcardSet) => flashcardSet.id === selectedId),
+                )
+                .filter(
+                    (flashcardSet): flashcardSet is StoredFlashcard =>
+                        Boolean(flashcardSet),
+                ),
+        [flashcardSets, selectedIds],
+    );
+    const flashcards = useMemo<PracticeFlashcard[]>(
+        () =>
+            selectedSets.flatMap((flashcardSet) =>
+                flashcardSet.cards.map((card, sourceCardIndex) => ({
+                    ...card,
+                    sourceSetId: flashcardSet.id,
+                    sourceCardIndex,
+                })),
+            ),
+        [selectedSets],
+    );
+    const isMultiSet = selectedSets.length > 1;
     const flashcardsInfo = {
-        title: flashcardsData?.title || "",
-        id: flashcardsData?.id || "",
+        title: isMultiSet
+            ? `${selectedSets.length} flashcard sets`
+            : selectedSets[0]?.title || "",
+        id: selectedSets[0]?.id || "",
     };
-    const flashcards = flashcardsData?.cards || [];
 
     return (
         <main className="p-5">
@@ -25,13 +60,13 @@ const FlashCard = () => {
                 <PracticeFlashcards
                     setPracticeFlashcards={setPracticeFlashcards}
                     flashcards={flashcards}
-                    flashcardsInfo={flashcardsInfo}
                 />
             ) : (
                 <FlashcardsPreview
                     setPracticeFlashcards={setPracticeFlashcards}
                     flashcards={flashcards}
                     flashcardsInfo={flashcardsInfo}
+                    isMultiSet={isMultiSet}
                 />
             )}
         </main>

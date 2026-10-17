@@ -7,12 +7,13 @@ import { Dispatch, SetStateAction, useMemo, useState } from "react";
 const FlashcardsPreview = ({
     setPracticeFlashcards,
     flashcards,
-
     flashcardsInfo,
+    isMultiSet = false,
 }: {
     setPracticeFlashcards: Dispatch<SetStateAction<boolean>>;
     flashcards: FlashcardTypes[];
     flashcardsInfo: { id: string; title: string };
+    isMultiSet?: boolean;
 }) => {
     const [showEditFlashcards, setShowEditFlashcards] = useState(false);
     const [flashcardToEdit, setFlashcardToEdit] = useState<
@@ -32,9 +33,11 @@ const FlashcardsPreview = ({
         ).length;
 
         return {
-            hard: Math.round((hardCards / totalCards) * 100),
-            medium: Math.round((mediumCards / totalCards) * 100),
-            easy: Math.round((easyCards / totalCards) * 100),
+            hard: totalCards ? Math.round((hardCards / totalCards) * 100) : 0,
+            medium: totalCards
+                ? Math.round((mediumCards / totalCards) * 100)
+                : 0,
+            easy: totalCards ? Math.round((easyCards / totalCards) * 100) : 0,
         };
     }, [flashcards]);
 
@@ -58,10 +61,9 @@ const FlashcardsPreview = ({
 
     return (
         <div className="mx-auto flex max-w-7xl flex-col gap-5">
-            {/* learning progress */}
             <div className="mx-auto w-full rounded border">
                 <div className="flex justify-between gap-2 border-b p-5 text-sm">
-                    <h2 className="">Learning Progress</h2>
+                    <h2>Learning Progress</h2>
                     <h3 className="text-gray-400">
                         {flashcards.length} Total cards
                     </h3>
@@ -86,8 +88,8 @@ const FlashcardsPreview = ({
                             percentage: levelPercentages.easy,
                             class: "easyPercentage",
                         },
-                    ].map((level, i) => (
-                        <div key={i} className="space-y-3 text-xs">
+                    ].map((level) => (
+                        <div key={level.label} className="space-y-3 text-xs">
                             <p>
                                 {level.label} ({level.percentage}%)
                             </p>
@@ -100,37 +102,42 @@ const FlashcardsPreview = ({
                     ))}
                 </div>
             </div>
-            {/*  */}
             <div className="flex w-full flex-col justify-between gap-2 sm:flex-row">
                 <Button
                     onClick={() => setPracticeFlashcards(true)}
+                    disabled={!flashcards.length}
                     className="flex items-center gap-2 p-5"
                 >
                     Practice Flashcards <Play className="h-4 w-4 fill-white" />
                 </Button>
-                <Button
-                    onClick={() => setShowEditFlashcards(true)}
-                    variant="ghost"
-                    className="flex items-center gap-2 border p-5"
-                >
-                    {" "}
-                    Add Flashcard <Plus className="h-4 w-4" />
-                </Button>
+                {!isMultiSet && (
+                    <Button
+                        onClick={() => setShowEditFlashcards(true)}
+                        variant="ghost"
+                        className="flex items-center gap-2 border p-5"
+                    >
+                        Add Flashcard <Plus className="h-4 w-4" />
+                    </Button>
+                )}
             </div>
-            {/* Flashcards */}
+            {isMultiSet && (
+                <p className="text-sm text-gray-500">
+                    Editing is available when viewing an individual flashcard set.
+                </p>
+            )}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {flashcards.map((flashcard, index) => (
                     <Card
-                        key={index}
-                        // setShowEditFlashcards={setShowEditFlashcards}
+                        key={`${flashcard.front}-${flashcard.back}-${index}`}
                         flashcard={flashcard}
                         index={index}
                         setFlashcardToEdit={setFlashcardToEdit}
                         flashcardsInfo={flashcardsInfo}
+                        allowEditing={!isMultiSet}
                     />
                 ))}
             </div>
-            {(showEditFlashcards || flashcardToEdit) && (
+            {!isMultiSet && (showEditFlashcards || flashcardToEdit) && (
                 <EditFlashcards
                     setShowEditFlashcards={setShowEditFlashcards}
                     flashcardToEdit={flashcardToEdit}
