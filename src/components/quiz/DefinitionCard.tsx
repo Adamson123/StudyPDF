@@ -26,6 +26,7 @@ const DefinitionCard = ({
     setCurrentQuestion: React.Dispatch<React.SetStateAction<QuizTypes>>;
 }) => {
     const [response, setResponse] = useState(choosenAnswer);
+    const [showExpectedKeyPoints, setShowExpectedKeyPoints] = useState(false);
 
     useEffect(() => setResponse(choosenAnswer), [choosenAnswer]);
 
@@ -69,6 +70,26 @@ const DefinitionCard = ({
 
             <div className="w-full text-sm font-semibold leading-6">{question}</div>
 
+            {keywords.length > 0 && (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                        setShowExpectedKeyPoints((previous) => !previous)
+                    }
+                >
+                    {showExpectedKeyPoints ? "Hide" : "Show"} expected key
+                    points
+                </Button>
+            )}
+
+            {showExpectedKeyPoints && keywords.length > 0 && (
+                <div className="w-full rounded-md border border-gray-border bg-gray-400/10 p-3 text-sm">
+                    <strong>Expected key points: </strong>
+                    {keywords.join(", ")}
+                </div>
+            )}
+
             <textarea
                 value={response}
                 onChange={(event) => setResponse(event.target.value)}
@@ -87,15 +108,21 @@ const DefinitionCard = ({
                         <strong>Keyword score: </strong>
                         {matchedKeywords.length} / {keywords.length}
                     </div>
-                    <div>
-                        <strong>Matched: </strong>
-                        {matchedKeywords.length ? matchedKeywords.join(", ") : "None yet"}
-                    </div>
-                    {missingKeywords.length > 0 && (
-                        <div className="text-red-500">
-                            <strong>Missing: </strong>
-                            {missingKeywords.join(", ")}
-                        </div>
+                    {showExpectedKeyPoints && (
+                        <>
+                            <div>
+                                <strong>Matched: </strong>
+                                {matchedKeywords.length
+                                    ? matchedKeywords.join(", ")
+                                    : "None yet"}
+                            </div>
+                            {missingKeywords.length > 0 && (
+                                <div className="text-red-500">
+                                    <strong>Missing: </strong>
+                                    {missingKeywords.join(", ")}
+                                </div>
+                            )}
+                        </>
                     )}
                     <div>
                         <strong>Expected definition: </strong>
