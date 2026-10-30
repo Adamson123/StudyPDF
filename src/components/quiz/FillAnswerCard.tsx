@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { Stars } from "lucide-react";
 import React, { useEffect, useRef } from "react";
+import MarkdownExplanation from "./MarkdownExplanation";
 
 const FillAnswerCard = ({
     index,
@@ -142,9 +143,7 @@ const FillAnswerCard = ({
                 className={`flex w-full flex-col gap-2 ${choosenAnswer.length ? "" : "blur"}`}
             >
                 <div className="text-md underline">Explanation</div>
-                <div className="text-sm font-semibold text-gray-500">
-                    {explanation}
-                </div>
+                <MarkdownExplanation content={explanation} />
             </div>
         </div>
     );

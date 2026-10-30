@@ -1,6 +1,7 @@
 import ReduxProvider from "@/components/ReduxProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import "@/styles/globals.css";
+import "@/styles/markdown.css";
 
 //import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";

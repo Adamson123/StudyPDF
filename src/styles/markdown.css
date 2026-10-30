@@ -44,6 +44,7 @@ td {
 
 .markdown p {
   font-size: 13px;
+  white-space: pre-wrap;
 }
 
 .katex-html {
