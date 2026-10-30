@@ -3,6 +3,7 @@ import Popup from "../ui/Popup";
 import FillAnswerCard from "./FillAnswerCard";
 import MultiChoiceCard from "./MultiChoiceCard";
 import DefinitionCard from "./DefinitionCard";
+import MarkdownExplanation from "./MarkdownExplanation";
 
 const getAnswerText = (question: QuizTypes) => {
     if ((question as MultiChoiceQuestionTypes).type === "multiChoice") {
@@ -90,33 +91,35 @@ const QuestionsPreview = ({
                                     </div>
                                     <div>
                                         <strong>Expected key points: </strong>
-                                        {
-                                            (
-                                                question as DefinitionQuestionTypes
-                                            ).keywords.join(", ")
-                                        }
+                                        {(
+                                            question as DefinitionQuestionTypes
+                                        ).keywords.join(", ")}
                                     </div>
                                     <div>
                                         <strong>Description: </strong>
-                                        {
-                                            (
-                                                question as DefinitionQuestionTypes
-                                            ).explanation
-                                        }
+                                        <MarkdownExplanation
+                                            content={
+                                                (
+                                                    question as DefinitionQuestionTypes
+                                                ).explanation
+                                            }
+                                        />
                                     </div>
                                 </div>
                             ) : (
-                                <div className="max-w-[600px] flex flex-col gap-2 rounded-md border border-green-500/40 bg-green-500/10 p-3 text-sm">
-    <div>
-        <strong>Answer: </strong>
-        {getAnswerText(question)}
-    </div>
+                                <div className="flex max-w-[600px] flex-col gap-2 rounded-md border border-green-500/40 bg-green-500/10 p-3 text-sm">
+                                    <div>
+                                        <strong>Answer: </strong>
+                                        {getAnswerText(question)}
+                                    </div>
 
-    <div>
-        <strong>Description: </strong>
-        {question.explanation}
-    </div>
-</div>
+                                    <div>
+                                        <strong>Description: </strong>
+                                        <MarkdownExplanation
+                                            content={question.explanation}
+                                        />
+                                    </div>
+                                </div>
                             ))}
                     </div>
                 ))}
