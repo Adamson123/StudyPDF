@@ -1,4 +1,5 @@
 import { Stars } from "lucide-react";
+import MarkdownExplanation from "./MarkdownExplanation";
 
 const optionAlp = ["A", "B", "C", "D"];
 
@@ -79,7 +80,7 @@ const MultiChoiceCard = ({
         className={`flex w-full flex-col gap-2 ${choosenAnswer.length ? "" : "blur"}`}
       >
         <div className="text-md underline">Explanation</div>
-        <div className="text-sm font-semibold text-gray-500">{explanation}</div>
+        <MarkdownExplanation content={explanation} />
       </div>
     </div>
   );

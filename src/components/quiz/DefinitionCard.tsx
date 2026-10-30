@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Stars } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import MarkdownExplanation from "./MarkdownExplanation";
 
 const normalize = (value: string) =>
     value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
@@ -128,9 +129,9 @@ const DefinitionCard = ({
                         <strong>Expected definition: </strong>
                         {answer}
                     </div>
-                    <div className="text-gray-500">
+                    <div>
                         <strong>Explanation: </strong>
-                        {explanation}
+                        <MarkdownExplanation content={explanation} />
                     </div>
                 </div>
             )}
